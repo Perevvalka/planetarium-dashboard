@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>Стрики посещений — Планетарий</title>
+    <link rel="icon" type="image/png" href="images/favicon-inverted.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preload" href="fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+    <script>
+      (function () {
+        var theme = localStorage.getItem("ids-theme");
+        if (theme === "dark" || (!theme && matchMedia("(prefers-color-scheme: dark)").matches)) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="css/tokens/palette.css">
+    <link rel="stylesheet" href="css/tokens/colors.css">
+    <link rel="stylesheet" href="css/tokens/scales.css">
+    <link rel="stylesheet" href="css/settings.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/page-composition/layout.css">
+    <link rel="stylesheet" href="css/components/ids.css">
+    <link rel="stylesheet" href="css/components/theme-toggle.css">
+    <style>
+      .plviz-tip {
+        position: fixed;
+        z-index: 100;
+        pointer-events: none;
+        background: var(--ids__text);
+        color: var(--ids__background);
+        padding: 0.5em 0.7em;
+        border-radius: 0.4em;
+        font-size: 0.8em;
+        line-height: 1.45;
+        max-width: 20em;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+      }
+      .plviz-tip.visible {
+        opacity: 1;
+      }
+      .plviz-info {
+        min-height: 2.6em;
+        color: var(--ids__text-caption);
+        font-size: 0.9em;
+        margin-top: 1em;
+      }
+      .plviz-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5em 1.4em;
+        margin-top: 1em;
+      }
+      .plviz-legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45em;
+        font-size: 0.85em;
+        color: var(--ids__text-caption);
+      }
+      .plviz-legend-item.static {
+        cursor: default;
+      }
+      .plviz-legend-item i {
+        width: 1em;
+        height: 1em;
+        border-radius: 50%;
+        flex: none;
+      }
+      .plviz-streak-swatch.short {
+        border: 2px solid var(--ids__link);
+        background: var(--ids__background);
+        box-sizing: border-box;
+      }
+      .plviz-streak-swatch.mid {
+        background: var(--ids__link);
+      }
+      .plviz-streak-swatch.long {
+        background: var(--ids__accent);
+      }
+
+      .plviz-streak-chart {
+        position: relative;
+        max-width: 52em;
+        padding-top: 1.8em;
+      }
+      .plviz-streak-axis {
+        position: absolute;
+        inset: 0;
+        left: 11em;
+        right: 2.8em;
+        pointer-events: none;
+      }
+      .plviz-streak-vline {
+        position: absolute;
+        top: 1.8em;
+        bottom: 0;
+        width: 1px;
+        background: var(--ids__border);
+      }
+      .plviz-streak-month {
+        position: absolute;
+        top: 0;
+        transform: translateX(-50%);
+        font-size: 0.75em;
+        color: var(--ids__text-caption);
+      }
+      .plviz-streak-stat-h {
+        position: absolute;
+        top: 0.35em;
+        right: 0;
+        width: 2.8em;
+        font-size: 0.7em;
+        color: var(--ids__text-caption);
+        text-align: right;
+      }
+      .plviz-streak-row {
+        display: grid;
+        grid-template-columns: 11em 1fr 2.8em;
+        align-items: center;
+        padding: 0.28em 0;
+        border-radius: 0.3em;
+        cursor: pointer;
+        position: relative;
+      }
+      .plviz-streak-row:hover {
+        background: color-mix(in srgb, var(--ids__surface) 60%, transparent);
+      }
+      .plviz-streak-row.active {
+        background: var(--ids__surface);
+      }
+      .plviz-streak-name {
+        padding-right: 1em;
+        font-size: 0.85em;
+        color: var(--ids__text-caption);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .plviz-streak-row.active .plviz-streak-name,
+      .plviz-streak-row:hover .plviz-streak-name {
+        color: var(--ids__text);
+      }
+      .plviz-streak-track {
+        position: relative;
+        height: 1.35em;
+      }
+      .plviz-streak-line {
+        position: absolute;
+        top: 50%;
+        height: 3px;
+        margin-top: -1.5px;
+        border-radius: 2px;
+        pointer-events: auto;
+      }
+      .plviz-streak-line.short {
+        background: color-mix(in srgb, var(--ids__link) 45%, transparent);
+      }
+      .plviz-streak-line.mid {
+        background: color-mix(in srgb, var(--ids__link) 75%, transparent);
+        height: 4px;
+        margin-top: -2px;
+      }
+      .plviz-streak-line.long {
+        background: var(--ids__accent);
+        height: 4px;
+        margin-top: -2px;
+      }
+      .plviz-streak-dot {
+        position: absolute;
+        top: 50%;
+        width: 0.55em;
+        height: 0.55em;
+        box-sizing: border-box;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        z-index: 1;
+      }
+      .plviz-streak-dot.short {
+        border: 2px solid var(--ids__link);
+        background: var(--ids__background);
+      }
+      .plviz-streak-dot.mid {
+        background: var(--ids__link);
+        border: none;
+      }
+      .plviz-streak-dot.long {
+        background: var(--ids__accent);
+        border: none;
+        width: 0.65em;
+        height: 0.65em;
+      }
+      .plviz-streak-stat {
+        font-size: 0.8em;
+        color: var(--ids__text-caption);
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .plviz-streak-row.active .plviz-streak-stat {
+        color: var(--ids__text);
+      }
+
+      @media (width < 768px) {
+        .plviz-streak-axis {
+          left: 7em;
+          right: 2.2em;
+        }
+        .plviz-streak-row {
+          grid-template-columns: 7em 1fr 2.2em;
+        }
+        .plviz-streak-stat-h {
+          width: 2.2em;
+        }
+        .plviz-streak-name {
+          font-size: 0.7em;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="ids">
+    <header>
+      <button class="ids__theme-toggle" role="switch" aria-checked="false" aria-label="Тёмная тема">
+        <span class="ids__theme-toggle__track"><span class="ids__theme-toggle__thumb"></span></span>
+      </button>
+    </header>
+
+    <main>
+      <div class="ids__wrapper">
+        <div class="section">
+          <div class="ids__space XL"></div>
+          <div class="ids__text-width">
+            <h1>Стрики посещений</h1>
+            <p>
+              Кто приходил на встречи Планетария подряд. Строка — человек, точка — визит, линия между точками —
+              непрерывность. Справа — самый длинный стрик.
+            </p>
+            <aside>
+              <p>
+                <b>Горизонталь</b> — встречи по порядку (окт 2025 — июл 2026). <b>Вертикаль</b> — люди, сортировка по
+                длине стрика. <b>Визуальный атом</b> — точка-визит; цвет и толщина линии — длина непрерывности.
+              </p>
+              <p>Данные: 26 встреч, списки присутствующих. «Кристина Мареченко» сведена с «Кристина Марченко».</p>
+            </aside>
+          </div>
+          <div class="ids__space S"></div>
+          <div class="plviz-scroll">
+            <div id="plviz-streak"></div>
+          </div>
+        </div>
+
+        <div class="ids__space XL"></div>
+      </div>
+    </main>
+
+    <script src="./js/theme-toggle.js"></script>
+    <script src="./js/attendance.js"></script>
+  </body>
+</html>
