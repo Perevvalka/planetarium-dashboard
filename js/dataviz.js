@@ -159,9 +159,21 @@
   // ---------------------------------------------------------------
 
   const FORMATS = {
-    1: { label: "просто рассказывает", short: "рассказ", color: "var(--ids__code)" },
-    2: { label: "демонстрирует экран или камеру", short: "экран", color: "var(--ids__link)" },
-    3: { label: "презентация со слайдами", short: "слайды", color: "var(--ids__mark)" },
+    1: {
+      label: "просто рассказывает",
+      short: "рассказ",
+      color: "color-mix(in srgb, var(--ids__success) 28%, var(--ids__background))",
+    },
+    2: {
+      label: "демонстрирует экран или камеру",
+      short: "экран",
+      color: "color-mix(in srgb, var(--ids__success) 52%, var(--ids__background))",
+    },
+    3: {
+      label: "презентация со слайдами",
+      short: "слайды",
+      color: "color-mix(in srgb, var(--ids__success) 78%, var(--ids__background))",
+    },
     4: { label: "опубликованный продукт", short: "продукт", color: "var(--ids__success)" },
   };
 
@@ -315,7 +327,7 @@
 
     let seenMonth = 0;
     const cols = DB.meetings
-      .map((m) => {
+      .map((m, idx) => {
         const demos = DB.demos.filter((d) => d.meeting === m.date);
         const squares = demos
           .map((d) => {
@@ -324,10 +336,12 @@
           })
           .join("");
         const mo = monthOf(m.date);
-        const label = mo !== seenMonth ? MONTHS[mo - 1].slice(0, 3) : "";
+        const monthStart = mo !== seenMonth;
+        const label = monthStart ? MONTHS[mo - 1].slice(0, 3) : "";
         seenMonth = mo;
+        const monthClass = monthStart && idx > 0 ? " plviz2-col--month" : "";
         return (
-          `<div class="plviz2-col" data-tip="Встреча ${fmtDate(m.date)} · ${m.minutes} мин · ${demos.length} демо">` +
+          `<div class="plviz2-col${monthClass}" data-tip="Встреча ${fmtDate(m.date)} · ${m.minutes} мин · ${demos.length} демо">` +
           `<div class="plviz2-stack">${squares}</div>` +
           `<div class="plviz2-label">${label}</div>` +
           `</div>`
@@ -335,6 +349,7 @@
       })
       .join("");
 
+    const legendEl = document.getElementById("plviz2-legend");
     const legend = [1, 2, 3, 4]
       .map(
         (f) =>
@@ -343,15 +358,15 @@
       )
       .join("");
 
-    el.innerHTML =
-      `<div class="plviz-scroll"><div class="plviz2-chart">${cols}</div></div>` +
-      `<div class="plviz-legend">${legend}</div>`;
+    if (legendEl) legendEl.innerHTML = legend;
+    el.innerHTML = `<div class="plviz-scroll"><div class="plviz2-chart">${cols}</div></div>`;
 
     let active = null;
-    el.querySelectorAll(".plviz-legend-item").forEach((btn) => {
+    const legendRoot = legendEl || el;
+    legendRoot.querySelectorAll(".plviz-legend-item").forEach((btn) => {
       btn.addEventListener("click", () => {
         active = active === btn.dataset.format ? null : btn.dataset.format;
-        el.querySelectorAll(".plviz-legend-item").forEach((x) =>
+        legendRoot.querySelectorAll(".plviz-legend-item").forEach((x) =>
           x.classList.toggle("off", active !== null && x.dataset.format !== active)
         );
         el.querySelectorAll(".plviz2-sq").forEach((sq) =>

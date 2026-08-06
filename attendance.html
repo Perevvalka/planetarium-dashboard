@@ -33,12 +33,19 @@
         border-radius: 0.4em;
         font-size: 0.8em;
         line-height: 1.45;
-        max-width: 20em;
+        max-width: 22em;
         opacity: 0;
         transition: opacity 0.15s ease;
       }
       .plviz-tip.visible {
         opacity: 1;
+      }
+      .plviz-tip.pinned {
+        pointer-events: auto;
+      }
+      .plviz-tip a {
+        color: inherit;
+        text-decoration: underline;
       }
       .plviz-info {
         min-height: 2.6em;
@@ -68,29 +75,48 @@
         border-radius: 50%;
         flex: none;
       }
-      .plviz-streak-swatch.short {
+      .plviz-streak-swatch.s1 {
         border: 2px solid var(--ids__link);
         background: var(--ids__background);
         box-sizing: border-box;
       }
-      .plviz-streak-swatch.mid {
+      .plviz-streak-swatch.s2 {
+        background: color-mix(in srgb, var(--ids__link) 28%, var(--ids__background));
+      }
+      .plviz-streak-swatch.s3 {
+        background: color-mix(in srgb, var(--ids__link) 50%, var(--ids__background));
+      }
+      .plviz-streak-swatch.s4 {
+        background: color-mix(in srgb, var(--ids__link) 75%, var(--ids__background));
+      }
+      .plviz-streak-swatch.s5 {
         background: var(--ids__link);
       }
-      .plviz-streak-swatch.long {
-        background: var(--ids__accent);
+      .plviz-streak-swatch.demo {
+        background: #7c5cbf;
       }
 
       .plviz-streak-chart {
         position: relative;
         max-width: 52em;
         padding-top: 1.8em;
+        isolation: isolate;
       }
       .plviz-streak-axis {
         position: absolute;
         inset: 0;
-        left: 11em;
-        right: 2.8em;
+        left: calc(11em + 0.35em);
+        right: calc(2.8em + 0.35em);
         pointer-events: none;
+        z-index: 1;
+      }
+      .plviz-streak-band {
+        position: absolute;
+        top: 1.8em;
+        bottom: 0;
+        transform: translateX(-50%);
+        background: color-mix(in srgb, #7c5cbf 16%, transparent);
+        border-radius: 0.15em;
       }
       .plviz-streak-vline {
         position: absolute;
@@ -109,26 +135,45 @@
       .plviz-streak-stat-h {
         position: absolute;
         top: 0.35em;
-        right: 0;
+        right: 0.35em;
         width: 2.8em;
         font-size: 0.7em;
         color: var(--ids__text-caption);
         text-align: right;
+        z-index: 2;
       }
       .plviz-streak-row {
         display: grid;
         grid-template-columns: 11em 1fr 2.8em;
         align-items: center;
-        padding: 0.28em 0;
+        padding: 0.35em;
         border-radius: 0.3em;
         cursor: pointer;
         position: relative;
+        background: transparent;
       }
-      .plviz-streak-row:hover {
+      .plviz-streak-row::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 0.3em;
         background: color-mix(in srgb, var(--ids__surface) 60%, transparent);
+        opacity: 0;
+        z-index: -1;
+        pointer-events: none;
       }
-      .plviz-streak-row.active {
+      .plviz-streak-row:hover::before,
+      .plviz-streak-row.active::before {
+        opacity: 1;
+      }
+      .plviz-streak-row.active::before {
         background: var(--ids__surface);
+      }
+      .plviz-streak-name,
+      .plviz-streak-track,
+      .plviz-streak-stat {
+        position: relative;
+        z-index: 2;
       }
       .plviz-streak-name {
         padding-right: 1em;
@@ -154,16 +199,19 @@
         border-radius: 2px;
         pointer-events: auto;
       }
-      .plviz-streak-line.short {
-        background: color-mix(in srgb, var(--ids__link) 45%, transparent);
+      .plviz-streak-line.s2 {
+        background: color-mix(in srgb, var(--ids__link) 28%, transparent);
       }
-      .plviz-streak-line.mid {
+      .plviz-streak-line.s3 {
+        background: color-mix(in srgb, var(--ids__link) 50%, transparent);
+      }
+      .plviz-streak-line.s4 {
         background: color-mix(in srgb, var(--ids__link) 75%, transparent);
-        height: 4px;
-        margin-top: -2px;
+        height: 3.5px;
+        margin-top: -1.75px;
       }
-      .plviz-streak-line.long {
-        background: var(--ids__accent);
+      .plviz-streak-line.s5 {
+        background: var(--ids__link);
         height: 4px;
         margin-top: -2px;
       }
@@ -177,19 +225,31 @@
         border-radius: 50%;
         z-index: 1;
       }
-      .plviz-streak-dot.short {
+      .plviz-streak-dot.s1 {
         border: 2px solid var(--ids__link);
         background: var(--ids__background);
       }
-      .plviz-streak-dot.mid {
+      .plviz-streak-dot.s2 {
+        background: color-mix(in srgb, var(--ids__link) 28%, var(--ids__background));
+        border: none;
+      }
+      .plviz-streak-dot.s3 {
+        background: color-mix(in srgb, var(--ids__link) 50%, var(--ids__background));
+        border: none;
+      }
+      .plviz-streak-dot.s4 {
+        background: color-mix(in srgb, var(--ids__link) 75%, var(--ids__background));
+        border: none;
+      }
+      .plviz-streak-dot.s5 {
         background: var(--ids__link);
         border: none;
       }
-      .plviz-streak-dot.long {
-        background: var(--ids__accent);
-        border: none;
-        width: 0.65em;
-        height: 0.65em;
+      .plviz-streak-dot.plviz-streak-demo {
+        background: #7c5cbf;
+        border: 1.5px solid var(--ids__background);
+        box-shadow: 0 0 0 1.5px #7c5cbf;
+        cursor: pointer;
       }
       .plviz-streak-stat {
         font-size: 0.8em;
@@ -203,8 +263,8 @@
 
       @media (width < 768px) {
         .plviz-streak-axis {
-          left: 7em;
-          right: 2.2em;
+          left: calc(7em + 0.35em);
+          right: calc(2.2em + 0.35em);
         }
         .plviz-streak-row {
           grid-template-columns: 7em 1fr 2.2em;
@@ -216,6 +276,7 @@
           font-size: 0.7em;
         }
       }
+
     </style>
   </head>
 
@@ -233,16 +294,8 @@
           <div class="ids__text-width">
             <h1>Стрики посещений</h1>
             <p>
-              Кто приходил на встречи Планетария подряд. Строка — человек, точка — визит, линия между точками —
-              непрерывность. Справа — самый длинный стрик.
+              Кто приходил на встречи Планетария и что показывал.
             </p>
-            <aside>
-              <p>
-                <b>Горизонталь</b> — встречи по порядку (окт 2025 — июл 2026). <b>Вертикаль</b> — люди, сортировка по
-                длине стрика. <b>Визуальный атом</b> — точка-визит; цвет и толщина линии — длина непрерывности.
-              </p>
-              <p>Данные: 26 встреч, списки присутствующих. «Кристина Мареченко» сведена с «Кристина Марченко».</p>
-            </aside>
           </div>
           <div class="ids__space S"></div>
           <div class="plviz-scroll">
