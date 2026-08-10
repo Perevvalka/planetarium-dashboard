@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>База данных — Планетарий</title>
+    <link rel="icon" type="image/png" href="images/favicon-inverted.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preload" href="fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+    <script>
+      (function () {
+        var theme = localStorage.getItem("ids-theme");
+        if (theme === "dark" || (!theme && matchMedia("(prefers-color-scheme: dark)").matches)) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="css/tokens/palette.css">
+    <link rel="stylesheet" href="css/tokens/colors.css">
+    <link rel="stylesheet" href="css/tokens/scales.css">
+    <link rel="stylesheet" href="css/settings.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/page-composition/layout.css">
+    <link rel="stylesheet" href="css/components/ids.css">
+    <link rel="stylesheet" href="css/components/theme-toggle.css">
+    <style>
+      .pdb-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35em 1.2em;
+        margin: 1.5em 0 2em;
+        border-bottom: 1px solid var(--ids__border);
+        padding-bottom: 0.75em;
+      }
+      .pdb-tabs button {
+        appearance: none;
+        background: none;
+        border: none;
+        padding: 0;
+        font: inherit;
+        color: var(--ids__text-caption);
+        cursor: pointer;
+      }
+      .pdb-tabs button[aria-selected="true"] {
+        color: var(--ids__text);
+      }
+      .pdb-panel[hidden] {
+        display: none;
+      }
+      .pdb-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75em 1em;
+        align-items: center;
+        margin-bottom: 1.25em;
+      }
+      .pdb-toolbar .pdb-status {
+        color: var(--ids__text-caption);
+        font-size: 0.9em;
+      }
+      .pdb-form {
+        display: grid;
+        gap: 0.9em;
+        margin-bottom: 2em;
+        max-width: 36em;
+      }
+      .pdb-form label {
+        display: grid;
+        gap: 0.35em;
+        font-size: 0.9em;
+      }
+      .pdb-form label > span {
+        color: var(--ids__text-caption);
+      }
+      .pdb-form input,
+      .pdb-form select,
+      .pdb-form textarea {
+        font: inherit;
+        color: var(--ids__text);
+        background: var(--ids__background);
+        border: 1px solid var(--ids__border);
+        border-radius: 0.35em;
+        padding: 0.45em 0.6em;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .pdb-form textarea {
+        min-height: 4.5em;
+        resize: vertical;
+      }
+      .pdb-form .pdb-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75em;
+      }
+      @media (width < 560px) {
+        .pdb-form .pdb-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .pdb-person-picker,
+      .pdb-entity-pick {
+        display: grid;
+        gap: 0.5em;
+      }
+      .pdb-person-picker .pdb-search,
+      .pdb-entity-pick .pdb-search {
+        font: inherit;
+        color: var(--ids__text);
+        background: var(--ids__background);
+        border: 1px solid var(--ids__border);
+        border-radius: 0.35em;
+        padding: 0.45em 0.6em;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .pdb-checks,
+      .pdb-list.pdb-scroll {
+        display: grid;
+        gap: 0.35em;
+        max-height: 14em;
+        overflow: auto;
+        padding: 0.5em 0.6em;
+        border: 1px solid var(--ids__border);
+        border-radius: 0.35em;
+      }
+      .pdb-checks label {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        font-size: 0.9em;
+      }
+      .pdb-checks label[hidden],
+      .pdb-list li[hidden] {
+        display: none;
+      }
+      .pdb-checks input {
+        width: auto;
+      }
+      .pdb-radios {
+        display: grid;
+        gap: 0.45em;
+      }
+      .pdb-radios label {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        font-size: 0.95em;
+      }
+      .pdb-radios input {
+        width: auto;
+      }
+      .pdb-form-caption {
+        color: var(--ids__text-caption);
+        font-size: 0.9em;
+        margin: 0 0 0.25em;
+      }
+      .pdb-url-needed input[name="url"] {
+        outline: 2px solid var(--ids__link);
+        outline-offset: 2px;
+      }
+      .pdb-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6em;
+      }
+      .pdb-actions button,
+      .pdb-toolbar button {
+        appearance: none;
+        font: inherit;
+        font-size: 0.9em;
+        padding: 0.45em 0.9em;
+        border-radius: 0.35em;
+        border: 1px solid var(--ids__border);
+        background: var(--ids__surface);
+        color: var(--ids__text);
+        cursor: pointer;
+      }
+      .pdb-actions button.primary,
+      .pdb-toolbar button.primary {
+        background: var(--ids__text);
+        color: var(--ids__background);
+        border-color: var(--ids__text);
+      }
+      .pdb-actions button.danger {
+        color: var(--ids__text);
+        border-color: color-mix(in srgb, var(--ids__text) 35%, var(--ids__border));
+      }
+      .pdb-list {
+        display: grid;
+        gap: 0.35em;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .pdb-list li {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.75em;
+        align-items: baseline;
+        padding: 0.55em 0.15em;
+        border-bottom: 1px solid var(--ids__border);
+        cursor: pointer;
+      }
+      .pdb-list li:hover,
+      .pdb-list li.active {
+        background: color-mix(in srgb, var(--ids__surface) 70%, transparent);
+      }
+      .pdb-list .meta {
+        color: var(--ids__text-caption);
+        font-size: 0.85em;
+        white-space: nowrap;
+      }
+      .pdb-empty {
+        color: var(--ids__text-caption);
+        font-size: 0.9em;
+      }
+      .pdb-export pre {
+        font-size: 0.75em;
+        line-height: 1.4;
+        max-height: 22em;
+        overflow: auto;
+        padding: 1em;
+        border: 1px solid var(--ids__border);
+        border-radius: 0.35em;
+        background: var(--ids__surface);
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+    </style>
+  </head>
+
+  <body class="ids">
+    <header>
+      <button class="ids__theme-toggle" role="switch" aria-checked="false" aria-label="Тёмная тема">
+        <span class="ids__theme-toggle__track"><span class="ids__theme-toggle__thumb"></span></span>
+      </button>
+    </header>
+
+    <main>
+      <div class="ids__wrapper">
+        <div class="section">
+          <div class="ids__space XL"></div>
+          <div class="ids__text-width">
+            <h1>База данных</h1>
+            <p>
+              Ввод данных встреч Планетария. Черновик сохраняется в браузере;
+              чтобы попасть в репозиторий — скачай <code>db.js</code> и замени файл в проекте.
+            </p>
+
+            <div class="pdb-toolbar">
+              <button type="button" class="primary" id="pdb-save-draft">Сохранить черновик</button>
+              <button type="button" id="pdb-download">Скачать db.js</button>
+              <button type="button" id="pdb-copy">Скопировать db.js</button>
+              <button type="button" id="pdb-reset">Сбросить к файлу</button>
+              <span class="pdb-status" id="pdb-status"></span>
+            </div>
+
+            <nav class="pdb-tabs" role="tablist" aria-label="Сущности">
+              <button type="button" role="tab" aria-selected="true" data-tab="persons">Персоны</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="projects">Проекты</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="meetings">Встречи</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="attendance">Присутствие</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="demos">Демо</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="export">Экспорт</button>
+            </nav>
+
+            <div class="pdb-panel" data-panel="persons">
+              <form class="pdb-form" id="form-person">
+                <input type="hidden" name="id" value="">
+                <label><span>Имя *</span><input name="name" required autocomplete="name"></label>
+                <div class="pdb-row">
+                  <label><span>Telegram</span><input name="telegram" placeholder="@username"></label>
+                  <label><span>Фото (URL)</span><input name="photo" type="url" placeholder="https://"></label>
+                </div>
+                <label><span>Заметка</span><textarea name="note"></textarea></label>
+                <div class="pdb-actions">
+                  <button type="submit" class="primary">Сохранить персону</button>
+                  <button type="button" data-clear="person">Новая</button>
+                  <button type="button" class="danger" data-delete="person">Удалить</button>
+                </div>
+              </form>
+              <ul class="pdb-list" id="list-persons"></ul>
+            </div>
+
+            <div class="pdb-panel" data-panel="projects" hidden>
+              <div class="pdb-entity-pick" style="margin-bottom: 1.5em; max-width: 36em">
+                <p class="pdb-form-caption">Найти и открыть проект — или создай новый</p>
+                <input type="search" class="pdb-search" id="project-list-search" placeholder="Поиск по названию…" autocomplete="off" aria-label="Поиск проектов">
+                <ul class="pdb-list pdb-scroll" id="list-projects"></ul>
+                <div class="pdb-actions">
+                  <button type="button" data-clear="project">Новый проект</button>
+                </div>
+              </div>
+              <form class="pdb-form" id="form-project">
+                <input type="hidden" name="id" value="">
+                <p class="pdb-form-caption" id="project-form-mode">Новый проект</p>
+                <label><span>Название *</span><input name="title" required></label>
+                <label><span>Ссылка</span><input name="url" type="url" placeholder="https://"></label>
+                <label>
+                  <span>Авторы *</span>
+                  <div class="pdb-person-picker">
+                    <input type="search" class="pdb-search" placeholder="Поиск по имени…" autocomplete="off" aria-label="Поиск авторов">
+                    <div class="pdb-checks" id="project-authors"></div>
+                  </div>
+                </label>
+                <label><span>Заметка</span><textarea name="note"></textarea></label>
+                <div class="pdb-actions">
+                  <button type="submit" class="primary">Сохранить проект</button>
+                  <button type="button" class="danger" data-delete="project">Удалить</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="pdb-panel" data-panel="meetings" hidden>
+              <form class="pdb-form" id="form-meeting">
+                <input type="hidden" name="origDate" value="">
+                <div class="pdb-row">
+                  <label><span>Дата *</span><input name="date" type="date" required></label>
+                  <label>
+                    <span>Тип *</span>
+                    <select name="type" required>
+                      <option value="weekly">Еженедельная встреча</option>
+                      <option value="stream">Демо-эфир</option>
+                    </select>
+                  </label>
+                </div>
+                <label><span>Длительность (минуты)</span><input name="minutes" type="number" min="1" step="1"></label>
+                <label><span>Заметка</span><textarea name="note"></textarea></label>
+                <div class="pdb-actions">
+                  <button type="submit" class="primary">Сохранить встречу</button>
+                  <button type="button" data-clear="meeting">Новая</button>
+                  <button type="button" class="danger" data-delete="meeting">Удалить</button>
+                </div>
+              </form>
+              <ul class="pdb-list" id="list-meetings"></ul>
+            </div>
+
+            <div class="pdb-panel" data-panel="attendance" hidden>
+              <form class="pdb-form" id="form-attendance">
+                <label>
+                  <span>Встреча *</span>
+                  <select name="meeting" required id="attendance-meeting"></select>
+                </label>
+                <label>
+                  <span>Кто был</span>
+                  <div class="pdb-person-picker">
+                    <input type="search" class="pdb-search" placeholder="Поиск по имени…" autocomplete="off" aria-label="Поиск присутствующих">
+                    <div class="pdb-checks" id="attendance-people"></div>
+                  </div>
+                </label>
+                <div class="pdb-actions">
+                  <button type="submit" class="primary">Сохранить присутствие</button>
+                </div>
+              </form>
+              <p class="pdb-empty" id="attendance-summary"></p>
+            </div>
+
+            <div class="pdb-panel" data-panel="demos" hidden>
+              <form class="pdb-form" id="form-demo">
+                <input type="hidden" name="id" value="">
+                <label>
+                  <span>Встреча / эфир *</span>
+                  <select name="meeting" required id="demo-meeting"></select>
+                </label>
+                <div>
+                  <span class="pdb-form-caption">Проект *</span>
+                  <div class="pdb-person-picker">
+                    <input type="search" class="pdb-search" id="demo-project-search" placeholder="Поиск проекта…" autocomplete="off" aria-label="Поиск проекта">
+                    <div class="pdb-checks" id="demo-project"></div>
+                  </div>
+                </div>
+                <label>
+                  <span>Показывающие *</span>
+                  <div class="pdb-person-picker">
+                    <input type="search" class="pdb-search" placeholder="Поиск по имени…" autocomplete="off" aria-label="Поиск показывающих">
+                    <div class="pdb-checks" id="demo-presenters"></div>
+                  </div>
+                </label>
+                <div id="demo-format-block">
+                  <span class="pdb-form-caption">Формат</span>
+                  <div class="pdb-radios" id="demo-format">
+                    <label><input type="radio" name="format" value="1"> просто рассказывает</label>
+                    <label><input type="radio" name="format" value="2"> экран</label>
+                    <label><input type="radio" name="format" value="3"> слайды</label>
+                  </div>
+                  <p class="pdb-empty" id="demo-format-auto" hidden>У проекта есть ссылка — формат автоматически «4 · опубликованный продукт».</p>
+                </div>
+                <label><span>Длительность (мин)</span><input name="minutes" type="number" min="1" step="1"></label>
+                <label>
+                  <span>Фидбэк</span>
+                  <div class="pdb-person-picker">
+                    <input type="search" class="pdb-search" placeholder="Поиск по имени…" autocomplete="off" aria-label="Поиск кто дал фидбэк">
+                    <div class="pdb-checks" id="demo-feedback"></div>
+                  </div>
+                  <span class="pdb-empty" style="margin-top:0.35em">Кто дал фидбэк на это демо — просто факт, без текста.</span>
+                </label>
+                <label><span>Заметка</span><textarea name="note"></textarea></label>
+                <div class="pdb-actions">
+                  <button type="submit" class="primary">Сохранить демо</button>
+                  <button type="button" data-clear="demo">Новое</button>
+                  <button type="button" class="danger" data-delete="demo">Удалить</button>
+                </div>
+              </form>
+              <ul class="pdb-list" id="list-demos"></ul>
+            </div>
+
+            <div class="pdb-panel pdb-export" data-panel="export" hidden>
+              <p>
+                Ниже — содержимое файла <code>js/db.js</code>. Скачай его и положи в проект
+                (или скопируй). После этого визуализации подхватят новые данные.
+              </p>
+              <div class="pdb-actions" style="margin: 1em 0">
+                <button type="button" class="primary" id="pdb-download-2">Скачать db.js</button>
+                <button type="button" id="pdb-copy-2">Скопировать</button>
+              </div>
+              <pre id="pdb-preview"></pre>
+            </div>
+          </div>
+          <div class="ids__space XL"></div>
+        </div>
+      </div>
+    </main>
+
+    <script src="./js/theme-toggle.js"></script>
+    <script src="./js/db.js"></script>
+    <script src="./js/admin.js"></script>
+  </body>
+</html>
