@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>Чек-листы — Планетарий</title>
+    <link rel="icon" type="image/png" href="images/favicon-inverted.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preload" href="fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+    <script>
+      (function () {
+        var theme = localStorage.getItem("ids-theme");
+        if (theme === "dark" || (!theme && matchMedia("(prefers-color-scheme: dark)").matches)) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="css/tokens/palette.css">
+    <link rel="stylesheet" href="css/tokens/colors.css">
+    <link rel="stylesheet" href="css/tokens/scales.css">
+    <link rel="stylesheet" href="css/settings.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/page-composition/layout.css">
+    <link rel="stylesheet" href="css/components/ids.css">
+    <link rel="stylesheet" href="css/components/theme-toggle.css">
+    <style>
+      .ops-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75em 1em;
+        align-items: center;
+        margin: 1.25em 0 1.75em;
+      }
+      .ops-toolbar .ops-meta {
+        color: var(--ids__text-caption);
+        font-size: 0.9em;
+        flex: 1 1 12em;
+      }
+      .ops-toolbar button {
+        appearance: none;
+        font: inherit;
+        font-size: 0.9em;
+        padding: 0.45em 0.9em;
+        border-radius: 0.35em;
+        border: 1px solid var(--ids__border);
+        background: var(--ids__surface);
+        color: var(--ids__text);
+        cursor: pointer;
+      }
+      .ops-toolbar button.danger {
+        color: var(--ids__text);
+        border-color: color-mix(in srgb, var(--ids__text) 35%, var(--ids__border));
+      }
+      .ops-week {
+        display: grid;
+        gap: 0.35em;
+        margin-bottom: 1.75em;
+      }
+      .ops-week-row {
+        display: grid;
+        grid-template-columns: 4.5em 1fr auto;
+        gap: 0.75em;
+        align-items: baseline;
+        width: 100%;
+        padding: 0.55em 0.6em;
+        border-radius: 0.35em;
+        border: 1px solid transparent;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+      .ops-week-row:hover {
+        background: color-mix(in srgb, var(--ids__surface) 55%, transparent);
+      }
+      .ops-week-row.selected {
+        border-color: var(--ids__text);
+        background: var(--ids__surface);
+      }
+      .ops-week-row.selected:hover {
+        background: var(--ids__surface);
+      }
+      @media (width < 560px) {
+        .ops-week-row {
+          grid-template-columns: 3.2em 1fr;
+        }
+        .ops-week-row .ops-week-when {
+          grid-column: 2;
+          grid-row: 2;
+        }
+      }
+      .ops-week-day {
+        font-variant-numeric: tabular-nums;
+      }
+      .ops-week-text {
+        min-width: 0;
+      }
+      .ops-week-count {
+        color: var(--ids__text-caption);
+        font-size: 0.85em;
+        margin-left: 0.45em;
+      }
+      .ops-week-when {
+        color: var(--ids__text-caption);
+        font-size: 0.85em;
+        white-space: nowrap;
+      }
+      .ops-detail {
+        border-top: 1px solid var(--ids__border);
+        padding-top: 1.5em;
+      }
+      .ops-detail-title {
+        margin: 0 0 0.75em;
+        font-size: 1.15em;
+      }
+      .ops-task {
+        margin: 0 0 1.75em;
+      }
+      .ops-task-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35em 1em;
+        align-items: baseline;
+        margin: 0 0 0.65em;
+      }
+      .ops-task-head h3 {
+        margin: 0;
+        font-size: 1.05em;
+      }
+      .ops-task-meta {
+        color: var(--ids__text-caption);
+        font-size: 0.85em;
+      }
+      .ops-list {
+        display: grid;
+        gap: 0.35em;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .ops-list label {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.65em;
+        align-items: start;
+        padding: 0.45em 0.5em;
+        border-radius: 0.35em;
+        cursor: pointer;
+      }
+      .ops-list label:hover {
+        background: color-mix(in srgb, var(--ids__surface) 60%, transparent);
+      }
+      .ops-list input {
+        margin-top: 0.2em;
+      }
+      .ops-list label.done span {
+        color: var(--ids__text-caption);
+        text-decoration: line-through;
+        text-decoration-thickness: 1px;
+      }
+      .ops-done-banner {
+        margin: 0 0 1.25em;
+        padding: 0.65em 0.8em;
+        border-radius: 0.35em;
+        border: 1px solid var(--ids__border);
+        background: var(--ids__surface);
+        font-size: 0.95em;
+      }
+      .ops-done-banner[hidden] {
+        display: none;
+      }
+      .ops-links {
+        margin-top: 2em;
+        font-size: 0.9em;
+        color: var(--ids__text-caption);
+      }
+    </style>
+  </head>
+
+  <body class="ids">
+    <header>
+      <button class="ids__theme-toggle" role="switch" aria-checked="false" aria-label="Тёмная тема">
+        <span class="ids__theme-toggle__track"><span class="ids__theme-toggle__thumb"></span></span>
+      </button>
+    </header>
+
+    <main>
+      <div class="ids__wrapper">
+        <div class="section">
+          <div class="ids__space XL"></div>
+          <div class="ids__text-width">
+            <h1>Чек-листы админа</h1>
+            <p>
+              Выбери день — внизу задачи и шаги.
+              Галочки хранятся только в твоём браузере (по ссылке другим не видны),
+              до сброса или до новой недели.
+            </p>
+
+            <div class="ops-toolbar">
+              <span class="ops-meta" id="ops-week-label"></span>
+              <button type="button" class="danger" id="ops-reset">Сбросить неделю</button>
+            </div>
+
+            <div class="ops-week" id="ops-week" role="listbox" aria-label="Календарь недели"></div>
+
+            <div class="ops-detail" id="ops-detail"></div>
+
+            <p class="ops-links">
+              <a href="admin.html">База данных</a>
+              ·
+              <a href="docs/admin/README.md">Текстовые версии в docs/admin</a>
+            </p>
+          </div>
+          <div class="ids__space XL"></div>
+        </div>
+      </div>
+    </main>
+
+    <script src="./js/theme-toggle.js"></script>
+    <script src="./js/ops.js"></script>
+  </body>
+</html>
