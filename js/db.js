@@ -413,6 +413,13 @@
       "telegram": null,
       "photo": null,
       "note": null
+    },
+    {
+      "id": "andrey",
+      "name": "Андрей",
+      "telegram": null,
+      "photo": null,
+      "note": null
     }
   ],
   "projects": [
@@ -499,7 +506,7 @@
     },
     {
       "id": "svoy-sayt",
-      "title": "Свой сайт",
+      "title": "Сайт Виктора Тимофеева",
       "url": null,
       "authors": [
         "viktor-timofeev"
@@ -640,6 +647,51 @@
         "anastasiya-fomina"
       ],
       "note": null
+    },
+    {
+      "id": "scurrynslide-biblioteka-dlya-drag-and-drop",
+      "title": "Scurry’n’slide — библиотека для drag-and-drop",
+      "url": "https://myshkin.eu/scurry-n-slide",
+      "authors": [
+        "kirill-myshkin"
+      ],
+      "note": null
+    },
+    {
+      "id": "igra-shpion-sredi-nas",
+      "title": "Игра «Шпион среди нас»",
+      "url": "https://apps.apple.com/kz/app/spy-party-game/id6787716143",
+      "authors": [
+        "marat-habibulin"
+      ],
+      "note": null
+    },
+    {
+      "id": "polina-hochet-uchitsya-vo-frantsii",
+      "title": "Полина хочет учиться во Франции",
+      "url": "https://t.me/+XuBW-Kc0t4wzYTYy",
+      "authors": [
+        "polina-perevalova"
+      ],
+      "note": null
+    },
+    {
+      "id": "sayt-kristiny-marchenko",
+      "title": "Сайт Кристины Марченко",
+      "url": null,
+      "authors": [
+        "kristina-marchenko"
+      ],
+      "note": null
+    },
+    {
+      "id": "taymer-dlya-chasov",
+      "title": "Таймер для часов",
+      "url": null,
+      "authors": [
+        "andrey"
+      ],
+      "note": "Надо узнать название"
     }
   ],
   "meetings": [
@@ -839,6 +891,12 @@
       "date": "2026-07-03",
       "type": "weekly",
       "minutes": null,
+      "note": null
+    },
+    {
+      "date": "2026-08-13",
+      "type": "weekly",
+      "minutes": 50,
       "note": null
     }
   ],
@@ -2054,6 +2112,54 @@
     {
       "meeting": "2026-07-03",
       "person": "polina-perevalova"
+    },
+    {
+      "meeting": "2026-08-13",
+      "person": "andrey"
+    },
+    {
+      "meeting": "2026-08-13",
+      "person": "danya-samoylenko"
+    },
+    {
+      "meeting": "2026-08-13",
+      "person": "dmitriy-sivuhin"
+    },
+    {
+      "meeting": "2026-08-13",
+      "person": "evgeniy-smirnov"
+    },
+    {
+      "meeting": "2026-08-13",
+      "person": "kirill-myshkin"
+    },
+    {
+      "meeting": "2026-08-13",
+      "person": "kristina-marchenko"
+    },
+    {
+      "meeting": "2026-08-13",
+      "person": "lesha-nikitin"
+    },
+    {
+      "meeting": "2026-08-13",
+      "person": "magomed-vagabov"
+    },
+    {
+      "meeting": "2026-08-13",
+      "person": "marat-habibulin"
+    },
+    {
+      "meeting": "2026-08-13",
+      "person": "polina-perevalova"
+    },
+    {
+      "meeting": "2026-08-13",
+      "person": "ruslan-mamedov"
+    },
+    {
+      "meeting": "2026-08-13",
+      "person": "rustam-mushraipov"
     }
   ],
   "demos": [
@@ -2375,12 +2481,91 @@
       "minutes": null,
       "format": null,
       "note": null
+    },
+    {
+      "id": "demo-30",
+      "meeting": "2026-08-13",
+      "project": "scurrynslide-biblioteka-dlya-drag-and-drop",
+      "presenters": [
+        "kirill-myshkin"
+      ],
+      "minutes": 12,
+      "format": null,
+      "note": "Дима сказал, что там не апостров, а кавычки"
+    },
+    {
+      "id": "demo-31",
+      "meeting": "2026-08-13",
+      "project": "igra-shpion-sredi-nas",
+      "presenters": [
+        "marat-habibulin"
+      ],
+      "minutes": 6,
+      "format": null,
+      "note": "Кристина сказала, что можно добавить имена к участникам игры"
+    },
+    {
+      "id": "demo-32",
+      "meeting": "2026-08-13",
+      "project": "polina-hochet-uchitsya-vo-frantsii",
+      "presenters": [
+        "polina-perevalova"
+      ],
+      "minutes": 6,
+      "format": null,
+      "note": "Марат, Кирилл и Кристина сказали как можно обойтись без прикручивания АПИ: поболтать с нейросетью, создать базу данных упражнений и положить в код"
+    },
+    {
+      "id": "demo-33",
+      "meeting": "2026-08-13",
+      "project": "sayt-kristiny-marchenko",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 5,
+      "format": 2,
+      "note": "Дима оценил шрифт Onest как норм."
+    },
+    {
+      "id": "demo-34",
+      "meeting": "2026-08-13",
+      "project": "taymer-dlya-chasov",
+      "presenters": [
+        "andrey"
+      ],
+      "minutes": 4,
+      "format": 2,
+      "note": null
     }
   ],
-  "feedback": []
+  "feedback": [
+    {
+      "demo": "demo-30",
+      "person": "dmitriy-sivuhin"
+    },
+    {
+      "demo": "demo-31",
+      "person": "kristina-marchenko"
+    },
+    {
+      "demo": "demo-32",
+      "person": "kirill-myshkin"
+    },
+    {
+      "demo": "demo-32",
+      "person": "kristina-marchenko"
+    },
+    {
+      "demo": "demo-32",
+      "person": "marat-habibulin"
+    },
+    {
+      "demo": "demo-33",
+      "person": "dmitriy-sivuhin"
+    }
+  ]
 };
 
-  // Экспорт для браузера и (при необходимости) Node
   if (typeof window !== "undefined") window.PlanetariumDB = PlanetariumDB;
   if (typeof module !== "undefined" && module.exports) module.exports = PlanetariumDB;
 })();
