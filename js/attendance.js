@@ -1,6 +1,7 @@
 // Стрики посещений Планетария.
 // Строка — человек, точки — встречи, линия — непрерывность (стрик).
-// Данные — из единой базы js/db.js (PlanetariumDB).
+// Сверху строка «все» — суммарная посещаемость каждой недели.
+// Данные — из единой базы js/db.js (PlanetariumDB), показываем с февраля 2026.
 
 (() => {
   "use strict";
@@ -11,11 +12,14 @@
     return;
   }
 
+  // Отсечка: всё, что раньше февраля 2026, в визуализацию не попадает
+  const CUTOFF = "2026-02-01";
+
   const personById = Object.fromEntries(DB.persons.map((p) => [p.id, p]));
   const projectById = Object.fromEntries(DB.projects.map((p) => [p.id, p]));
 
   const weekly = DB.meetings
-    .filter((m) => m.type === "weekly")
+    .filter((m) => m.type === "weekly" && m.date >= CUTOFF)
     .slice()
     .sort((a, b) => a.date.localeCompare(b.date));
 
@@ -26,43 +30,52 @@
       ...DB.demos.map((d) => d.meeting),
     ]),
   ]
-    .filter((date) => !weeklyDates.has(date))
+    .filter((date) => date >= CUTOFF && !weeklyDates.has(date))
     .sort((a, b) => a.localeCompare(b));
 
   const MEETINGS = weekly.map((m) => ({
     date: m.date,
-    people: DB.attendance
-      .filter((a) => a.meeting === m.date)
-      .map((a) => personById[a.person]?.name)
-      .filter(Boolean),
+    people: [
+      ...new Set(
+        DB.attendance
+          .filter((a) => a.meeting === m.date)
+          .map((a) => personById[a.person]?.name)
+          .filter(Boolean)
+      ),
+    ],
   }));
 
-  const DEMO_STREAMS = streamDates.map((date) => ({
-    date,
-    demos: DB.demos
-      .filter((d) => d.meeting === date)
-      .map((d) => {
-        const project = projectById[d.project];
-        const presenter = personById[d.presenters[0]];
-        return {
-          person: presenter?.name || d.presenters[0],
-          project: project?.title || d.project,
-          url: project?.url || null,
-        };
-      }),
-  })).filter((s) => s.demos.length);
+  const DEMO_STREAMS = streamDates
+    .map((date) => ({
+      date,
+      demos: DB.demos
+        .filter((d) => d.meeting === date)
+        .map((d) => {
+          const project = projectById[d.project];
+          const presenter = personById[d.presenters[0]];
+          return {
+            person: presenter?.name || d.presenters[0],
+            project: project?.title || d.project,
+            url: project?.url || null,
+          };
+        }),
+    }))
+    .filter((s) => s.demos.length);
 
   const dates = MEETINGS.map((m) => m.date);
   const n = dates.length;
+  const counts = MEETINGS.map((m) => m.people.length);
 
-  // Общая ось: встречи + демо-эфиры по хронологии
-  const timeline = [
-    ...MEETINGS.map((m, meetingIdx) => ({ date: m.date, type: "meeting", meetingIdx })),
-    ...DEMO_STREAMS.map((s, streamIdx) => ({ date: s.date, type: "demo", streamIdx })),
-  ].sort((a, b) => a.date.localeCompare(b.date));
-
-  const tLen = timeline.length;
-  const meetingSlot = MEETINGS.map((_, i) => timeline.findIndex((s) => s.type === "meeting" && s.meetingIdx === i));
+  // Заглушка посещаемости демо-эфиров: вокруг среднего по weekly, ±3.
+  // Стабильный «рандом» от даты, чтобы не прыгало при перезагрузке.
+  const avgWeekly =
+    counts.length ? Math.round(counts.reduce((s, c) => s + c, 0) / counts.length) : 10;
+  const stubFromDate = (iso) => {
+    let h = 0;
+    for (let i = 0; i < iso.length; i++) h = (h * 31 + iso.charCodeAt(i)) >>> 0;
+    return Math.max(3, avgWeekly - 3 + (h % 7));
+  };
+  const demoCounts = DEMO_STREAMS.map((s) => stubFromDate(s.date));
 
   const attendance = new Map(); // name → Set of meeting indices
   MEETINGS.forEach((m, i) => {
@@ -75,14 +88,14 @@
   // name → демо на эфирах
   const demosByPerson = new Map();
   DEMO_STREAMS.forEach((stream, streamIdx) => {
-    const slot = timeline.findIndex((s) => s.type === "demo" && s.streamIdx === streamIdx);
     stream.demos.forEach((d) => {
       const name = d.person;
       if (!demosByPerson.has(name)) demosByPerson.set(name, []);
-      demosByPerson.get(name).push({ ...d, person: name, date: stream.date, slot });
+      demosByPerson.get(name).push({ ...d, date: stream.date, streamIdx });
       if (!attendance.has(name)) attendance.set(name, new Set());
     });
   });
+
   // Стрик = подряд идущие встречи из списка (не календарные недели, не эфиры)
   function streaksOf(indices) {
     const sorted = [...indices].sort((a, b) => a - b);
@@ -103,6 +116,20 @@
     return streaks;
   }
 
+  // Хронологическая сортировка «свежести»: посещения читаем как двоичное число,
+  // где самая свежая встреча — старший разряд. Кто был на последней встрече,
+  // тот выше; при равенстве решает предыдущая встреча, и так далее.
+  // В сумме получается градиент: правый верхний угол — ходят сейчас,
+  // левый нижний — ходили раньше.
+  function cmpRecency(a, b) {
+    for (let i = n - 1; i >= 0; i--) {
+      const av = a.set.has(i);
+      const bv = b.set.has(i);
+      if (av !== bv) return av ? -1 : 1;
+    }
+    return a.name.localeCompare(b.name, "ru");
+  }
+
   const rows = [...attendance.entries()]
     .map(([name, set]) => {
       const streaks = streaksOf(set);
@@ -120,14 +147,9 @@
         demos: demosByPerson.get(name) || [],
       };
     })
-    .sort((a, b) => b.longest - a.longest || b.total - a.total || a.name.localeCompare(b.name, "ru"));
+    .sort(cmpRecency);
 
   const MONTHS_SHORT = {
-    "2025-08": "авг",
-    "2025-09": "сен",
-    "2025-10": "окт",
-    "2025-11": "ноя",
-    "2025-12": "дек",
     "2026-01": "янв",
     "2026-02": "фев",
     "2026-03": "мар",
@@ -135,6 +157,11 @@
     "2026-05": "май",
     "2026-06": "июн",
     "2026-07": "июл",
+    "2026-08": "авг",
+    "2026-09": "сен",
+    "2026-10": "окт",
+    "2026-11": "ноя",
+    "2026-12": "дек",
   };
   const MONTHS_GEN = [
     "января",
@@ -156,6 +183,12 @@
     const m = +iso.slice(5, 7);
     const y = iso.slice(2, 4);
     return `${d} ${MONTHS_GEN[m - 1]} ’${y}`;
+  };
+
+  const plural = (k) => {
+    if (k % 10 === 1 && k % 100 !== 11) return "человек";
+    if (k % 10 >= 2 && k % 10 <= 4 && (k % 100 < 12 || k % 100 > 14)) return "человека";
+    return "человек";
   };
 
   const escTip = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;");
@@ -186,13 +219,54 @@
     );
   };
 
-  // Равномерные слоты по общей оси
-  const pct = (slot) => ((slot + 0.5) / tLen) * 100;
-  const spanMeetings = (m0, m1) => {
-    const left = pct(meetingSlot[m0]);
-    const right = pct(meetingSlot[m1]);
-    return { left, width: right - left };
+  // Недельная арифметика для календарного режима (неделя начинается с понедельника)
+  const weekStart = (iso) => {
+    const d = new Date(iso + "T00:00:00Z");
+    const day = (d.getUTCDay() + 6) % 7;
+    d.setUTCDate(d.getUTCDate() - day);
+    return d.toISOString().slice(0, 10);
   };
+  const addDays = (iso, k) => {
+    const d = new Date(iso + "T00:00:00Z");
+    d.setUTCDate(d.getUTCDate() + k);
+    return d.toISOString().slice(0, 10);
+  };
+
+  // Две версии оси X:
+  //  ordinal  — слот на каждую состоявшуюся встречу/эфир (порядковый номер четверга)
+  //  calendar — слот на каждую календарную неделю, пропущенные недели пустые
+  function buildAxis(mode) {
+    if (mode === "ordinal") {
+      const timeline = [
+        ...MEETINGS.map((m, i) => ({ date: m.date, kind: "meeting", i })),
+        ...DEMO_STREAMS.map((s, j) => ({ date: s.date, kind: "stream", j })),
+      ].sort((a, b) => a.date.localeCompare(b.date));
+      const meetingSlot = new Array(n);
+      const streamSlot = new Array(DEMO_STREAMS.length);
+      timeline.forEach((s, idx) => {
+        if (s.kind === "meeting") meetingSlot[s.i] = idx;
+        else streamSlot[s.j] = idx;
+      });
+      return {
+        L: timeline.length,
+        meetingSlot,
+        streamSlot,
+        slotMonths: timeline.map((s) => s.date.slice(0, 7)),
+      };
+    }
+    const all = [...dates, ...DEMO_STREAMS.map((s) => s.date)].sort();
+    const lastWeek = weekStart(all[all.length - 1]);
+    const weeks = [];
+    for (let w = weekStart(all[0]); w <= lastWeek; w = addDays(w, 7)) weeks.push(w);
+    const weekIdx = new Map(weeks.map((w, i) => [w, i]));
+    return {
+      L: weeks.length,
+      meetingSlot: dates.map((d) => weekIdx.get(weekStart(d))),
+      streamSlot: DEMO_STREAMS.map((s) => weekIdx.get(weekStart(s.date))),
+      // месяц недели определяем по её четвергу
+      slotMonths: weeks.map((w) => addDays(w, 3).slice(0, 7)),
+    };
+  }
 
   const tip = document.createElement("div");
   tip.className = "plviz-tip";
@@ -250,46 +324,73 @@
     if (tip.classList.contains("pinned")) hideTip();
   });
 
-  function streakClass(len) {
-    if (len >= 10) return "s5";
-    if (len >= 7) return "s4";
-    if (len >= 4) return "s3";
-    if (len >= 2) return "s2";
-    return "s1";
-  }
+  const INFO_DEFAULT =
+    "Кликните по строке — визиты и стрики. Клик по точке с обводкой — проект с эфира (ссылка кликабельна).";
+
+  let mode = "ordinal";
 
   function render() {
     const el = document.getElementById("plviz-streak");
     if (!el) return;
 
-    const monthMarks = [];
-    let prevKey = "";
-    timeline.forEach((slot, i) => {
-      const key = slot.date.slice(0, 7);
-      if (key !== prevKey) {
-        monthMarks.push({ i, label: MONTHS_SHORT[key] || key });
-        prevKey = key;
-      }
+    const axis = buildAxis(mode);
+    const L = axis.L;
+    const slotW = 100 / L;
+    const pct = (s) => ((s + 0.5) / L) * 100;
+    const slotLeft = (s) => (s / L) * 100;
+    const spanMeetings = (m0, m1) => {
+      const left = pct(axis.meetingSlot[m0]);
+      return { left, width: pct(axis.meetingSlot[m1]) - left };
+    };
+
+    // Месяцы как периоды: подпись + линия тянутся на все слоты месяца
+    const monthSpans = [];
+    axis.slotMonths.forEach((key, i) => {
+      const lastSpan = monthSpans[monthSpans.length - 1];
+      if (lastSpan && lastSpan.key === key) lastSpan.s1 = i;
+      else monthSpans.push({ key, s0: i, s1: i });
     });
 
-    const bandW = ((100 / tLen) * 0.55).toFixed(2);
-    const demoBands = timeline
-      .map((slot, i) =>
-        slot.type === "demo"
-          ? `<div class="plviz-streak-band" style="left:${pct(i)}%;width:${bandW}%"></div>`
-          : ""
+    const monthsHTML = monthSpans
+      .map(
+        ({ key, s0, s1 }) =>
+          `<div class="plviz-streak-month" style="left:${slotLeft(s0).toFixed(2)}%;` +
+          `width:calc(${((s1 - s0 + 1) * slotW).toFixed(2)}% - 0.5em)">${MONTHS_SHORT[key] || key}</div>`
       )
       .join("");
 
-    const vlines = monthMarks
-      .map((m) => {
-        const nudge = m.label === "авг" ? "translateX(calc(-50% - 0.55em))" : "translateX(-50%)";
-        return (
-          `<div class="plviz-streak-vline" style="left:${pct(m.i)}%"></div>` +
-          `<div class="plviz-streak-month" style="left:${pct(m.i)}%;transform:${nudge}">${m.label}</div>`
-        );
-      })
+    const vlines = monthSpans
+      .slice(1)
+      .map(({ s0 }) => `<div class="plviz-streak-vline" style="left:${slotLeft(s0).toFixed(2)}%"></div>`)
       .join("");
+
+    // Строка «все»: квадратик недели — это все личные квадратики с прозрачностью 0.1,
+    // наложенные друг на друга; итоговая непрозрачность 1 − 0.9^k
+    const cellW = (slotW * 0.72).toFixed(2);
+    const cellHtml = (slot, c, label, tipExtra) => {
+      const alpha = ((1 - Math.pow(0.9, c)) * 100).toFixed(1);
+      return (
+        `<span class="plviz-streak-cell" style="left:${pct(slot).toFixed(2)}%;width:${cellW}%;` +
+        `background:color-mix(in srgb, var(--ids__link) ${alpha}%, transparent)" ` +
+        `data-tip="<b>все</b><br>${label} — ${c} ${plural(c)}${tipExtra || ""}"></span>`
+      );
+    };
+    const totalCells =
+      MEETINGS.map((m, i) => cellHtml(axis.meetingSlot[i], counts[i], fmtDate(dates[i]))).join("") +
+      DEMO_STREAMS.map((s, j) =>
+        cellHtml(
+          axis.streamSlot[j],
+          demoCounts[j],
+          `демо-эфир ${fmtDate(s.date)}`,
+          " · заглушка"
+        )
+      ).join("");
+
+    const totalRow =
+      `<div class="plviz-streak-row plviz-streak-total" data-total>` +
+      `<div class="plviz-streak-name">все</div>` +
+      `<div class="plviz-streak-track">${totalCells}</div>` +
+      `</div>`;
 
     let popupId = 0;
     const popups = new Map();
@@ -300,7 +401,7 @@
           .map((s) => {
             const { left, width } = spanMeetings(s.start, s.end);
             return (
-              `<div class="plviz-streak-line ${streakClass(s.len)}" ` +
+              `<div class="plviz-streak-line" ` +
               `style="left:${left.toFixed(2)}%;width:${width.toFixed(2)}%" ` +
               `data-tip="<b>${escTip(r.name)}</b><br>стрик ${s.len} · ${fmtDate(dates[s.start])} — ${fmtDate(dates[s.end])}"></div>`
             );
@@ -309,10 +410,8 @@
 
         const dots = [...r.set]
           .map((i) => {
-            const streak = r.streaks.find((s) => i >= s.start && i <= s.end);
-            const cls = streakClass(streak?.len || 1);
             return (
-              `<span class="plviz-streak-dot ${cls}" style="left:${pct(meetingSlot[i]).toFixed(2)}%" ` +
+              `<span class="plviz-streak-dot" style="left:${pct(axis.meetingSlot[i]).toFixed(2)}%" ` +
               `data-tip="<b>${escTip(r.name)}</b><br>${fmtDate(dates[i])}"></span>`
             );
           })
@@ -323,7 +422,7 @@
             const id = String(++popupId);
             popups.set(id, demoPopupHtml(d));
             return (
-              `<span class="plviz-streak-dot plviz-streak-demo" style="left:${pct(d.slot).toFixed(2)}%" ` +
+              `<span class="plviz-streak-dot plviz-streak-demo" style="left:${pct(axis.streamSlot[d.streamIdx]).toFixed(2)}%" ` +
               `data-popup-id="${id}"></span>`
             );
           })
@@ -333,27 +432,36 @@
           `<div class="plviz-streak-row" data-idx="${idx}">` +
           `<div class="plviz-streak-name">${r.name}</div>` +
           `<div class="plviz-streak-track">${lines}${dots}${demoDots}</div>` +
-          `<div class="plviz-streak-stat">${r.longest}</div>` +
           `</div>`
         );
       })
       .join("");
 
     el.innerHTML =
+      `<div class="plviz-mode">` +
+      `<button type="button" data-mode="ordinal" class="${mode === "ordinal" ? "active" : ""}">четверги подряд</button>` +
+      `<button type="button" data-mode="calendar" class="${mode === "calendar" ? "active" : ""}">календарь</button>` +
+      `</div>` +
       `<div class="plviz-streak-chart">` +
-      `<div class="plviz-streak-stat-h">макс</div>` +
+      totalRow +
       rowsHTML +
-      `<div class="plviz-streak-axis">${demoBands}${vlines}</div>` +
+      `<div class="plviz-streak-axis">${vlines}${monthsHTML}</div>` +
       `</div>` +
       `<div class="plviz-legend">` +
-      `<span class="plviz-legend-item static"><i class="plviz-streak-swatch s1"></i>1</span>` +
-      `<span class="plviz-legend-item static"><i class="plviz-streak-swatch s2"></i>2–3</span>` +
-      `<span class="plviz-legend-item static"><i class="plviz-streak-swatch s3"></i>4–7</span>` +
-      `<span class="plviz-legend-item static"><i class="plviz-streak-swatch s4"></i>7–10</span>` +
-      `<span class="plviz-legend-item static"><i class="plviz-streak-swatch s5"></i>10+</span>` +
+      `<span class="plviz-legend-item static"><i class="plviz-streak-swatch s2"></i>визит</span>` +
       `<span class="plviz-legend-item static"><i class="plviz-streak-swatch demo"></i>демо-эфир</span>` +
+      `<span class="plviz-legend-item static"><i class="plviz-streak-swatch all"></i>«все»: гуще цвет — больше людей</span>` +
       `</div>` +
-      `<p class="plviz-info" id="plviz-streak-info">Кликните по строке — визиты и стрики. Клик по фиолетовой точке — проект с эфира (ссылка кликабельна).</p>`;
+      `<p class="plviz-info" id="plviz-streak-info">${INFO_DEFAULT}</p>`;
+
+    el.querySelectorAll(".plviz-mode button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.dataset.mode === mode) return;
+        mode = btn.dataset.mode;
+        hideTip();
+        render();
+      });
+    });
 
     // клик по демо-точке — закреплённый попап со ссылкой
     el.querySelectorAll(".plviz-streak-demo").forEach((demo) => {
@@ -372,13 +480,33 @@
     });
 
     const info = el.querySelector("#plviz-streak-info");
-    el.querySelectorAll(".plviz-streak-row").forEach((row) => {
+    const deactivate = () => {
+      el.querySelectorAll(".plviz-streak-row").forEach((x) => x.classList.remove("active"));
+    };
+
+    el.querySelector("[data-total]").addEventListener("click", function () {
+      const on = this.classList.contains("active");
+      deactivate();
+      if (on) {
+        info.textContent = INFO_DEFAULT;
+        return;
+      }
+      this.classList.add("active");
+      const avg = counts.reduce((s, c) => s + c, 0) / (n || 1);
+      const max = Math.max(...counts);
+      const maxDate = dates[counts.indexOf(max)];
+      info.innerHTML =
+        `<b>Все</b> — ${n} встреч с февраля 2026, ${rows.length} участников; ` +
+        `в среднем ${avg.toFixed(1).replace(".", ",")} ${plural(Math.round(avg))} на встрече; ` +
+        `максимум ${max} (${fmtDate(maxDate)}).`;
+    });
+
+    el.querySelectorAll(".plviz-streak-row[data-idx]").forEach((row) => {
       row.addEventListener("click", () => {
         const on = row.classList.contains("active");
-        el.querySelectorAll(".plviz-streak-row").forEach((x) => x.classList.remove("active"));
+        deactivate();
         if (on) {
-          info.textContent =
-            "Кликните по строке — визиты и стрики. Клик по фиолетовой точке — проект с эфира (ссылка кликабельна).";
+          info.textContent = INFO_DEFAULT;
           return;
         }
         row.classList.add("active");
