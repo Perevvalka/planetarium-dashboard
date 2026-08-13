@@ -98,7 +98,30 @@
               href: "admin.html",
               linkLabel: "форма",
             },
-            { id: "demo-3", text: "Перепроверить все разделы и сохранить" },
+            {
+              id: "demo-3",
+              text: "Перепроверить все разделы и сохранить",
+              substeps: [
+                {
+                  id: "demo-3-1",
+                  text: "Прочитать сводку по встрече",
+                  href: "admin.html#summary",
+                  linkLabel: "сводка",
+                },
+                { id: "demo-3-2", text: "Перейти на ветку main" },
+                {
+                  id: "demo-3-3",
+                  text: "Скопировать db.js",
+                  href: "admin.html#export",
+                  linkLabel: "экспорт",
+                },
+                {
+                  id: "demo-3-4",
+                  text: "Выделить весь код в js/db.js и вставить (⌘A, ⌘V)",
+                },
+                { id: "demo-3-5", text: "Пуш коммит на прод" },
+              ],
+            },
             { id: "demo-4", text: "Собрать скриншоты созвона" },
             { id: "demo-5", text: "Сшить коллаж в Illustrator" },
             { id: "demo-6", text: "Пост в канал + картинка" },
@@ -198,12 +221,26 @@
     localStorage.setItem(storageKey(), JSON.stringify(state));
   }
 
+  function stepIds(step) {
+    var ids = [step.id];
+    (step.substeps || []).forEach(function (sub) {
+      ids.push(sub.id);
+    });
+    return ids;
+  }
+
+  function taskStepIds(task) {
+    var ids = [];
+    task.steps.forEach(function (step) {
+      ids = ids.concat(stepIds(step));
+    });
+    return ids;
+  }
+
   function dayStepIds(day) {
     var ids = [];
     day.tasks.forEach(function (task) {
-      task.steps.forEach(function (step) {
-        ids.push(step.id);
-      });
+      ids = ids.concat(taskStepIds(task));
     });
     return ids;
   }
@@ -218,11 +255,12 @@
   }
 
   function countTask(task, state) {
+    var ids = taskStepIds(task);
     var done = 0;
-    task.steps.forEach(function (step) {
-      if (state[step.id]) done += 1;
+    ids.forEach(function (id) {
+      if (state[id]) done += 1;
     });
-    return { done: done, total: task.steps.length };
+    return { done: done, total: ids.length };
   }
 
   function findDay(id) {
@@ -270,6 +308,23 @@
 
   var state = loadState();
   var selectedDayId = null;
+
+  function stepLabel(item) {
+    var label = document.createElement("label");
+    if (state[item.id]) label.classList.add("done");
+
+    var input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = !!state[item.id];
+    input.dataset.id = item.id;
+
+    var span = document.createElement("span");
+    appendStepLabel(span, item);
+
+    label.appendChild(input);
+    label.appendChild(span);
+    return label;
+  }
 
   var weekLabel = document.getElementById("ops-week-label");
   var weekEl = document.getElementById("ops-week");
@@ -361,20 +416,17 @@
       ul.className = "ops-list";
       task.steps.forEach(function (item) {
         var li = document.createElement("li");
-        var label = document.createElement("label");
-        if (state[item.id]) label.classList.add("done");
-
-        var input = document.createElement("input");
-        input.type = "checkbox";
-        input.checked = !!state[item.id];
-        input.dataset.id = item.id;
-
-        var span = document.createElement("span");
-        appendStepLabel(span, item);
-
-        label.appendChild(input);
-        label.appendChild(span);
-        li.appendChild(label);
+        li.appendChild(stepLabel(item));
+        if (item.substeps && item.substeps.length) {
+          var subUl = document.createElement("ul");
+          subUl.className = "ops-list ops-sublist";
+          item.substeps.forEach(function (sub) {
+            var subLi = document.createElement("li");
+            subLi.appendChild(stepLabel(sub));
+            subUl.appendChild(subLi);
+          });
+          li.appendChild(subUl);
+        }
         ul.appendChild(li);
       });
       block.appendChild(ul);

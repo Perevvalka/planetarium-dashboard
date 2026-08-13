@@ -134,9 +134,11 @@
     document.querySelectorAll(".pdb-panel").forEach((p) => {
       p.hidden = p.dataset.panel !== id;
     });
+    if (id === "summary") renderSummary();
     if (id === "export") {
       document.getElementById("pdb-preview").textContent = serializeFile();
     }
+    history.replaceState(null, "", `#${id}`);
   };
 
   document.querySelectorAll(".pdb-tabs [role='tab']").forEach((tab) => {
@@ -777,6 +779,155 @@
     });
   };
 
+  // ---------------------------------------------------------------
+  // Сводка по встрече
+  // ---------------------------------------------------------------
+
+  const summaryMeetings = document.getElementById("summary-meetings");
+  const summaryTextEl = document.getElementById("summary-text");
+  let summaryDate = "";
+
+  const FORMATS = {
+    1: "просто рассказывает",
+    2: "экран",
+    3: "слайды",
+    4: "опубликованный продукт",
+  };
+
+  const humanDate = (date) => {
+    const d = new Date(`${date}T00:00:00`);
+    if (Number.isNaN(d.getTime())) return date;
+    return d.toLocaleDateString("ru-RU", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  const namesOf = (ids) => ids.map(personName).sort((a, b) => a.localeCompare(b, "ru"));
+
+  const meetingChecks = (m, presentIds, demos) => {
+    const out = [];
+    const weekly = m.type !== "stream";
+    const present = new Set(presentIds);
+    if (!m.minutes) out.push("у встречи не указана длительность");
+    if (weekly && !presentIds.length) out.push("не отмечено присутствие");
+    if (!demos.length) out.push("нет ни одного демо");
+    demos.forEach((d) => {
+      const title = projectTitle(d.project);
+      if (!d.presenters.length) out.push(`«${title}»: нет показывающих`);
+      if (!d.minutes) out.push(`«${title}»: нет длительности`);
+      if (!projectHasUrl(d.project) && !d.format) {
+        out.push(`«${title}»: нет ни ссылки на проект, ни формата`);
+      }
+      if (!weekly) return;
+      d.presenters.forEach((p) => {
+        if (!present.has(p)) {
+          out.push(`${personName(p)} показывает «${title}», но не отмечен в присутствии`);
+        }
+      });
+      feedbackForDemo(d.id).forEach((p) => {
+        if (!present.has(p)) {
+          out.push(`${personName(p)} дал фидбэк на «${title}», но не отмечен в присутствии`);
+        }
+      });
+    });
+    return out;
+  };
+
+  const meetingSummary = (date) => {
+    const m = db.meetings.find((x) => x.date === date);
+    if (!m) return "Выбери встречу в списке выше.";
+
+    const presentIds = db.attendance
+      .filter((a) => a.meeting === date)
+      .map((a) => a.person);
+    const demos = db.demos.filter((d) => d.meeting === date);
+    const lines = [humanDate(date)];
+
+    lines.push(
+      `${m.type === "stream" ? "Демо-эфир" : "Еженедельная встреча"} · ` +
+        (m.minutes ? `${m.minutes} мин` : "длительность не указана")
+    );
+    if (m.note) lines.push(`Заметка: ${m.note}`);
+
+    lines.push("", `Присутствие — ${presentIds.length}`);
+    if (presentIds.length) {
+      namesOf(presentIds).forEach((name) => lines.push(`  — ${name}`));
+    } else {
+      lines.push("  — никого не отмечено");
+    }
+
+    lines.push("", `Демо — ${demos.length}`);
+    if (!demos.length) lines.push("  — пусто");
+    demos.forEach((d, i) => {
+      const project = db.projects.find((x) => x.id === d.project);
+      const format = projectHasUrl(d.project) ? 4 : d.format;
+      lines.push(`  ${i + 1}. ${projectTitle(d.project)}`);
+      lines.push(`     — показывает: ${namesOf(d.presenters).join(", ") || "не указано"}`);
+      lines.push(
+        `     — ${d.minutes ? `${d.minutes} мин` : "время не указано"} · ` +
+          (format ? `формат ${format} · ${FORMATS[format]}` : "формат не указан")
+      );
+      if (project?.url) lines.push(`     — ссылка: ${project.url}`);
+      const feedback = feedbackForDemo(d.id);
+      if (feedback.length) lines.push(`     — фидбэк: ${namesOf(feedback).join(", ")}`);
+      if (d.note) lines.push(`     — заметка: ${d.note}`);
+    });
+
+    const checks = meetingChecks(m, presentIds, demos);
+    lines.push(
+      "",
+      checks.length ? `Проверить — ${checks.length}` : "Проверить — пусто, всё заполнено"
+    );
+    checks.forEach((c) => lines.push(`  — ${c}`));
+
+    return lines.join("\n");
+  };
+
+  const renderSummary = () => {
+    const items = db.meetings.slice().sort((a, b) => b.date.localeCompare(a.date));
+    if (!items.some((m) => m.date === summaryDate)) summaryDate = items[0]?.date || "";
+
+    summaryMeetings.innerHTML = items.length
+      ? items
+          .map((m) => {
+            const people = db.attendance.filter((a) => a.meeting === m.date).length;
+            const count = db.demos.filter((d) => d.meeting === m.date).length;
+            const meta =
+              m.type === "stream"
+                ? `эфир · ${count} демо`
+                : `${people} чел. · ${count} демо`;
+            return (
+              `<li data-date="${m.date}"${m.date === summaryDate ? ' class="active"' : ""}>` +
+              `<span>${m.date}</span><span class="meta">${meta}</span></li>`
+            );
+          })
+          .join("")
+      : `<li class="pdb-empty" style="cursor:default;border:none">Пока нет встреч</li>`;
+
+    summaryMeetings.querySelectorAll("li[data-date]").forEach((li) => {
+      li.addEventListener("click", () => {
+        summaryDate = li.dataset.date;
+        renderSummary();
+      });
+    });
+
+    summaryTextEl.textContent = summaryDate
+      ? meetingSummary(summaryDate)
+      : "Сначала создай встречу на вкладке «Встречи».";
+  };
+
+  document.getElementById("summary-copy").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(summaryTextEl.textContent);
+      setStatus("Сводка скопирована");
+    } catch {
+      setStatus("Не удалось скопировать");
+    }
+  });
+
   const renderAll = () => {
     renderPersons();
     fillPersonChecks(projectAuthors, checkedValues(projectAuthors));
@@ -792,6 +943,7 @@
     syncDemoFormatUI();
     loadAttendanceForm();
     renderDemos();
+    if (!document.querySelector('[data-panel="summary"]').hidden) renderSummary();
     const preview = document.getElementById("pdb-preview");
     if (preview && !document.querySelector('[data-panel="export"]').hidden) {
       preview.textContent = serializeFile();
@@ -826,6 +978,11 @@
   fillMeetingSelect(demoMeeting);
   fillProjectRadios(demoProject, "");
   renderAll();
+  const hashTab = location.hash.replace(/^#/, "");
+  const tabIds = [...document.querySelectorAll(".pdb-tabs [role='tab']")].map(
+    (t) => t.dataset.tab
+  );
+  if (tabIds.includes(hashTab)) switchTab(hashTab);
   if (localStorage.getItem(STORAGE_KEY)) {
     setStatus("Открыт черновик из браузера");
   } else {

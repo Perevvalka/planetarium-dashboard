@@ -214,6 +214,18 @@
         color: var(--ids__text-caption);
         font-size: 0.9em;
       }
+      .pdb-summary .pdb-list {
+        max-width: 36em;
+      }
+      .pdb-summary-text {
+        white-space: pre-wrap;
+        font-size: 0.95em;
+        line-height: 1.55;
+        padding: 1em 1.1em;
+        border: 1px solid var(--ids__border);
+        border-radius: 0.35em;
+        background: var(--ids__surface);
+      }
       .pdb-export pre {
         font-size: 0.75em;
         line-height: 1.4;
@@ -262,6 +274,7 @@
               <button type="button" role="tab" aria-selected="false" data-tab="meetings">Встречи</button>
               <button type="button" role="tab" aria-selected="false" data-tab="attendance">Присутствие</button>
               <button type="button" role="tab" aria-selected="false" data-tab="demos">Демо</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="summary">Сводка</button>
               <button type="button" role="tab" aria-selected="false" data-tab="export">Экспорт</button>
             </nav>
 
@@ -405,10 +418,25 @@
               <ul class="pdb-list" id="list-demos"></ul>
             </div>
 
+            <div class="pdb-panel pdb-summary" data-panel="summary" hidden>
+              <p>
+                Вся встреча одним текстом — перечитать перед тем, как переносить
+                <code>db.js</code> в репозиторий. Свежая встреча выбрана сама,
+                другую можно кликнуть в списке.
+              </p>
+              <p class="pdb-form-caption">Встречи — свежие сверху</p>
+              <ul class="pdb-list pdb-scroll" id="summary-meetings"></ul>
+              <div class="pdb-actions" style="margin: 1em 0">
+                <button type="button" id="summary-copy">Скопировать текст</button>
+              </div>
+              <div class="pdb-summary-text" id="summary-text"></div>
+            </div>
+
             <div class="pdb-panel pdb-export" data-panel="export" hidden>
               <p>
                 Ниже — содержимое файла <code>js/db.js</code>. Скачай его и положи в проект
                 (или скопируй). После этого визуализации подхватят новые данные.
+                Перед выгрузкой стоит перечитать встречу текстом на вкладке «Сводка».
               </p>
               <div class="pdb-actions" style="margin: 1em 0">
                 <button type="button" class="primary" id="pdb-download-2">Скачать db.js</button>
@@ -423,7 +451,7 @@
     </main>
 
     <script src="./js/theme-toggle.js"></script>
-    <script src="./js/db.js"></script>
-    <script src="./js/admin.js"></script>
+    <script src="./js/db.js?v=2"></script>
+    <script src="./js/admin.js?v=2"></script>
   </body>
 </html>
