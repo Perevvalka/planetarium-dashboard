@@ -29,7 +29,7 @@
       }
       .sqviz-row {
         display: grid;
-        grid-template-columns: 11em 1fr 2.8em;
+        grid-template-columns: 11em 1fr;
       }
       .sqviz-label {
         align-self: center;
@@ -55,20 +55,21 @@
         outline: 1px solid var(--ids__text);
         outline-offset: -1px;
       }
-      .sqviz-stat {
-        align-self: center;
-        padding-left: 0.35em;
-        font-size: 0.8em;
-        color: var(--ids__text-caption);
-        text-align: right;
-        font-variant-numeric: tabular-nums;
-      }
       .sqviz-marks .sqviz-mark {
         font-size: 0.7em;
         line-height: 1.7;
         color: var(--ids__text-caption);
         white-space: nowrap;
+        overflow: hidden;
+        padding-right: 0.4em;
+        box-sizing: border-box;
+      }
+      .sqviz-mark-pack {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.4em;
         overflow: visible;
+        padding-right: 0;
       }
       .sqviz-num {
         text-align: center;
@@ -101,7 +102,7 @@
 
       @media (width < 768px) {
         .sqviz-row {
-          grid-template-columns: 7em 1fr 2.2em;
+          grid-template-columns: 7em 1fr;
         }
         .sqviz-label {
           font-size: 0.7em;

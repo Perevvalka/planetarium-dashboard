@@ -106,21 +106,46 @@
     if (!el) return;
     const C = palette();
 
-    // Подписи месяцев — на первой встрече каждого месяца.
-    const monthCells = [];
-    let prevMonth = "";
+    // Подписи месяцев занимают все встречи месяца; между соседними — зазор 0.4em.
+    const monthSpans = [];
     meetings.forEach((m, i) => {
       const key = m.date.slice(0, 7);
-      monthCells.push(key !== prevMonth ? MONTHS_SHORT[+key.slice(5) - 1] : "");
-      prevMonth = key;
+      if (!monthSpans.length || monthSpans.at(-1).key !== key) {
+        monthSpans.push({ key, start: i, label: MONTHS_SHORT[+key.slice(5) - 1] });
+      }
     });
+    monthSpans.forEach((s, j) => {
+      s.end = monthSpans[j + 1]?.start ?? n;
+    });
+
+    const monthMarksHtml = (() => {
+      let html = "";
+      let i = 0;
+      while (i < monthSpans.length) {
+        const width = monthSpans[i].end - monthSpans[i].start;
+        if (width === 1) {
+          let j = i;
+          while (j < monthSpans.length && monthSpans[j].end - monthSpans[j].start === 1) j++;
+          const pack = monthSpans.slice(i, j);
+          html +=
+            `<div class="sqviz-mark sqviz-mark-pack" style="grid-column: span ${pack.length}">` +
+            pack.map((s) => `<span>${s.label}</span>`).join("") +
+            `</div>`;
+          i = j;
+        } else {
+          html += `<div class="sqviz-mark" style="grid-column: span ${width}">${monthSpans[i].label}</div>`;
+          i++;
+        }
+      }
+      return html;
+    })();
 
     const trackCells = (cellsHtml) => `<div class="sqviz-track">${cellsHtml}</div>`;
 
     const monthsRow =
       `<div class="sqviz-row sqviz-marks"><div class="sqviz-label"></div>` +
-      trackCells(monthCells.map((t) => `<div class="sqviz-mark">${t}</div>`).join("")) +
-      `<div class="sqviz-stat"></div></div>`;
+      trackCells(monthMarksHtml) +
+      `</div>`;
 
     const sumCells = totals
       .map(({ k, d }, i) => {
@@ -131,7 +156,7 @@
     const sumRow =
       `<div class="sqviz-row sqviz-sum"><div class="sqviz-label">Все вместе</div>` +
       trackCells(sumCells) +
-      `<div class="sqviz-stat"></div></div>`;
+      `</div>`;
 
     const personRows = rows
       .map((r, ri) => {
@@ -145,7 +170,7 @@
         return (
           `<div class="sqviz-row"><div class="sqviz-label">${escHtml(r.name)}</div>` +
           trackCells(cells) +
-          `<div class="sqviz-stat">${r.total}</div></div>`
+          `</div>`
         );
       })
       .join("");
@@ -162,7 +187,7 @@
           })
           .join("")
       ) +
-      `<div class="sqviz-stat">всего</div></div>`;
+      `</div>`;
 
     const legend =
       `<div class="sqviz-legend">` +
