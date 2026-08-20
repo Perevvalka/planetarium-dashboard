@@ -420,6 +420,20 @@
       "telegram": null,
       "photo": null,
       "note": null
+    },
+    {
+      "id": "ayrat",
+      "name": "Айрат",
+      "telegram": null,
+      "photo": null,
+      "note": null
+    },
+    {
+      "id": "sasha-permyakov",
+      "name": "Саша Пермяков",
+      "telegram": null,
+      "photo": null,
+      "note": null
     }
   ],
   "projects": [
@@ -692,6 +706,42 @@
         "andrey"
       ],
       "note": "Надо узнать название"
+    },
+    {
+      "id": "sayly-ai-english-tutor",
+      "title": "Sayly — AI English tutor",
+      "url": "https://t.me/PerfectEnglishTutorBot",
+      "authors": [
+        "ayrat"
+      ],
+      "note": null
+    },
+    {
+      "id": "otslezhivatel-biletov-na-vodnyy-transport",
+      "title": "Отслеживатель билетов на водный транспорт",
+      "url": null,
+      "authors": [
+        "zhenya-arutyunov"
+      ],
+      "note": null
+    },
+    {
+      "id": "ernolaev-space-svoy-sayt",
+      "title": "ernolaev.space — свой сайт",
+      "url": "https://ermolaev.space",
+      "authors": [
+        "artem-ermolaev"
+      ],
+      "note": null
+    },
+    {
+      "id": "shrift",
+      "title": "Шрифт Магомеда",
+      "url": null,
+      "authors": [
+        "magomed-vagabov"
+      ],
+      "note": null
     }
   ],
   "meetings": [
@@ -897,6 +947,12 @@
       "date": "2026-08-13",
       "type": "weekly",
       "minutes": 50,
+      "note": null
+    },
+    {
+      "date": "2026-08-20",
+      "type": "weekly",
+      "minutes": 60,
       "note": null
     }
   ],
@@ -2160,6 +2216,62 @@
     {
       "meeting": "2026-08-13",
       "person": "rustam-mushraipov"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "ayrat"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "artem-ermolaev"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "dmitriy-sivuhin"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "zhenya-arutyunov"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "zhenya-sarnetskiy"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "kirill-myshkin"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "kristina-marchenko"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "lesha-nikitin"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "magomed-vagabov"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "marat-habibulin"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "olga-permyakova"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "polina-perevalova"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "ruslan-mamedov"
+    },
+    {
+      "meeting": "2026-08-20",
+      "person": "sasha-permyakov"
     }
   ],
   "demos": [
@@ -2536,6 +2648,61 @@
       "minutes": 4,
       "format": 2,
       "note": null
+    },
+    {
+      "id": "demo-35",
+      "meeting": "2026-08-20",
+      "project": "igra-shpion-sredi-nas",
+      "presenters": [
+        "marat-habibulin"
+      ],
+      "minutes": 4,
+      "format": null,
+      "note": null
+    },
+    {
+      "id": "demo-36",
+      "meeting": "2026-08-20",
+      "project": "ernolaev-space-svoy-sayt",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 3,
+      "format": null,
+      "note": null
+    },
+    {
+      "id": "demo-37",
+      "meeting": "2026-08-20",
+      "project": "otslezhivatel-biletov-na-vodnyy-transport",
+      "presenters": [
+        "zhenya-arutyunov"
+      ],
+      "minutes": 7,
+      "format": 2,
+      "note": null
+    },
+    {
+      "id": "demo-38",
+      "meeting": "2026-08-20",
+      "project": "sayly-ai-english-tutor",
+      "presenters": [
+        "ayrat"
+      ],
+      "minutes": 5,
+      "format": null,
+      "note": null
+    },
+    {
+      "id": "demo-39",
+      "meeting": "2026-08-20",
+      "project": "shrift",
+      "presenters": [
+        "magomed-vagabov"
+      ],
+      "minutes": 7,
+      "format": 2,
+      "note": null
     }
   ],
   "feedback": [
@@ -2562,6 +2729,10 @@
     {
       "demo": "demo-33",
       "person": "dmitriy-sivuhin"
+    },
+    {
+      "demo": "demo-36",
+      "person": "artem-ermolaev"
     }
   ]
 };
