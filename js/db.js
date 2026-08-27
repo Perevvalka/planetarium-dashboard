@@ -742,6 +742,33 @@
         "magomed-vagabov"
       ],
       "note": null
+    },
+    {
+      "id": "obnovlenie-sayta-evgeniya-smirnova",
+      "title": "Обновление сайта Евгения Смирнова",
+      "url": "https://yevgeniysmirnov.ru/",
+      "authors": [
+        "evgeniy-smirnov"
+      ],
+      "note": null
+    },
+    {
+      "id": "konsultatsionnyy-klub",
+      "title": "Консультационный клуб",
+      "url": null,
+      "authors": [
+        "zhenya-arutyunov"
+      ],
+      "note": null
+    },
+    {
+      "id": "sayt-dannyh-dlya-dnd",
+      "title": "Сайт данных для ДНД",
+      "url": null,
+      "authors": [
+        "ramil-karimov"
+      ],
+      "note": null
     }
   ],
   "meetings": [
@@ -953,6 +980,12 @@
       "date": "2026-08-20",
       "type": "weekly",
       "minutes": 60,
+      "note": null
+    },
+    {
+      "date": "2026-08-27",
+      "type": "weekly",
+      "minutes": 50,
       "note": null
     }
   ],
@@ -2272,6 +2305,38 @@
     {
       "meeting": "2026-08-20",
       "person": "sasha-permyakov"
+    },
+    {
+      "meeting": "2026-08-27",
+      "person": "artem-ermolaev"
+    },
+    {
+      "meeting": "2026-08-27",
+      "person": "danya-samoylenko"
+    },
+    {
+      "meeting": "2026-08-27",
+      "person": "evgeniy-smirnov"
+    },
+    {
+      "meeting": "2026-08-27",
+      "person": "zhenya-arutyunov"
+    },
+    {
+      "meeting": "2026-08-27",
+      "person": "kristina-marchenko"
+    },
+    {
+      "meeting": "2026-08-27",
+      "person": "lesha-nikitin"
+    },
+    {
+      "meeting": "2026-08-27",
+      "person": "polina-perevalova"
+    },
+    {
+      "meeting": "2026-08-27",
+      "person": "ramil-karimov"
     }
   ],
   "demos": [
@@ -2699,6 +2764,39 @@
       "project": "shrift",
       "presenters": [
         "magomed-vagabov"
+      ],
+      "minutes": 7,
+      "format": 2,
+      "note": null
+    },
+    {
+      "id": "demo-40",
+      "meeting": "2026-08-27",
+      "project": "obnovlenie-sayta-evgeniya-smirnova",
+      "presenters": [
+        "evgeniy-smirnov"
+      ],
+      "minutes": 8,
+      "format": null,
+      "note": null
+    },
+    {
+      "id": "demo-41",
+      "meeting": "2026-08-27",
+      "project": "konsultatsionnyy-klub",
+      "presenters": [
+        "zhenya-arutyunov"
+      ],
+      "minutes": 15,
+      "format": 1,
+      "note": null
+    },
+    {
+      "id": "demo-42",
+      "meeting": "2026-08-27",
+      "project": "sayt-dannyh-dlya-dnd",
+      "presenters": [
+        "ramil-karimov"
       ],
       "minutes": 7,
       "format": 2,
