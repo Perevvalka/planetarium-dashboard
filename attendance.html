@@ -2,7 +2,7 @@
 <html lang="ru">
   <head>
     <meta charset="utf-8">
-    <title>Стрики посещений — Планетарий</title>
+    <title>Посещаемость — Планетарий</title>
     <link rel="icon" type="image/png" href="images/favicon-inverted.png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="preload" href="fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
@@ -23,170 +23,16 @@
     <link rel="stylesheet" href="css/components/ids.css">
     <link rel="stylesheet" href="css/components/theme-toggle.css">
     <style>
-      .plviz-tip {
-        position: fixed;
-        z-index: 100;
-        pointer-events: none;
-        background: var(--ids__text);
-        color: var(--ids__background);
-        padding: 0.5em 0.7em;
-        border-radius: 0.4em;
-        font-size: 0.8em;
-        line-height: 1.45;
-        max-width: 22em;
-        opacity: 0;
-        transition: opacity 0.15s ease;
+      /* Квадратики впритык: без гэпов, без скруглений. */
+      .sqviz {
+        max-width: 56em;
       }
-      .plviz-tip.visible {
-        opacity: 1;
-      }
-      .plviz-tip.pinned {
-        pointer-events: auto;
-      }
-      .plviz-tip a {
-        color: inherit;
-        text-decoration: underline;
-      }
-      .plviz-info {
-        min-height: 2.6em;
-        color: var(--ids__text-caption);
-        font-size: 0.9em;
-        margin-top: 1em;
-      }
-      .plviz-legend {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5em 1.4em;
-        margin-top: 1em;
-      }
-      .plviz-legend-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45em;
-        font-size: 0.85em;
-        color: var(--ids__text-caption);
-      }
-      .plviz-legend-item.static {
-        cursor: default;
-      }
-      .plviz-legend-item i {
-        width: 1em;
-        height: 1em;
-        border-radius: 50%;
-        flex: none;
-      }
-      .plviz-streak-swatch.s2 {
-        background: color-mix(in srgb, var(--ids__link) 28%, var(--ids__background));
-      }
-      .plviz-streak-swatch.demo {
-        background: color-mix(in srgb, var(--ids__link) 28%, var(--ids__background));
-        box-shadow: inset 0 0 0 1.5px var(--ids__link);
-        box-sizing: border-box;
-      }
-      .plviz-streak-swatch.all {
-        background: color-mix(in srgb, var(--ids__link) 55%, transparent);
-        border-radius: 0.2em;
-      }
-
-      .plviz-mode {
-        display: flex;
-        gap: 0.4em;
-        margin-bottom: 1em;
-      }
-      .plviz-mode button {
-        font: inherit;
-        font-size: 0.8em;
-        padding: 0.35em 0.9em;
-        border-radius: 1em;
-        border: 1px solid var(--ids__border);
-        background: transparent;
-        color: var(--ids__text-caption);
-        cursor: pointer;
-      }
-      .plviz-mode button.active {
-        background: var(--ids__surface);
-        color: var(--ids__text);
-      }
-
-      .plviz-streak-chart {
-        position: relative;
-        max-width: 52em;
-        padding-top: 1.8em;
-        isolation: isolate;
-      }
-      .plviz-streak-axis {
-        position: absolute;
-        inset: 0;
-        left: calc(11em + 0.35em);
-        right: 0.35em;
-        pointer-events: none;
-        z-index: 1;
-      }
-      .plviz-streak-vline {
-        position: absolute;
-        top: 1.8em;
-        bottom: 0;
-        width: 1px;
-        background: var(--ids__border);
-      }
-      .plviz-streak-month {
-        position: absolute;
-        top: 0.3em;
-        height: 1.75em;
-        font-size: 0.75em;
-        color: var(--ids__text-caption);
-        border-bottom: 2px solid var(--ids__border);
-        box-sizing: border-box;
-        padding-left: 0.15em;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-      .plviz-streak-row {
+      .sqviz-row {
         display: grid;
         grid-template-columns: 11em 1fr;
-        align-items: center;
-        padding: 0.35em;
-        border-radius: 0.3em;
-        cursor: pointer;
-        position: relative;
-        background: transparent;
       }
-      .plviz-streak-total {
-        margin-bottom: 0.7em;
-      }
-      .plviz-streak-total .plviz-streak-name {
-        color: var(--ids__text);
-      }
-      .plviz-streak-cell {
-        position: absolute;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        height: 1.2em;
-        border-radius: 0.15em;
-      }
-      .plviz-streak-row::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: 0.3em;
-        background: color-mix(in srgb, var(--ids__surface) 60%, transparent);
-        opacity: 0;
-        z-index: -1;
-        pointer-events: none;
-      }
-      .plviz-streak-row:hover::before,
-      .plviz-streak-row.active::before {
-        opacity: 1;
-      }
-      .plviz-streak-row.active::before {
-        background: var(--ids__surface);
-      }
-      .plviz-streak-name,
-      .plviz-streak-track {
-        position: relative;
-        z-index: 2;
-      }
-      .plviz-streak-name {
+      .sqviz-label {
+        align-self: center;
         padding-right: 1em;
         font-size: 0.85em;
         color: var(--ids__text-caption);
@@ -194,52 +40,74 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      .plviz-streak-row.active .plviz-streak-name,
-      .plviz-streak-row:hover .plviz-streak-name {
+      .sqviz-sum .sqviz-label {
         color: var(--ids__text);
       }
-      .plviz-streak-track {
-        position: relative;
-        height: 1.35em;
+      .sqviz-track {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
       }
-      .plviz-streak-line {
-        position: absolute;
-        top: 50%;
-        height: 3px;
-        margin-top: -1.5px;
-        border-radius: 2px;
-        pointer-events: auto;
-        background: color-mix(in srgb, var(--ids__link) 28%, transparent);
+      .sqviz-cell {
+        aspect-ratio: 1 / 1;
       }
-      .plviz-streak-dot {
-        position: absolute;
-        top: 50%;
-        width: 0.55em;
-        height: 0.55em;
+      .sqviz-cell:hover {
+        outline: 1px solid var(--ids__text);
+        outline-offset: -1px;
+      }
+      .sqviz-marks .sqviz-mark {
+        font-size: 0.7em;
+        line-height: 1.7;
+        color: var(--ids__text-caption);
+        white-space: nowrap;
+        overflow: hidden;
+        padding-right: 0.4em;
         box-sizing: border-box;
-        transform: translate(-50%, -50%);
-        border-radius: 50%;
-        z-index: 1;
-        background: color-mix(in srgb, var(--ids__link) 28%, var(--ids__background));
-        border: none;
       }
-      .plviz-streak-dot.plviz-streak-demo {
-        border: 1.5px solid var(--ids__link);
-        cursor: pointer;
+      .sqviz-mark-pack {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.4em;
+        overflow: visible;
+        padding-right: 0;
       }
+      .sqviz-num {
+        text-align: center;
+      }
+
+      .sqviz-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5em 1.4em;
+        margin-top: 1em;
+      }
+      .sqviz-legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45em;
+        font-size: 0.85em;
+        color: var(--ids__text-caption);
+      }
+      .sqviz-legend-item i {
+        width: 1em;
+        height: 1em;
+        flex: none;
+      }
+      .sqviz-info {
+        min-height: 2.6em;
+        margin-top: 1em;
+        font-size: 0.9em;
+        color: var(--ids__text-caption);
+      }
+
       @media (width < 768px) {
-        .plviz-streak-axis {
-          left: calc(7em + 0.35em);
-          right: 0.35em;
-        }
-        .plviz-streak-row {
+        .sqviz-row {
           grid-template-columns: 7em 1fr;
         }
-        .plviz-streak-name {
+        .sqviz-label {
           font-size: 0.7em;
         }
       }
-
     </style>
   </head>
 
@@ -256,15 +124,16 @@
           <div class="ids__space XL"></div>
           <div class="ids__text-width">
             <p><a href="index.html">← Главная</a></p>
-            <h1>Стрики посещений</h1>
+            <h1>Посещаемость</h1>
             <p>
-              Кто приходил на встречи Планетария и что показывал. Данные — с февраля 2026.
+              Строка — человек, квадратик — встреча. Синий — пришёл,
+              зелёный — пришёл и показал демо. Верхняя строка — все
+              строчки, наложенные друг на друга: чем темнее, тем больше
+              людей; чем зеленее, тем больше демо.
             </p>
           </div>
           <div class="ids__space S"></div>
-          <div class="plviz-scroll">
-            <div id="plviz-streak"></div>
-          </div>
+          <div id="plviz-attend"></div>
         </div>
 
         <div class="ids__space XL"></div>
