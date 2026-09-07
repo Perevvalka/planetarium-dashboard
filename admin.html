@@ -52,10 +52,18 @@
         gap: 0.75em 1em;
         align-items: center;
         margin-bottom: 1.25em;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        padding: 0.55em 0;
+        background: var(--ids__background);
       }
       .pdb-toolbar .pdb-status {
         color: var(--ids__text-caption);
         font-size: 0.9em;
+      }
+      .pdb-toolbar .pdb-status.is-ok {
+        color: var(--ids__text);
       }
       .pdb-form {
         display: grid;
@@ -92,6 +100,34 @@
         grid-template-columns: 1fr 1fr;
         gap: 0.75em;
       }
+      .pdb-date-row {
+        display: flex;
+        gap: 0.5em;
+        align-items: stretch;
+      }
+      .pdb-date-row input {
+        flex: 1;
+        min-width: 0;
+      }
+      .pdb-date-row button,
+      .pdb-date-row + .pdb-date-human {
+        font: inherit;
+      }
+      .pdb-date-row button {
+        appearance: none;
+        font-size: 0.9em;
+        padding: 0.45em 0.75em;
+        border-radius: 0.35em;
+        border: 1px solid var(--ids__border);
+        background: var(--ids__surface);
+        color: var(--ids__text);
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .pdb-date-human {
+        color: var(--ids__text-caption);
+        font-size: 0.9em;
+      }
       @media (width < 560px) {
         .pdb-form .pdb-row {
           grid-template-columns: 1fr;
@@ -116,38 +152,43 @@
       .pdb-checks,
       .pdb-list.pdb-scroll {
         display: grid;
-        gap: 0.35em;
+        gap: 0.2em;
         max-height: 14em;
         overflow: auto;
-        padding: 0.5em 0.6em;
+        padding: 0.45em 0.7em;
         border: 1px solid var(--ids__border);
         border-radius: 0.35em;
       }
       .pdb-checks label {
         display: flex;
         align-items: center;
-        gap: 0.5em;
+        gap: 0.45em;
         font-size: 0.9em;
+        margin: 0;
+        padding: 0.12em 0;
       }
       .pdb-checks label[hidden],
       .pdb-list li[hidden] {
         display: none;
       }
-      .pdb-checks input {
-        width: auto;
+      .pdb-checks input,
+      .pdb-radios input {
+        width: 1em;
+        height: 1em;
+        margin: 0;
+        flex-shrink: 0;
       }
       .pdb-radios {
         display: grid;
-        gap: 0.45em;
+        gap: 0.25em;
       }
       .pdb-radios label {
         display: flex;
         align-items: center;
         gap: 0.5em;
         font-size: 0.95em;
-      }
-      .pdb-radios input {
-        width: auto;
+        margin: 0;
+        padding: 0.15em 0;
       }
       .pdb-form-caption {
         color: var(--ids__text-caption);
@@ -181,29 +222,55 @@
         color: var(--ids__background);
         border-color: var(--ids__text);
       }
-      .pdb-actions button.danger {
-        color: var(--ids__text);
-        border-color: color-mix(in srgb, var(--ids__text) 35%, var(--ids__border));
+      .pdb-actions button:disabled,
+      .pdb-toolbar button:disabled {
+        opacity: 0.55;
+        cursor: wait;
       }
-      .pdb-list {
+      .ids ul.pdb-list {
         display: grid;
-        gap: 0.35em;
+        gap: 0;
         margin: 0;
         padding: 0;
         list-style: none;
       }
-      .pdb-list li {
+      .ids ul.pdb-list > li {
         display: grid;
         grid-template-columns: 1fr auto;
         gap: 0.75em;
-        align-items: baseline;
-        padding: 0.55em 0.15em;
+        align-items: center;
+        position: relative;
+        margin: 0;
+        padding: 0.4em 0.1em;
         border-bottom: 1px solid var(--ids__border);
         cursor: pointer;
+        scroll-margin-top: 4.5em;
+      }
+      .ids ul.pdb-list > li:before {
+        content: none;
+      }
+      .ids ul.pdb-list > li.pdb-empty {
+        padding-left: 0.1em;
+        cursor: default;
+        border: none;
+      }
+      .ids ul.pdb-list > li.pdb-empty:before {
+        content: none;
       }
       .pdb-list li:hover,
       .pdb-list li.active {
         background: color-mix(in srgb, var(--ids__surface) 70%, transparent);
+      }
+      .pdb-list li.just-saved {
+        animation: pdb-flash 1.6s ease;
+      }
+      @keyframes pdb-flash {
+        from {
+          background: color-mix(in srgb, var(--ids__link) 22%, transparent);
+        }
+        to {
+          background: transparent;
+        }
       }
       .pdb-list .meta {
         color: var(--ids__text-caption);
@@ -256,12 +323,13 @@
             <p><a href="index.html">← Главная</a></p>
             <h1>База данных</h1>
             <p>
-              Ввод данных встреч Планетария. Черновик сохраняется в браузере;
-              чтобы попасть в репозиторий — скачай <code>db.js</code> и замени файл в проекте.
+              Ввод данных встреч Планетария. Черновик сохраняется в браузере.
+              Когда встреча собрана — кнопка «На прод» записывает базу в репозиторий.
             </p>
 
             <div class="pdb-toolbar">
-              <button type="button" class="primary" id="pdb-save-draft">Сохранить черновик</button>
+              <button type="button" id="pdb-save-draft">Сохранить черновик</button>
+              <button type="button" class="primary" id="pdb-publish-top">На прод</button>
               <button type="button" id="pdb-download">Скачать db.js</button>
               <button type="button" id="pdb-copy">Скопировать db.js</button>
               <button type="button" id="pdb-reset">Сбросить к файлу</button>
@@ -329,7 +397,14 @@
               <form class="pdb-form" id="form-meeting">
                 <input type="hidden" name="origDate" value="">
                 <div class="pdb-row">
-                  <label><span>Дата *</span><input name="date" type="date" required></label>
+                  <label>
+                    <span>Дата *</span>
+                    <div class="pdb-date-row">
+                      <input name="date" type="date" required>
+                      <button type="button" id="meeting-today">Сегодня</button>
+                    </div>
+                    <span class="pdb-date-human" id="meeting-date-human"></span>
+                  </label>
                   <label>
                     <span>Тип *</span>
                     <select name="type" required>
@@ -390,14 +465,13 @@
                     <div class="pdb-checks" id="demo-presenters"></div>
                   </div>
                 </label>
-                <div id="demo-format-block">
+                <div id="demo-format-block" hidden>
                   <span class="pdb-form-caption">Формат</span>
                   <div class="pdb-radios" id="demo-format">
                     <label><input type="radio" name="format" value="1"> просто рассказывает</label>
                     <label><input type="radio" name="format" value="2"> экран</label>
                     <label><input type="radio" name="format" value="3"> слайды</label>
                   </div>
-                  <p class="pdb-empty" id="demo-format-auto" hidden>У проекта есть ссылка — формат автоматически «4 · опубликованный продукт».</p>
                 </div>
                 <label><span>Длительность (мин)</span><input name="minutes" type="number" min="1" step="1"></label>
                 <label>
@@ -420,9 +494,8 @@
 
             <div class="pdb-panel pdb-summary" data-panel="summary" hidden>
               <p>
-                Вся встреча одним текстом — перечитать перед тем, как переносить
-                <code>db.js</code> в репозиторий. Свежая встреча выбрана сама,
-                другую можно кликнуть в списке.
+                Вся встреча одним текстом — перечитать перед тем, как нажать «На прод».
+                Свежая встреча выбрана сама, другую можно кликнуть в списке.
               </p>
               <p class="pdb-form-caption">Встречи — свежие сверху</p>
               <ul class="pdb-list pdb-scroll" id="summary-meetings"></ul>
@@ -434,12 +507,25 @@
 
             <div class="pdb-panel pdb-export" data-panel="export" hidden>
               <p>
-                Ниже — содержимое файла <code>js/db.js</code>. Скачай его и положи в проект
-                (или скопируй). После этого визуализации подхватят новые данные.
-                Перед выгрузкой стоит перечитать встречу текстом на вкладке «Сводка».
+                «На прод» записывает текущую базу в <code>js/db.js</code> на ветке
+                <code>main</code> — копировать код вручную не нужно.
+                Перед этим перечитай встречу на вкладке «Сводка».
               </p>
+              <div class="pdb-form" style="margin-top: 1.25em">
+                <label>
+                  <span>Токен GitHub (один раз, хранится только в этом браузере)</span>
+                  <input type="password" id="pdb-gh-token" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
+                </label>
+                <p class="pdb-empty">
+                  Fine-grained token, право Contents: Read and write, только репозиторий
+                  planetarium-dashboard.
+                  <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Создать токен</a>
+                </p>
+              </div>
               <div class="pdb-actions" style="margin: 1em 0">
-                <button type="button" class="primary" id="pdb-download-2">Скачать db.js</button>
+                <button type="button" class="primary" id="pdb-publish">Опубликовать на прод</button>
+                <button type="button" id="pdb-save-token">Сохранить токен</button>
+                <button type="button" id="pdb-download-2">Скачать db.js</button>
                 <button type="button" id="pdb-copy-2">Скопировать</button>
               </div>
               <pre id="pdb-preview"></pre>
@@ -451,7 +537,7 @@
     </main>
 
     <script src="./js/theme-toggle.js"></script>
-    <script src="./js/db.js?v=2"></script>
-    <script src="./js/admin.js?v=2"></script>
+    <script src="./js/db.js?v=3"></script>
+    <script src="./js/admin.js?v=3"></script>
   </body>
 </html>

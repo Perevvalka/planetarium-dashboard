@@ -1,5 +1,5 @@
 // Админка единой базы PlanetariumDB.
-// Черновик — localStorage; в репозиторий — через скачивание js/db.js.
+// Черновик — localStorage; на прод — кнопка «На прод» (коммит js/db.js в main).
 
 (() => {
   "use strict";
@@ -28,8 +28,52 @@
   })();
 
   const statusEl = document.getElementById("pdb-status");
-  const setStatus = (msg) => {
+  const setStatus = (msg, ok) => {
     statusEl.textContent = msg || "";
+    statusEl.classList.toggle("is-ok", Boolean(ok && msg));
+  };
+
+  const MONTHS_GEN = [
+    "января", "февраля", "марта", "апреля", "мая", "июня",
+    "июля", "августа", "сентября", "октября", "ноября", "декабря",
+  ];
+
+  const todayIso = () => {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  const fmtDateRu = (iso) => {
+    if (!iso) return "";
+    const parts = String(iso).split("-");
+    if (parts.length !== 3) return iso;
+    const y = +parts[0];
+    const m = +parts[1];
+    const d = +parts[2];
+    if (!y || !m || !d || !MONTHS_GEN[m - 1]) return iso;
+    return `${d} ${MONTHS_GEN[m - 1]} ${y}`;
+  };
+
+  const revealListItem = (list, selector) => {
+    const li = list?.querySelector(selector);
+    if (!li) return;
+    li.classList.add("just-saved");
+    li.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    window.setTimeout(() => li.classList.remove("just-saved"), 1600);
+  };
+
+  const flashSubmit = (form, label) => {
+    const btn = form.querySelector("button[type=submit]");
+    if (!btn) return;
+    const orig = btn.dataset.origLabel || btn.textContent;
+    btn.dataset.origLabel = orig;
+    btn.textContent = label;
+    window.setTimeout(() => {
+      if (btn.textContent === label) btn.textContent = orig;
+    }, 1600);
   };
 
   const MAP = {
@@ -119,7 +163,6 @@
 
   const saveDraft = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-    setStatus("Черновик сохранён в браузере");
     renderAll();
   };
 
@@ -211,7 +254,7 @@
       .sort((a, b) => b.date.localeCompare(a.date));
     select.innerHTML = items
       .map((m) => {
-        const label = `${m.date} · ${m.type === "stream" ? "эфир" : "встреча"}`;
+        const label = `${fmtDateRu(m.date)} · ${m.type === "stream" ? "эфир" : "встреча"}`;
         return `<option value="${m.date}"${m.date === selected ? " selected" : ""}>${label}</option>`;
       })
       .join("");
@@ -266,13 +309,17 @@
     return Boolean(p?.url);
   };
 
+  const setDemoFormat = (value) => {
+    document.querySelectorAll("#demo-format input[name=format]").forEach((input) => {
+      input.checked = value != null && String(input.value) === String(value);
+    });
+  };
+
   const syncDemoFormatUI = () => {
-    const radios = document.getElementById("demo-format");
-    const autoNote = document.getElementById("demo-format-auto");
+    const block = document.getElementById("demo-format-block");
     const projectId = selectedProjectId();
     const hasUrl = projectId && projectHasUrl(projectId);
-    if (radios) radios.hidden = hasUrl;
-    if (autoNote) autoNote.hidden = !hasUrl;
+    if (block) block.hidden = !projectId || hasUrl;
     if (hasUrl) setDemoFormat(null);
   };
 
@@ -327,7 +374,9 @@
     }
     saveDraft();
     loadPerson(id);
-    setStatus("Персона сохранена");
+    revealListItem(listPersons, `[data-id="${CSS.escape(id)}"]`);
+    flashSubmit(formPerson, "Сохранено");
+    setStatus(`Персона сохранена: ${name}`, true);
   });
 
   document.querySelector('[data-clear="person"]').addEventListener("click", clearPerson);
@@ -419,7 +468,9 @@
     formProject.classList.remove("pdb-url-needed");
     saveDraft();
     loadProject(id);
-    setStatus("Проект сохранён");
+    revealListItem(listProjects, `[data-id="${CSS.escape(id)}"]`);
+    flashSubmit(formProject, "Сохранено");
+    setStatus(`Проект сохранён: ${title}`, true);
   });
 
   document.querySelector('[data-clear="project"]').addEventListener("click", clearProject);
@@ -446,10 +497,20 @@
 
   const formMeeting = document.getElementById("form-meeting");
   const listMeetings = document.getElementById("list-meetings");
+  const meetingDateHuman = document.getElementById("meeting-date-human");
+  const meetingToday = document.getElementById("meeting-today");
+
+  const syncMeetingDateLabel = () => {
+    if (!meetingDateHuman) return;
+    meetingDateHuman.textContent = formMeeting.date.value
+      ? fmtDateRu(formMeeting.date.value)
+      : "";
+  };
 
   const clearMeeting = () => {
     formMeeting.reset();
     formMeeting.origDate.value = "";
+    syncMeetingDateLabel();
     listMeetings.querySelectorAll("li").forEach((li) => li.classList.remove("active"));
   };
 
@@ -461,6 +522,7 @@
     formMeeting.type.value = m.type || "weekly";
     formMeeting.minutes.value = m.minutes ?? "";
     formMeeting.note.value = m.note || "";
+    syncMeetingDateLabel();
     listMeetings.querySelectorAll("li").forEach((li) => {
       li.classList.toggle("active", li.dataset.date === date);
     });
@@ -499,7 +561,9 @@
     db.meetings.sort((a, b) => a.date.localeCompare(b.date));
     saveDraft();
     loadMeeting(date);
-    setStatus("Встреча сохранена");
+    revealListItem(listMeetings, `[data-date="${CSS.escape(date)}"]`);
+    flashSubmit(formMeeting, "Сохранено");
+    setStatus(`Встреча сохранена: ${fmtDateRu(date)}`, true);
   });
 
   document.querySelector('[data-clear="meeting"]').addEventListener("click", clearMeeting);
@@ -516,6 +580,16 @@
     saveDraft();
     setStatus("Встреча удалена");
   });
+
+  formMeeting.date.addEventListener("input", syncMeetingDateLabel);
+  formMeeting.date.addEventListener("change", syncMeetingDateLabel);
+  if (meetingToday) {
+    meetingToday.addEventListener("click", () => {
+      formMeeting.date.value = todayIso();
+      syncMeetingDateLabel();
+      formMeeting.date.focus();
+    });
+  }
 
   // ---------------------------------------------------------------
   // Attendance
@@ -539,7 +613,7 @@
     const selected = db.attendance.filter((a) => a.meeting === date).map((a) => a.person);
     fillPersonChecks(attendancePeople, selected);
     attendanceSummary.textContent = date
-      ? `${selected.length} человек на встрече ${date}`
+      ? `${selected.length} человек · ${fmtDateRu(date)}`
       : "Нет еженедельных встреч";
   };
 
@@ -554,7 +628,8 @@
     people.forEach((person) => db.attendance.push({ meeting: date, person }));
     saveDraft();
     loadAttendanceForm();
-    setStatus(`Присутствие сохранено: ${people.length}`);
+    flashSubmit(formAttendance, "Сохранено");
+    setStatus(`Присутствие сохранено: ${people.length} · ${fmtDateRu(date)}`, true);
   });
 
   // ---------------------------------------------------------------
@@ -581,12 +656,6 @@
 
   const feedbackForDemo = (demoId) =>
     (db.feedback || []).filter((f) => f.demo === demoId).map((f) => f.person);
-
-  const setDemoFormat = (value) => {
-    document.querySelectorAll("#demo-format input[name=format]").forEach((input) => {
-      input.checked = value != null && String(input.value) === String(value);
-    });
-  };
 
   const clearDemo = () => {
     formDemo.reset();
@@ -673,10 +742,13 @@
 
     saveDraft();
     loadDemo(id);
+    revealListItem(listDemos, `[data-id="${CSS.escape(id)}"]`);
+    flashSubmit(formDemo, "Сохранено");
     setStatus(
       feedbackPeople.length
-        ? `Демо сохранено · фидбэк: ${feedbackPeople.length}`
-        : "Демо сохранено"
+        ? `Демо сохранено: ${projectTitle(project)} · фидбэк: ${feedbackPeople.length}`
+        : `Демо сохранено: ${projectTitle(project)}`,
+      true
     );
   });
   document.querySelector('[data-clear="demo"]').addEventListener("click", clearDemo);
@@ -727,11 +799,11 @@
       .join("");
     const visible = listProjects.querySelectorAll("li:not([hidden])").length;
     if (!items.length) {
-      listProjects.innerHTML = `<li class="pdb-empty" style="cursor:default;border:none">Пока нет проектов</li>`;
+      listProjects.innerHTML = `<li class="pdb-empty">Пока нет проектов</li>`;
     } else if (query && !visible) {
       listProjects.insertAdjacentHTML(
         "beforeend",
-        `<li class="pdb-empty" style="cursor:default;border:none">Ничего не найдено</li>`
+        `<li class="pdb-empty">Ничего не найдено</li>`
       );
     }
     listProjects.querySelectorAll("li[data-id]").forEach((li) => {
@@ -753,7 +825,7 @@
             ? `эфир · ${demos} демо`
             : `встреча · ${count} чел.${demos ? ` · ${demos} демо` : ""}`;
         return (
-          `<li data-date="${m.date}"><span>${m.date}</span>` +
+          `<li data-date="${m.date}"><span>${fmtDateRu(m.date)}</span>` +
           `<span class="meta">${meta}</span></li>`
         );
       })
@@ -770,7 +842,7 @@
         const who = d.presenters.map(personName).join(", ");
         return (
           `<li data-id="${d.id}"><span>${escapeHtml(projectTitle(d.project))}</span>` +
-          `<span class="meta">${d.meeting} · ${escapeHtml(who)}</span></li>`
+          `<span class="meta">${fmtDateRu(d.meeting)} · ${escapeHtml(who)}</span></li>`
         );
       })
       .join("");
@@ -794,16 +866,7 @@
     4: "опубликованный продукт",
   };
 
-  const humanDate = (date) => {
-    const d = new Date(`${date}T00:00:00`);
-    if (Number.isNaN(d.getTime())) return date;
-    return d.toLocaleDateString("ru-RU", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  };
+  const humanDate = (date) => fmtDateRu(date);
 
   const namesOf = (ids) => ids.map(personName).sort((a, b) => a.localeCompare(b, "ru"));
 
@@ -901,11 +964,11 @@
                 : `${people} чел. · ${count} демо`;
             return (
               `<li data-date="${m.date}"${m.date === summaryDate ? ' class="active"' : ""}>` +
-              `<span>${m.date}</span><span class="meta">${meta}</span></li>`
+              `<span>${fmtDateRu(m.date)}</span><span class="meta">${meta}</span></li>`
             );
           })
           .join("")
-      : `<li class="pdb-empty" style="cursor:default;border:none">Пока нет встреч</li>`;
+      : `<li class="pdb-empty">Пока нет встреч</li>`;
 
     summaryMeetings.querySelectorAll("li[data-date]").forEach((li) => {
       li.addEventListener("click", () => {
@@ -954,7 +1017,10 @@
   // Toolbar
   // ---------------------------------------------------------------
 
-  document.getElementById("pdb-save-draft").addEventListener("click", saveDraft);
+  document.getElementById("pdb-save-draft").addEventListener("click", () => {
+    saveDraft();
+    setStatus("Черновик сохранён в браузере", true);
+  });
   document.getElementById("pdb-download").addEventListener("click", downloadDb);
   document.getElementById("pdb-download-2").addEventListener("click", downloadDb);
   document.getElementById("pdb-copy").addEventListener("click", copyDb);
@@ -971,12 +1037,226 @@
     setStatus("Загружено из файла");
   });
 
+  // ---------------------------------------------------------------
+  // Публикация на прод (коммит js/db.js в main через GitHub API)
+  // ---------------------------------------------------------------
+
+  const GH_TOKEN_KEY = "planetarium-gh-token";
+  const GH_REPO = "Perevvalka/planetarium-dashboard";
+  const GH_BRANCH = "main";
+  const tokenInput = document.getElementById("pdb-gh-token");
+  const publishButtons = [
+    document.getElementById("pdb-publish"),
+    document.getElementById("pdb-publish-top"),
+  ].filter(Boolean);
+
+  const utf8ToBase64 = (str) => {
+    const bytes = new TextEncoder().encode(str);
+    const chunk = 0x8000;
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+    }
+    return btoa(binary);
+  };
+
+  const base64ToUtf8 = (b64) =>
+    new TextDecoder().decode(
+      Uint8Array.from(atob(String(b64).replace(/\s/g, "")), (c) => c.charCodeAt(0))
+    );
+
+  const loadToken = () => {
+    const token = localStorage.getItem(GH_TOKEN_KEY) || "";
+    if (tokenInput) tokenInput.value = token;
+    return token;
+  };
+
+  const saveToken = () => {
+    const token = (tokenInput?.value || "").trim();
+    if (!token) {
+      localStorage.removeItem(GH_TOKEN_KEY);
+      setStatus("Токен удалён");
+      return "";
+    }
+    localStorage.setItem(GH_TOKEN_KEY, token);
+    setStatus("Токен сохранён в браузере", true);
+    return token;
+  };
+
+  const ghRequest = async (url, token, opts = {}) => {
+    const res = await fetch(url, {
+      ...opts,
+      headers: {
+        Accept: "application/vnd.github+json",
+        Authorization: `Bearer ${token}`,
+        "X-GitHub-Api-Version": "2022-11-28",
+        ...(opts.body ? { "Content-Type": "application/json" } : {}),
+        ...(opts.headers || {}),
+      },
+    });
+    const text = await res.text();
+    let data = null;
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      data = { message: text };
+    }
+    if (!res.ok) {
+      const msg = data?.message || `GitHub ${res.status}`;
+      const err = new Error(msg);
+      err.status = res.status;
+      throw err;
+    }
+    return data;
+  };
+
+  const ghRepo = (path) => `https://api.github.com/repos/${GH_REPO}${path}`;
+
+  const readRepoFile = async (path, token) => {
+    const file = await ghRequest(
+      `${ghRepo(`/contents/${path}`)}?ref=${GH_BRANCH}`,
+      token
+    );
+    return base64ToUtf8(file.content);
+  };
+
+  const bustDbCache = (html) =>
+    html.replace(
+      /(src=["'][^"']*js\/db\.js)(\?v=[^"']*)?/g,
+      `$1?v=${todayIso()}`
+    );
+
+  const commitFiles = async (token, message, files) => {
+    const ref = await ghRequest(`${ghRepo(`/git/ref/heads/${GH_BRANCH}`)}`, token);
+    const headSha = ref.object.sha;
+    const commit = await ghRequest(`${ghRepo(`/git/commits/${headSha}`)}`, token);
+    const treeItems = [];
+    for (const f of files) {
+      const blob = await ghRequest(`${ghRepo("/git/blobs")}`, token, {
+        method: "POST",
+        body: JSON.stringify({ content: f.content, encoding: "utf-8" }),
+      });
+      treeItems.push({
+        path: f.path,
+        mode: "100644",
+        type: "blob",
+        sha: blob.sha,
+      });
+    }
+    const tree = await ghRequest(`${ghRepo("/git/trees")}`, token, {
+      method: "POST",
+      body: JSON.stringify({ base_tree: commit.tree.sha, tree: treeItems }),
+    });
+    const created = await ghRequest(`${ghRepo("/git/commits")}`, token, {
+      method: "POST",
+      body: JSON.stringify({
+        message,
+        tree: tree.sha,
+        parents: [headSha],
+      }),
+    });
+    await ghRequest(`${ghRepo(`/git/refs/heads/${GH_BRANCH}`)}`, token, {
+      method: "PATCH",
+      body: JSON.stringify({ sha: created.sha }),
+    });
+  };
+
+  const publishViaContents = async (token, dbContent) => {
+    const apiFile = ghRepo("/contents/js/db.js");
+    let sha;
+    try {
+      const existing = await ghRequest(`${apiFile}?ref=${GH_BRANCH}`, token);
+      sha = existing.sha;
+    } catch (e) {
+      if (e.status !== 404) throw e;
+    }
+    const payload = {
+      message: `Update PlanetariumDB (${todayIso()}).`,
+      content: utf8ToBase64(dbContent),
+      branch: GH_BRANCH,
+    };
+    if (sha) payload.sha = sha;
+    await ghRequest(apiFile, token, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+  };
+
+  const publishToProd = async () => {
+    let token = (tokenInput?.value || "").trim() || localStorage.getItem(GH_TOKEN_KEY) || "";
+    if (!token) {
+      switchTab("export");
+      tokenInput?.focus();
+      setStatus("Сначала вставь токен GitHub на вкладке «Экспорт»");
+      return;
+    }
+    if (tokenInput) tokenInput.value = token;
+    localStorage.setItem(GH_TOKEN_KEY, token);
+
+    if (
+      !confirm("Записать текущую базу в js/db.js на ветке main и выложить на прод?")
+    ) {
+      return;
+    }
+
+    saveDraft();
+    setStatus("Публикую на прод…");
+    publishButtons.forEach((b) => {
+      b.disabled = true;
+    });
+
+    const dbContent = serializeFile();
+
+    try {
+      const files = [{ path: "js/db.js", content: dbContent }];
+      for (const path of ["dashboard.html", "admin.html", "attendance.html"]) {
+        try {
+          const html = await readRepoFile(path, token);
+          const next = bustDbCache(html);
+          if (next !== html) files.push({ path, content: next });
+        } catch (_) {}
+      }
+      try {
+        await commitFiles(
+          token,
+          `Update PlanetariumDB (${todayIso()}).`,
+          files
+        );
+      } catch (e) {
+        if (e.status === 401 || e.status === 403) throw e;
+        await publishViaContents(token, dbContent);
+      }
+      setStatus("Опубликовано на прод. Дашборд обновится через минуту.", true);
+    } catch (e) {
+      if (e.status === 401 || e.status === 403) {
+        switchTab("export");
+        setStatus("Токен не принят. Проверь права Contents: Read and write.");
+      } else {
+        setStatus(`Не удалось опубликовать: ${e.message || e}`);
+      }
+    } finally {
+      publishButtons.forEach((b) => {
+        b.disabled = false;
+      });
+    }
+  };
+
+  loadToken();
+  document.getElementById("pdb-save-token")?.addEventListener("click", saveToken);
+  document.getElementById("pdb-publish")?.addEventListener("click", () => {
+    publishToProd();
+  });
+  document.getElementById("pdb-publish-top")?.addEventListener("click", () => {
+    publishToProd();
+  });
+
   // init
   fillPersonChecks(projectAuthors, []);
   fillPersonChecks(demoPresenters, []);
   fillPersonChecks(demoFeedback, []);
   fillMeetingSelect(demoMeeting);
   fillProjectRadios(demoProject, "");
+  syncMeetingDateLabel();
   renderAll();
   const hashTab = location.hash.replace(/^#/, "");
   const tabIds = [...document.querySelectorAll(".pdb-tabs [role='tab']")].map(

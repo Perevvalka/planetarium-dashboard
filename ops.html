@@ -114,14 +114,14 @@
         font-size: 1.15em;
       }
       .ops-task {
-        margin: 0 0 1.75em;
+        margin: 0 0 1.25em;
       }
       .ops-task-head {
         display: flex;
         flex-wrap: wrap;
         gap: 0.35em 1em;
         align-items: baseline;
-        margin: 0 0 0.65em;
+        margin: 0 0 0.4em;
       }
       .ops-task-head h3 {
         margin: 0;
@@ -131,19 +131,27 @@
         color: var(--ids__text-caption);
         font-size: 0.85em;
       }
-      .ops-list {
+      .ids ul.ops-list {
         display: grid;
-        gap: 0.35em;
+        gap: 0.1em;
         margin: 0;
         padding: 0;
         list-style: none;
       }
+      .ids ul.ops-list > li {
+        position: relative;
+        margin: 0;
+        padding: 0;
+      }
+      .ids ul.ops-list > li:before {
+        content: none;
+      }
       .ops-list label {
         display: grid;
         grid-template-columns: auto 1fr;
-        gap: 0.65em;
+        gap: 0.5em;
         align-items: start;
-        padding: 0.45em 0.5em;
+        padding: 0.2em 0.15em;
         border-radius: 0.35em;
         cursor: pointer;
       }
@@ -151,10 +159,19 @@
         background: color-mix(in srgb, var(--ids__surface) 60%, transparent);
       }
       .ops-list input {
-        margin-top: 0.2em;
+        width: 1.05em;
+        height: 1.05em;
+        margin: 0.2em 0 0;
+        flex-shrink: 0;
       }
-      .ops-sublist {
-        margin: 0.1em 0 0.5em 2.1em;
+      .ops-list label > span {
+        min-width: 0;
+      }
+      .ops-list label a {
+        white-space: nowrap;
+      }
+      .ids ul.ops-sublist {
+        margin: 0.1em 0 0.2em 1.7em;
         font-size: 0.95em;
       }
       .ops-list label.done span {
@@ -222,6 +239,6 @@
     </main>
 
     <script src="./js/theme-toggle.js"></script>
-    <script src="./js/ops.js?v=2"></script>
+    <script src="./js/ops.js?v=3"></script>
   </body>
 </html>
