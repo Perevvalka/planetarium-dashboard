@@ -416,7 +416,7 @@
     },
     {
       "id": "andrey",
-      "name": "Андрей",
+      "name": "Андрей Шикарненко",
       "telegram": null,
       "photo": null,
       "note": null
@@ -769,6 +769,15 @@
         "ramil-karimov"
       ],
       "note": null
+    },
+    {
+      "id": "tsifrovaya-prepodavatelskaya",
+      "title": "Цифровая преподавательская",
+      "url": null,
+      "authors": [
+        "kristina-marchenko"
+      ],
+      "note": null
     }
   ],
   "meetings": [
@@ -986,6 +995,12 @@
       "date": "2026-08-27",
       "type": "weekly",
       "minutes": 50,
+      "note": null
+    },
+    {
+      "date": "2026-09-03",
+      "type": "weekly",
+      "minutes": 57,
       "note": null
     }
   ],
@@ -2337,6 +2352,46 @@
     {
       "meeting": "2026-08-27",
       "person": "ramil-karimov"
+    },
+    {
+      "meeting": "2026-09-03",
+      "person": "andrey"
+    },
+    {
+      "meeting": "2026-09-03",
+      "person": "artem-ermolaev"
+    },
+    {
+      "meeting": "2026-09-03",
+      "person": "dmitriy-sivuhin"
+    },
+    {
+      "meeting": "2026-09-03",
+      "person": "evgeniy-smirnov"
+    },
+    {
+      "meeting": "2026-09-03",
+      "person": "zhenya-arutyunov"
+    },
+    {
+      "meeting": "2026-09-03",
+      "person": "kristina-marchenko"
+    },
+    {
+      "meeting": "2026-09-03",
+      "person": "lesha-nikitin"
+    },
+    {
+      "meeting": "2026-09-03",
+      "person": "olga-permyakova"
+    },
+    {
+      "meeting": "2026-09-03",
+      "person": "polina-perevalova"
+    },
+    {
+      "meeting": "2026-09-03",
+      "person": "rustam-mushraipov"
     }
   ],
   "demos": [
@@ -2799,6 +2854,50 @@
         "ramil-karimov"
       ],
       "minutes": 7,
+      "format": 2,
+      "note": null
+    },
+    {
+      "id": "demo-43",
+      "meeting": "2026-09-03",
+      "project": "tsifrovaya-prepodavatelskaya",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 1,
+      "format": 2,
+      "note": null
+    },
+    {
+      "id": "demo-44",
+      "meeting": "2026-09-03",
+      "project": "obnovlenie-sayta-evgeniya-smirnova",
+      "presenters": [
+        "evgeniy-smirnov"
+      ],
+      "minutes": 5,
+      "format": null,
+      "note": null
+    },
+    {
+      "id": "demo-45",
+      "meeting": "2026-09-03",
+      "project": "konsultatsionnyy-klub",
+      "presenters": [
+        "zhenya-arutyunov"
+      ],
+      "minutes": 2,
+      "format": 1,
+      "note": null
+    },
+    {
+      "id": "demo-46",
+      "meeting": "2026-09-03",
+      "project": "taymer-dlya-chasov",
+      "presenters": [
+        "andrey"
+      ],
+      "minutes": 5,
       "format": 2,
       "note": null
     }
