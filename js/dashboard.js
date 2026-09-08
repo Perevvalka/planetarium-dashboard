@@ -1,6 +1,8 @@
 // Дашборд явки Планетария.
 // Строка — человек, квадратик — встреча. Квадратики стык в стык, как в тетрадке.
 // Был — голубой, показывал — зелёный, не был — пусто.
+// Сверху столбики длительности: зелёные блоки — демо от длинного к короткому,
+// голубой сверху — обсуждение. Ширина как у квадратика, 60 мин ≈ 4 клетки.
 // Данные — из js/db.js, с декабря 2025.
 
 (() => {
@@ -15,6 +17,9 @@
   const CUTOFF = "2025-12-01";
   const CELL = 44;
   const NAME = "18em";
+  // 60 минут ≈ 4 квадратика в высоту; ширина столбика = квадратик.
+  const PX_PER_MIN = (CELL * 4) / 60;
+  const BAR_GAP = 3;
 
   const MISSED = 0;
   const VISIT = 1;
@@ -43,6 +48,9 @@
   const n = dates.length;
   const slotOf = {};
   dates.forEach((d, i) => (slotOf[d] = i));
+  const meetingMin = Object.fromEntries(
+    DB.meetings.map((m) => [m.date, m.minutes || 0])
+  );
 
   const esc = (s) =>
     String(s)
@@ -72,6 +80,17 @@
     const slot = slotOf[d.meeting];
     if (slot === undefined) return;
     demosAt[slot].push(d);
+  });
+
+  const barAt = dates.map((date, i) => {
+    const demos = demosAt[i]
+      .filter((d) => d.minutes > 0)
+      .slice()
+      .sort((a, b) => b.minutes - a.minutes || a.id.localeCompare(b.id));
+    const demoMin = demos.reduce((s, d) => s + d.minutes, 0);
+    const total = meetingMin[date] || 0;
+    const talk = Math.max(0, total - demoMin);
+    return { total, demos, talk };
   });
 
   const states = {};
@@ -149,47 +168,88 @@
   };
 
   const fmtDate = (iso) =>
-    `${+iso.slice(8, 10)} ${MONTHS_GEN[+iso.slice(5, 7) - 1]} ’${iso.slice(2, 4)}`;
+    `${+iso.slice(8, 10)}\u00a0${MONTHS_GEN[+iso.slice(5, 7) - 1]}\u00a0’${iso.slice(2, 4)}`;
 
-  const meetingTip = (i) => {
+  const peopleAt = dates.map((_, i) =>
+    rows.filter((r) => r.row[i] !== MISSED).map((r) => r.name)
+  );
+
+  const panelHtml = (title, entries, note) => {
+    const rowsHtml = entries
+      .filter(([, v]) => v != null && v !== "")
+      .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`)
+      .join("");
+    return (
+      `<p class="plviz-panel-title">${esc(title)}</p>` +
+      `<dl class="plviz-dl">${rowsHtml}</dl>` +
+      (note ? `<p class="plviz-panel-note">${note}</p>` : "")
+    );
+  };
+
+  const defaultPanel = () =>
+    panelHtml(
+      "Все встречи",
+      [
+        ["период", `${fmtDate(dates[0])} — ${fmtDate(dates[n - 1])}`],
+        ["встреч", String(n)],
+        ["участников", String(rows.length)],
+        ["демо", String(demosAt.reduce((s, list) => s + list.length, 0))],
+      ],
+      "Наведите на квадратик или столбик — здесь появятся детали."
+    );
+
+  const meetingPanel = (i) => {
     const t = totals[i];
+    const b = barAt[i];
     const shown = demosAt[i];
-    const who =
-      `${t.people} ${plural(t.people, "человек", "человека", "человек")}` +
-      (t.demos ? `, ${t.demos} с демо` : "");
-    if (!shown.length) return `${fmtDate(dates[i])}<br>${who}`;
-    return `${fmtDate(dates[i])}<br>${who}<br>` + shown.map(demoLine).join("<br>");
+    const demoLineHtml = shown.length
+      ? shown.map(demoLine).join("<br>")
+      : "нет";
+    return panelHtml(`Встреча №${i + 1}`, [
+      ["дата", fmtDate(dates[i])],
+      ["длительность", b.total ? `${b.total} мин` : ""],
+      [
+        "были",
+        t.people
+          ? `${t.people} ${plural(t.people, "человек", "человека", "человек")}: ${esc(peopleAt[i].join(", "))}`
+          : "данных о явке нет",
+      ],
+      ["демо", t.demos ? `${t.demos}<br>${demoLineHtml}` : demoLineHtml],
+      ["обсуждение", b.talk ? `${b.talk} мин` : ""],
+    ]);
   };
 
-  const personTip = (r, i) => {
-    let body = `<b>${esc(r.name)}</b><br>${fmtDate(dates[i])}`;
+  const demoFields = (d) => {
+    const project = projectById[d.project];
+    const title = project ? project.title : d.project;
+    const fmt = FORMATS[formatOf(d)];
+    return [
+      ["проект", esc(title)],
+      ["формат", fmt || ""],
+      ["длительность", d.minutes ? `${d.minutes} мин` : ""],
+    ];
+  };
+
+  const demoPanel = (d, i) => {
+    const names = d.presenters
+      .map((id) => personById[id] && personById[id].name)
+      .filter(Boolean)
+      .join(", ");
+    return panelHtml("Демо", [
+      ["встреча", `№${i + 1} · ${fmtDate(dates[i])}`],
+      ...demoFields(d),
+      ["показывал", esc(names)],
+    ]);
+  };
+
+  const personPanel = (r, i) => {
     const own = demosAt[i].filter((d) => d.presenters.indexOf(r.id) >= 0);
-    if (own.length) body += `<br>` + own.map(demoLine).join("<br>");
-    return body;
+    const extra = own.flatMap(demoFields);
+    return panelHtml(r.name, [["встреча", `№${i + 1} · ${fmtDate(dates[i])}`], ...extra]);
   };
-
-  const tip = document.createElement("div");
-  tip.className = "plviz-tip";
-  document.body.appendChild(tip);
-
-  document.addEventListener("pointermove", (e) => {
-    const t = e.target.closest ? e.target.closest("[data-tip]") : null;
-    if (!t) {
-      tip.className = "plviz-tip";
-      return;
-    }
-    tip.innerHTML = t.getAttribute("data-tip");
-    tip.className = "plviz-tip visible";
-    const box = tip.getBoundingClientRect();
-    let x = e.clientX + 14;
-    let y = e.clientY + 14;
-    if (x + box.width > window.innerWidth - 8) x = e.clientX - box.width - 14;
-    if (y + box.height > window.innerHeight - 8) y = e.clientY - box.height - 14;
-    tip.style.left = Math.max(8, x) + "px";
-    tip.style.top = Math.max(8, y) + "px";
-  });
 
   const el = document.getElementById("plviz-dashboard");
+  const box = document.getElementById("plviz-panel");
   if (!el) return;
 
   if (!n) {
@@ -205,14 +265,44 @@
     else monthSpans.push({ key, len: 1, start: i });
   });
 
+  const barHeightPx = (b) => {
+    const parts = b.demos.length + (b.talk > 0 ? 1 : 0);
+    const mins = b.demos.reduce((s, d) => s + d.minutes, 0) + b.talk;
+    const gaps = Math.max(0, parts - 1) * BAR_GAP;
+    return mins * PX_PER_MIN + gaps;
+  };
+  const barsRowPx = Math.ceil(Math.max(0, ...barAt.map(barHeightPx)));
+  const minPx = (minutes) => `${(minutes * PX_PER_MIN).toFixed(2)}px`;
+
+  const barsHtml =
+    `<div class="plviz-name" style="grid-row:1;grid-column:1"></div>` +
+    barAt
+      .map((b, i) => {
+        const segs = b.demos.map(
+          (d) =>
+            `<span class="plviz-seg demo" data-i="${i}" data-demo="${esc(d.id)}" style="height:${minPx(d.minutes)}"></span>`
+        );
+        if (b.talk > 0) {
+          segs.push(
+            `<span class="plviz-seg talk" data-i="${i}" style="height:${minPx(b.talk)}"></span>`
+          );
+        }
+        return (
+          `<span class="plviz-bar" data-i="${i}" data-row="sum" style="grid-row:1;grid-column:${i + 2}">` +
+          segs.join("") +
+          `</span>`
+        );
+      })
+      .join("");
+
   const monthsHtml =
-    `<div class="plviz-name plviz-corner" style="grid-row:1;grid-column:1"></div>` +
+    `<div class="plviz-name plviz-corner" style="grid-row:2;grid-column:1"></div>` +
     monthSpans
       .map((m) => {
         const label = MONTHS_SHORT[+m.key.slice(5, 7) - 1];
         const col = m.start + 2;
         return (
-          `<div class="plviz-month" style="grid-row:1;grid-column:${col} / ${col + m.len}">${label}</div>`
+          `<div class="plviz-month" style="grid-row:2;grid-column:${col} / ${col + m.len}">${label}</div>`
         );
       })
       .join("");
@@ -222,7 +312,7 @@
     dates
       .map(
         (d, i) =>
-          `<span class="plviz-cell sum-cell" data-tip="${meetingTip(i)}">${summaryLayers(i)}</span>`
+          `<span class="plviz-cell sum-cell" data-i="${i}" data-row="sum">${summaryLayers(i)}</span>`
       )
       .join("");
 
@@ -231,8 +321,8 @@
       const cells = r.row
         .map((v, i) => {
           if (v === MISSED) return `<span class="plviz-cell"></span>`;
-          const kind = v === DEMO ? "demo" : "visit";
-          return `<span class="plviz-cell ${kind}" data-tip="${personTip(r, i)}"></span>`;
+          if (v === VISIT) return `<span class="plviz-cell visit"></span>`;
+          return `<span class="plviz-cell demo" data-i="${i}" data-row="${esc(r.id)}"></span>`;
         })
         .join("");
       return `<div class="plviz-name">${esc(r.name)}</div>${cells}`;
@@ -240,13 +330,59 @@
     .join("");
 
   el.innerHTML =
-    `<div class="plviz-chart" style="--cell:${CELL}px;grid-template-columns:${NAME} repeat(${n}, ${CELL}px)">` +
+    `<div class="plviz-chart" style="--cell:${CELL}px;--bars:${barsRowPx}px;--bar-gap:${BAR_GAP}px;grid-template-columns:${NAME} repeat(${n}, ${CELL}px);grid-template-rows:${barsRowPx}px 2.2em">` +
+    barsHtml +
     monthsHtml +
     `<div class="plviz-head" style="display:contents">${headHtml}</div>` +
     rowsHtml +
     `</div>` +
     `<div class="plviz-legend">` +
-    `<span><i class="visit"></i>был</span>` +
-    `<span><i class="demo"></i>показывал</span>` +
+    `<span><i class="visit"></i>был / обсуждение</span>` +
+    `<span><i class="demo"></i>показывал / демо</span>` +
     `</div>`;
+
+  const rowById = Object.fromEntries(rows.map((r) => [r.id, r]));
+
+  const showDefault = () => {
+    if (box) box.innerHTML = defaultPanel();
+  };
+
+  const shell = el.closest(".plviz-shell") || el;
+  shell.addEventListener("pointerover", (e) => {
+    if (!box) return;
+    const seg = e.target.closest(".plviz-seg");
+    if (seg && seg.dataset.i != null) {
+      const i = +seg.dataset.i;
+      if (seg.dataset.demo) {
+        const d = barAt[i].demos.find((x) => x.id === seg.dataset.demo);
+        box.innerHTML = d ? demoPanel(d, i) : meetingPanel(i);
+      } else {
+        box.innerHTML = meetingPanel(i);
+      }
+      return;
+    }
+    const bar = e.target.closest(".plviz-bar");
+    if (bar && bar.dataset.i != null) {
+      box.innerHTML = meetingPanel(+bar.dataset.i);
+      return;
+    }
+    const cell = e.target.closest(".plviz-cell");
+    if (!cell || cell.dataset.i == null) return;
+    const i = +cell.dataset.i;
+    if (cell.dataset.row === "sum") box.innerHTML = meetingPanel(i);
+    else box.innerHTML = personPanel(rowById[cell.dataset.row], i);
+  });
+  shell.addEventListener("pointerleave", showDefault);
+  showDefault();
+
+  const scroller = el.closest(".plviz-scroll") || el;
+  const showLatest = () => {
+    const cells = el.querySelectorAll(".sum-cell");
+    const last = cells[cells.length - 1];
+    if (!last || scroller.scrollWidth <= scroller.clientWidth + 1) return;
+    scroller.scrollLeft += last.getBoundingClientRect().right - scroller.getBoundingClientRect().right;
+  };
+  showLatest();
+  requestAnimationFrame(showLatest);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(showLatest);
 })();

@@ -1209,7 +1209,7 @@
 
     try {
       const files = [{ path: "js/db.js", content: dbContent }];
-      for (const path of ["dashboard.html", "admin.html", "attendance.html"]) {
+      for (const path of ["dashboard.html", "admin.html"]) {
         try {
           const html = await readRepoFile(path, token);
           const next = bustDbCache(html);
