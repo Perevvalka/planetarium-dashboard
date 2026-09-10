@@ -23,13 +23,6 @@
       "note": null
     },
     {
-      "id": "aleksandr-liso",
-      "name": "Александр Лисо…?",
-      "telegram": null,
-      "photo": null,
-      "note": null
-    },
-    {
       "id": "alena-grishkovets",
       "name": "Алёна Гришковец",
       "telegram": null,
@@ -434,6 +427,13 @@
       "telegram": null,
       "photo": null,
       "note": null
+    },
+    {
+      "id": "egor",
+      "name": "Егор",
+      "telegram": null,
+      "photo": null,
+      "note": null
     }
   ],
   "projects": [
@@ -736,7 +736,7 @@
     },
     {
       "id": "shrift",
-      "title": "Шрифт Магомеда",
+      "title": "Шрифт Михей",
       "url": null,
       "authors": [
         "magomed-vagabov"
@@ -776,6 +776,24 @@
       "url": null,
       "authors": [
         "kristina-marchenko"
+      ],
+      "note": null
+    },
+    {
+      "id": "pechat-knigi-eto-krasivo-a-eto-net",
+      "title": "Печать книги «Это красиво, а это нет»",
+      "url": null,
+      "authors": [
+        "zhenya-arutyunov"
+      ],
+      "note": null
+    },
+    {
+      "id": "inst-dlya-tvorchestva",
+      "title": "Инст для творчества",
+      "url": "https://www.instagram.com/polina_tancy_muzyka/",
+      "authors": [
+        "polina-perevalova"
       ],
       "note": null
     }
@@ -1001,6 +1019,12 @@
       "date": "2026-09-03",
       "type": "weekly",
       "minutes": 57,
+      "note": null
+    },
+    {
+      "date": "2026-09-10",
+      "type": "weekly",
+      "minutes": 60,
       "note": null
     }
   ],
@@ -1995,10 +2019,6 @@
     },
     {
       "meeting": "2026-04-24",
-      "person": "aleksandr-liso"
-    },
-    {
-      "meeting": "2026-04-24",
       "person": "polina-perevalova"
     },
     {
@@ -2392,6 +2412,46 @@
     {
       "meeting": "2026-09-03",
       "person": "rustam-mushraipov"
+    },
+    {
+      "meeting": "2026-09-10",
+      "person": "andrey"
+    },
+    {
+      "meeting": "2026-09-10",
+      "person": "artem-ermolaev"
+    },
+    {
+      "meeting": "2026-09-10",
+      "person": "dmitriy-sivuhin"
+    },
+    {
+      "meeting": "2026-09-10",
+      "person": "evgeniy-smirnov"
+    },
+    {
+      "meeting": "2026-09-10",
+      "person": "egor"
+    },
+    {
+      "meeting": "2026-09-10",
+      "person": "zhenya-arutyunov"
+    },
+    {
+      "meeting": "2026-09-10",
+      "person": "kristina-marchenko"
+    },
+    {
+      "meeting": "2026-09-10",
+      "person": "lesha-nikitin"
+    },
+    {
+      "meeting": "2026-09-10",
+      "person": "magomed-vagabov"
+    },
+    {
+      "meeting": "2026-09-10",
+      "person": "polina-perevalova"
     }
   ],
   "demos": [
@@ -2900,6 +2960,72 @@
       "minutes": 5,
       "format": 2,
       "note": null
+    },
+    {
+      "id": "demo-47",
+      "meeting": "2026-09-10",
+      "project": "pechat-knigi-eto-krasivo-a-eto-net",
+      "presenters": [
+        "zhenya-arutyunov"
+      ],
+      "minutes": 9,
+      "format": 2,
+      "note": null
+    },
+    {
+      "id": "demo-48",
+      "meeting": "2026-09-10",
+      "project": "konsultatsionnyy-klub",
+      "presenters": [
+        "zhenya-arutyunov"
+      ],
+      "minutes": 7,
+      "format": 1,
+      "note": null
+    },
+    {
+      "id": "demo-49",
+      "meeting": "2026-09-10",
+      "project": "past-simple",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 1,
+      "format": null,
+      "note": null
+    },
+    {
+      "id": "demo-50",
+      "meeting": "2026-09-10",
+      "project": "obnovlenie-sayta-evgeniya-smirnova",
+      "presenters": [
+        "evgeniy-smirnov"
+      ],
+      "minutes": 6,
+      "format": null,
+      "note": null
+    },
+    {
+      "id": "demo-51",
+      "meeting": "2026-09-10",
+      "project": "inst-dlya-tvorchestva",
+      "presenters": [
+        "polina-perevalova"
+      ],
+      "minutes": 5,
+      "format": null,
+      "note": null
+    },
+    {
+      "id": "demo-52",
+      "meeting": "2026-09-10",
+      "project": "shrift",
+      "presenters": [
+        "magomed-vagabov"
+      ],
+      "minutes": 3,
+      "format": 2,
+      "note": null
     }
   ],
   "feedback": [
@@ -2930,6 +3056,14 @@
     {
       "demo": "demo-36",
       "person": "artem-ermolaev"
+    },
+    {
+      "demo": "demo-48",
+      "person": "zhenya-arutyunov"
+    },
+    {
+      "demo": "demo-49",
+      "person": "zhenya-arutyunov"
     }
   ]
 };
