@@ -15,10 +15,7 @@
   }
 
   const CUTOFF = "2025-12-01";
-  const CELL = 44;
-  const NAME = "18em";
   // 60 минут ≈ 4 квадратика в высоту; ширина столбика = квадратик.
-  const PX_PER_MIN = (CELL * 4) / 60;
   const BAR_GAP = 3;
 
   const MISSED = 0;
@@ -202,21 +199,28 @@
     const t = totals[i];
     const b = barAt[i];
     const shown = demosAt[i];
+    const meeting = DB.meetings.find((m) => m.date === dates[i]);
     const demoLineHtml = shown.length
       ? shown.map(demoLine).join("<br>")
       : "нет";
-    return panelHtml(`Встреча №${i + 1}`, [
-      ["дата", fmtDate(dates[i])],
-      ["длительность", b.total ? `${b.total} мин` : ""],
+    return panelHtml(
+      `Встреча №${i + 1}`,
       [
-        "были",
-        t.people
-          ? `${t.people} ${plural(t.people, "человек", "человека", "человек")}: ${esc(peopleAt[i].join(", "))}`
-          : "данных о явке нет",
+        ["дата", fmtDate(dates[i])],
+        ["длительность", b.total ? `${b.total} мин` : ""],
+        [
+          "были",
+          t.people
+            ? `${t.people} ${plural(t.people, "человек", "человека", "человек")}: ${esc(peopleAt[i].join(", "))}`
+            : "данных о явке нет",
+        ],
+        ["демо", t.demos ? `${t.demos}<br>${demoLineHtml}` : demoLineHtml],
+        ["обсуждение", b.talk ? `${b.talk} мин` : ""],
       ],
-      ["демо", t.demos ? `${t.demos}<br>${demoLineHtml}` : demoLineHtml],
-      ["обсуждение", b.talk ? `${b.talk} мин` : ""],
-    ]);
+      meeting?.generated
+        ? "Длительность и демо до августа сгенерированы по образцу августа 2026."
+        : undefined
+    );
   };
 
   const demoFields = (d) => {
@@ -265,77 +269,84 @@
     else monthSpans.push({ key, len: 1, start: i });
   });
 
-  const barHeightPx = (b) => {
+  const barStack = (b) => {
     const parts = b.demos.length + (b.talk > 0 ? 1 : 0);
     const mins = b.demos.reduce((s, d) => s + d.minutes, 0) + b.talk;
-    const gaps = Math.max(0, parts - 1) * BAR_GAP;
-    return mins * PX_PER_MIN + gaps;
+    return { mins, gaps: Math.max(0, parts - 1) };
   };
-  const barsRowPx = Math.ceil(Math.max(0, ...barAt.map(barHeightPx)));
-  const minPx = (minutes) => `${(minutes * PX_PER_MIN).toFixed(2)}px`;
+  const tallest = barAt.reduce(
+    (max, b) => {
+      const s = barStack(b);
+      return s.mins > max.mins ? s : max;
+    },
+    { mins: 0, gaps: 0 }
+  );
+  const minH = (minutes) => `calc(${minutes} * var(--cell) * 4 / 60)`;
 
-  const barsHtml =
-    `<div class="plviz-name" style="grid-row:1;grid-column:1"></div>` +
-    barAt
-      .map((b, i) => {
-        const segs = b.demos.map(
-          (d) =>
-            `<span class="plviz-seg demo" data-i="${i}" data-demo="${esc(d.id)}" style="height:${minPx(d.minutes)}"></span>`
+  const barsHtml = barAt
+    .map((b, i) => {
+      const segs = b.demos.map(
+        (d) =>
+          `<span class="plviz-seg demo ids__hover-dot" data-i="${i}" data-demo="${esc(d.id)}" style="height:${minH(d.minutes)}"></span>`
+      );
+      if (b.talk > 0) {
+        segs.push(
+          `<span class="plviz-seg talk ids__hover-dot" data-i="${i}" style="height:${minH(b.talk)}"></span>`
         );
-        if (b.talk > 0) {
-          segs.push(
-            `<span class="plviz-seg talk" data-i="${i}" style="height:${minPx(b.talk)}"></span>`
-          );
-        }
-        return (
-          `<span class="plviz-bar" data-i="${i}" data-row="sum" style="grid-row:1;grid-column:${i + 2}">` +
-          segs.join("") +
-          `</span>`
-        );
-      })
-      .join("");
-
-  const monthsHtml =
-    `<div class="plviz-name plviz-corner" style="grid-row:2;grid-column:1"></div>` +
-    monthSpans
-      .map((m) => {
-        const label = MONTHS_SHORT[+m.key.slice(5, 7) - 1];
-        const col = m.start + 2;
-        return (
-          `<div class="plviz-month" style="grid-row:2;grid-column:${col} / ${col + m.len}">${label}</div>`
-        );
-      })
-      .join("");
-
-  const headHtml =
-    `<div class="plviz-name">все</div>` +
-    dates
-      .map(
-        (d, i) =>
-          `<span class="plviz-cell sum-cell" data-i="${i}" data-row="sum">${summaryLayers(i)}</span>`
-      )
-      .join("");
-
-  const rowsHtml = rows
-    .map((r) => {
-      const cells = r.row
-        .map((v, i) => {
-          if (v === MISSED) return `<span class="plviz-cell"></span>`;
-          if (v === VISIT) return `<span class="plviz-cell visit"></span>`;
-          return `<span class="plviz-cell demo" data-i="${i}" data-row="${esc(r.id)}"></span>`;
-        })
-        .join("");
-      return `<div class="plviz-name">${esc(r.name)}</div>${cells}`;
+      }
+      return (
+        `<span class="plviz-bar" data-i="${i}" data-row="sum" style="grid-row:1;grid-column:${i + 1}">` +
+        segs.join("") +
+        `</span>`
+      );
     })
     .join("");
 
+  const monthsHtml = monthSpans
+    .map((m) => {
+      const label = MONTHS_SHORT[+m.key.slice(5, 7) - 1];
+      const col = m.start + 1;
+      return `<div class="plviz-month" style="grid-row:2;grid-column:${col} / ${col + m.len}">${label}</div>`;
+    })
+    .join("");
+
+  const headHtml = dates
+    .map(
+      (d, i) =>
+        `<span class="plviz-cell sum-cell ids__hover-dot" data-i="${i}" data-row="sum">${summaryLayers(i)}</span>`
+    )
+    .join("");
+
+  const rowsHtml = rows
+    .map((r) =>
+      r.row
+        .map((v, i) => {
+          if (v === MISSED) return `<span class="plviz-cell"></span>`;
+          if (v === VISIT)
+            return `<span class="plviz-cell visit ids__hover-dot" data-i="${i}" data-row="${esc(r.id)}"></span>`;
+          return `<span class="plviz-cell demo ids__hover-dot" data-i="${i}" data-row="${esc(r.id)}"></span>`;
+        })
+        .join("")
+    )
+    .join("");
+
+  const namesHtml =
+    `<div class="plviz-names">` +
+    `<div class="plviz-name"></div>` +
+    `<div class="plviz-name"></div>` +
+    `<div class="plviz-name plviz-name-all">все</div>` +
+    rows.map((r) => `<div class="plviz-name">${esc(r.name)}</div>`).join("") +
+    `</div>`;
+
   el.innerHTML =
-    `<div class="plviz-chart" style="--cell:${CELL}px;--bars:${barsRowPx}px;--bar-gap:${BAR_GAP}px;grid-template-columns:${NAME} repeat(${n}, ${CELL}px);grid-template-rows:${barsRowPx}px 2.2em">` +
+    `<div class="plviz-chart" style="--n:${n};--bar-mins:${tallest.mins};--bar-gap-count:${tallest.gaps};--bar-gap:${BAR_GAP}px">` +
+    namesHtml +
+    `<div class="plviz-grid">` +
     barsHtml +
     monthsHtml +
     `<div class="plviz-head" style="display:contents">${headHtml}</div>` +
     rowsHtml +
-    `</div>` +
+    `</div></div>` +
     `<div class="plviz-legend">` +
     `<span><i class="visit"></i>был / обсуждение</span>` +
     `<span><i class="demo"></i>показывал / демо</span>` +
@@ -375,14 +386,14 @@
   shell.addEventListener("pointerleave", showDefault);
   showDefault();
 
-  const scroller = el.closest(".plviz-scroll") || el;
-  const showLatest = () => {
-    const cells = el.querySelectorAll(".sum-cell");
-    const last = cells[cells.length - 1];
-    if (!last || scroller.scrollWidth <= scroller.clientWidth + 1) return;
-    scroller.scrollLeft += last.getBoundingClientRect().right - scroller.getBoundingClientRect().right;
+  const chart = el.querySelector(".plviz-chart");
+  const board = el.closest(".plviz-board") || el;
+  const fit = () => {
+    if (!chart || !n) return;
+    const w = board.clientWidth;
+    if (!w) return;
+    chart.style.setProperty("--cell", `${w / n}px`);
   };
-  showLatest();
-  requestAnimationFrame(showLatest);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(showLatest);
+  fit();
+  if (typeof ResizeObserver !== "undefined") new ResizeObserver(fit).observe(board);
 })();

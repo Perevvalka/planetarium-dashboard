@@ -1,0 +1,27 @@
+/* Белая точка по центру: появляется мгновенно, исчезает fade-out.
+   Длительности — из шкалы: --ids__duration-instant на ховер,
+   --ids__duration-base на уход. Как у ссылок в ids.css. */
+
+.ids__hover-dot {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--ids__hover-dot-size);
+    height: var(--ids__hover-dot-size);
+    border-radius: var(--ids__radius-pill);
+    background-color: var(--ids__hover-dot);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--ids__duration-base) var(--ids__easing-base);
+  }
+
+  &:hover::after {
+    opacity: 1;
+    transition-duration: var(--ids__duration-instant);
+  }
+}

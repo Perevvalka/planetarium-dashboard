@@ -28,4 +28,7 @@
   --ids__duration-fast: 0.1s;
   --ids__duration-base: 0.5s;
   --ids__easing-base: ease;
+
+  /* Ховер-точка .ids__hover-dot: мгновенно появляется, fade-out по --ids__duration-base. */
+  --ids__hover-dot-size: 0.5em;
 }

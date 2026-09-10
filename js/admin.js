@@ -132,7 +132,9 @@
     return (
       `// Единая база данных Планетария.\n` +
       `// Источник правды для визуализаций и админки.\n` +
-      `// Реальные данные: посещения еженедельных встреч + демо-эфиры.\n\n` +
+      `// Реальные данные: посещения еженедельных встреч + демо-эфиры.\n` +
+      `// generated: true — длительность, формат, фидбэк и демо на еженедельных\n` +
+      `// встречах до августа 2026 дозаполнены по образцу реальных августовских записей.\n\n` +
       `(() => {\n` +
       `  "use strict";\n\n` +
       `  const PlanetariumDB = ${JSON.stringify(payload, null, 2)};\n\n` +
@@ -820,10 +822,11 @@
       .map((m) => {
         const count = db.attendance.filter((a) => a.meeting === m.date).length;
         const demos = db.demos.filter((d) => d.meeting === m.date).length;
+        const gen = m.generated ? " · сген." : "";
         const meta =
           m.type === "stream"
-            ? `эфир · ${demos} демо`
-            : `встреча · ${count} чел.${demos ? ` · ${demos} демо` : ""}`;
+            ? `эфир · ${demos} демо${gen}`
+            : `встреча · ${count} чел.${demos ? ` · ${demos} демо` : ""}${gen}`;
         return (
           `<li data-date="${m.date}"><span>${fmtDateRu(m.date)}</span>` +
           `<span class="meta">${meta}</span></li>`
@@ -840,9 +843,10 @@
     listDemos.innerHTML = items
       .map((d) => {
         const who = d.presenters.map(personName).join(", ");
+        const gen = d.generated ? " · сген." : "";
         return (
           `<li data-id="${d.id}"><span>${escapeHtml(projectTitle(d.project))}</span>` +
-          `<span class="meta">${fmtDateRu(d.meeting)} · ${escapeHtml(who)}</span></li>`
+          `<span class="meta">${fmtDateRu(d.meeting)} · ${escapeHtml(who)}${gen}</span></li>`
         );
       })
       .join("");
@@ -913,6 +917,7 @@
       `${m.type === "stream" ? "Демо-эфир" : "Еженедельная встреча"} · ` +
         (m.minutes ? `${m.minutes} мин` : "длительность не указана")
     );
+    if (m.generated) lines.push("Данные сгенерированы по образцу августа 2026.");
     if (m.note) lines.push(`Заметка: ${m.note}`);
 
     lines.push("", `Присутствие — ${presentIds.length}`);
@@ -958,10 +963,11 @@
           .map((m) => {
             const people = db.attendance.filter((a) => a.meeting === m.date).length;
             const count = db.demos.filter((d) => d.meeting === m.date).length;
+            const gen = m.generated ? " · сген." : "";
             const meta =
               m.type === "stream"
-                ? `эфир · ${count} демо`
-                : `${people} чел. · ${count} демо`;
+                ? `эфир · ${count} демо${gen}`
+                : `${people} чел. · ${count} демо${gen}`;
             return (
               `<li data-date="${m.date}"${m.date === summaryDate ? ' class="active"' : ""}>` +
               `<span>${fmtDateRu(m.date)}</span><span class="meta">${meta}</span></li>`

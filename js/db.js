@@ -1,6 +1,8 @@
 // Единая база данных Планетария.
 // Источник правды для визуализаций и админки.
 // Реальные данные: посещения еженедельных встреч + демо-эфиры.
+// generated: true — длительность, формат, фидбэк и демо на еженедельных
+// встречах до августа 2026 дозаполнены по образцу реальных августовских записей.
 
 (() => {
   "use strict";
@@ -775,200 +777,233 @@
     {
       "date": "2025-08-28",
       "type": "stream",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2025-09-11",
       "type": "stream",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2025-09-25",
       "type": "stream",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2025-10-10",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2025-10-16",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2025-10-23",
       "type": "stream",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2025-11-07",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2025-11-14",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2025-11-21",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2025-11-27",
       "type": "stream",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2025-12-05",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2025-12-12",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-01-16",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-01-23",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-01-29",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-02-06",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-02-21",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-02-27",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-03-07",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-03-12",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-03-20",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-03-28",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-04-02",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-04-09",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-04-17",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-04-24",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-05-01",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-05-15",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-05-25",
       "type": "stream",
-      "minutes": null,
-      "note": null
+      "minutes": 60,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-06-05",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-06-12",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-06-25",
       "type": "stream",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-07-03",
       "type": "weekly",
-      "minutes": null,
-      "note": null
+      "minutes": 50,
+      "note": null,
+      "generated": true
     },
     {
       "date": "2026-08-13",
@@ -2347,9 +2382,10 @@
       "presenters": [
         "roma-kuzhel"
       ],
-      "minutes": null,
+      "minutes": 6,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-2",
@@ -2358,9 +2394,10 @@
       "presenters": [
         "elena-chausova"
       ],
-      "minutes": null,
+      "minutes": 5,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-3",
@@ -2369,9 +2406,10 @@
       "presenters": [
         "kirill-oleynichenko"
       ],
-      "minutes": null,
+      "minutes": 6,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-4",
@@ -2380,9 +2418,10 @@
       "presenters": [
         "kristina-dunina"
       ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      "minutes": 5,
+      "format": 1,
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-5",
@@ -2391,9 +2430,10 @@
       "presenters": [
         "rinat-enikeev"
       ],
-      "minutes": null,
+      "minutes": 5,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-6",
@@ -2402,9 +2442,10 @@
       "presenters": [
         "kristina-marchenko"
       ],
-      "minutes": null,
+      "minutes": 11,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-7",
@@ -2413,9 +2454,10 @@
       "presenters": [
         "roma-kuzhel"
       ],
-      "minutes": null,
+      "minutes": 10,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-8",
@@ -2424,9 +2466,10 @@
       "presenters": [
         "ruslan-mamedov"
       ],
-      "minutes": null,
+      "minutes": 9,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-9",
@@ -2435,9 +2478,10 @@
       "presenters": [
         "daler-alierov"
       ],
-      "minutes": null,
+      "minutes": 4,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-10",
@@ -2446,9 +2490,10 @@
       "presenters": [
         "viktor-timofeev"
       ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      "minutes": 5,
+      "format": 2,
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-11",
@@ -2457,9 +2502,10 @@
       "presenters": [
         "ira-zaharova"
       ],
-      "minutes": null,
+      "minutes": 5,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-12",
@@ -2468,9 +2514,10 @@
       "presenters": [
         "ekaterina-lakutina"
       ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      "minutes": 5,
+      "format": 2,
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-13",
@@ -2479,9 +2526,10 @@
       "presenters": [
         "kristina-marchenko"
       ],
-      "minutes": null,
+      "minutes": 5,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-14",
@@ -2490,9 +2538,82 @@
       "presenters": [
         "ruslan-mamedov"
       ],
-      "minutes": null,
+      "minutes": 3,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-43",
+      "meeting": "2025-10-10",
+      "project": "illyustratsii-dlya-upakovki",
+      "presenters": [
+        "kristina-dunina"
+      ],
+      "minutes": 10,
+      "format": 2,
+      "note": "Посоветовали упростить первый экран",
+      "generated": true
+    },
+    {
+      "id": "demo-44",
+      "meeting": "2025-10-10",
+      "project": "hypetype",
+      "presenters": [
+        "ruslan-mamedov"
+      ],
+      "minutes": 11,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-45",
+      "meeting": "2025-10-10",
+      "project": "svoy-sayt",
+      "presenters": [
+        "viktor-timofeev"
+      ],
+      "minutes": 8,
+      "format": 1,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-46",
+      "meeting": "2025-10-16",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-47",
+      "meeting": "2025-10-16",
+      "project": "aside",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 7,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-48",
+      "meeting": "2025-10-16",
+      "project": "muzey-neprinyatyh-rabot-stol",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 12,
+      "format": null,
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-15",
@@ -2501,9 +2622,10 @@
       "presenters": [
         "artem-ermolaev"
       ],
-      "minutes": null,
+      "minutes": 14,
       "format": null,
-      "note": null
+      "note": "Посоветовали упростить первый экран",
+      "generated": true
     },
     {
       "id": "demo-16",
@@ -2512,9 +2634,118 @@
       "presenters": [
         "ruslan-mamedov"
       ],
-      "minutes": null,
+      "minutes": 15,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-49",
+      "meeting": "2025-11-07",
+      "project": "bookov",
+      "presenters": [
+        "kirill-oleynichenko"
+      ],
+      "minutes": 7,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-50",
+      "meeting": "2025-11-07",
+      "project": "podkast-hoba",
+      "presenters": [
+        "daler-alierov"
+      ],
+      "minutes": 6,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-51",
+      "meeting": "2025-11-07",
+      "project": "illyustratsii-dlya-upakovki",
+      "presenters": [
+        "kristina-dunina"
+      ],
+      "minutes": 11,
+      "format": 1,
+      "note": "Спросили, что будет, если ничего не найдётся",
+      "generated": true
+    },
+    {
+      "id": "demo-52",
+      "meeting": "2025-11-14",
+      "project": "telegram-kanal-oy-babonki-glyante-ka",
+      "presenters": [
+        "elena-chausova"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-53",
+      "meeting": "2025-11-14",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-54",
+      "meeting": "2025-11-14",
+      "project": "aside",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 11,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-55",
+      "meeting": "2025-11-21",
+      "project": "telegram-kanal-ruslan-i-bukvalnyy-chellendzh",
+      "presenters": [
+        "ruslan-mamedov"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-56",
+      "meeting": "2025-11-21",
+      "project": "bot-letmidzhoyn",
+      "presenters": [
+        "kirill-myshkin"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-57",
+      "meeting": "2025-11-21",
+      "project": "svoy-sayt",
+      "presenters": [
+        "viktor-timofeev"
+      ],
+      "minutes": 12,
+      "format": 3,
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-17",
@@ -2523,9 +2754,10 @@
       "presenters": [
         "artem-ermolaev"
       ],
-      "minutes": null,
+      "minutes": 11,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-18",
@@ -2534,9 +2766,730 @@
       "presenters": [
         "adam-arutyunov"
       ],
-      "minutes": null,
+      "minutes": 14,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-58",
+      "meeting": "2025-12-05",
+      "project": "pervyy-rolik-na-yutyub",
+      "presenters": [
+        "masha-troitskaya"
+      ],
+      "minutes": 7,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-59",
+      "meeting": "2025-12-05",
+      "project": "illyustratsii-dlya-upakovki",
+      "presenters": [
+        "kristina-dunina"
+      ],
+      "minutes": 12,
+      "format": 2,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-60",
+      "meeting": "2025-12-05",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 11,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-61",
+      "meeting": "2025-12-12",
+      "project": "telerupor",
+      "presenters": [
+        "kirill-myshkin"
+      ],
+      "minutes": 7,
+      "format": 2,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-62",
+      "meeting": "2025-12-12",
+      "project": "past-simple",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 6,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-63",
+      "meeting": "2025-12-12",
+      "project": "aside",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 6,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-64",
+      "meeting": "2025-12-12",
+      "project": "hypetype",
+      "presenters": [
+        "ruslan-mamedov"
+      ],
+      "minutes": 5,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-65",
+      "meeting": "2026-01-16",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 8,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-66",
+      "meeting": "2026-01-16",
+      "project": "illyustratsii-dlya-upakovki",
+      "presenters": [
+        "kristina-dunina"
+      ],
+      "minutes": 8,
+      "format": 1,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-67",
+      "meeting": "2026-01-16",
+      "project": "pervyy-rolik-na-yutyub",
+      "presenters": [
+        "masha-troitskaya"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-68",
+      "meeting": "2026-01-23",
+      "project": "bookov",
+      "presenters": [
+        "kirill-oleynichenko"
+      ],
+      "minutes": 11,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-69",
+      "meeting": "2026-01-23",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-70",
+      "meeting": "2026-01-23",
+      "project": "telegram-kanal-ruslan-i-bukvalnyy-chellendzh",
+      "presenters": [
+        "ruslan-mamedov"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-71",
+      "meeting": "2026-01-29",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 12,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-72",
+      "meeting": "2026-01-29",
+      "project": "hypetype",
+      "presenters": [
+        "ruslan-mamedov"
+      ],
+      "minutes": 11,
+      "format": null,
+      "note": "Похвалили, что уже можно тыкать",
+      "generated": true
+    },
+    {
+      "id": "demo-73",
+      "meeting": "2026-01-29",
+      "project": "aside",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 11,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-74",
+      "meeting": "2026-02-06",
+      "project": "pervyy-rolik-na-yutyub",
+      "presenters": [
+        "masha-troitskaya"
+      ],
+      "minutes": 9,
+      "format": null,
+      "note": "Предложили сделать заголовок короче",
+      "generated": true
+    },
+    {
+      "id": "demo-75",
+      "meeting": "2026-02-06",
+      "project": "bot-letmidzhoyn",
+      "presenters": [
+        "kirill-myshkin"
+      ],
+      "minutes": 7,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-76",
+      "meeting": "2026-02-06",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 6,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-77",
+      "meeting": "2026-02-06",
+      "project": "aside",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 9,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-78",
+      "meeting": "2026-02-21",
+      "project": "telerupor",
+      "presenters": [
+        "kirill-myshkin"
+      ],
+      "minutes": 14,
+      "format": 2,
+      "note": "Посоветовали не прятать главное действие",
+      "generated": true
+    },
+    {
+      "id": "demo-79",
+      "meeting": "2026-02-21",
+      "project": "aside",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-80",
+      "meeting": "2026-02-21",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 8,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-81",
+      "meeting": "2026-02-27",
+      "project": "prilozhenie-dlya-rasshifrovki-vstrech-context",
+      "presenters": [
+        "daler-alierov"
+      ],
+      "minutes": 8,
+      "format": 3,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-82",
+      "meeting": "2026-02-27",
+      "project": "telegram-kanal-ruslan-i-bukvalnyy-chellendzh",
+      "presenters": [
+        "ruslan-mamedov"
+      ],
+      "minutes": 8,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-83",
+      "meeting": "2026-02-27",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-84",
+      "meeting": "2026-03-07",
+      "project": "illyustratsii-dlya-upakovki",
+      "presenters": [
+        "kristina-dunina"
+      ],
+      "minutes": 6,
+      "format": 1,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-85",
+      "meeting": "2026-03-07",
+      "project": "aside",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 5,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-86",
+      "meeting": "2026-03-07",
+      "project": "pervyy-rolik-na-yutyub",
+      "presenters": [
+        "masha-troitskaya"
+      ],
+      "minutes": 6,
+      "format": null,
+      "note": "Посоветовали не прятать главное действие",
+      "generated": true
+    },
+    {
+      "id": "demo-87",
+      "meeting": "2026-03-07",
+      "project": "creative-spark-board",
+      "presenters": [
+        "roma-kuzhel"
+      ],
+      "minutes": 5,
+      "format": null,
+      "note": "Похвалили, что уже можно тыкать",
+      "generated": true
+    },
+    {
+      "id": "demo-88",
+      "meeting": "2026-03-12",
+      "project": "search-thru",
+      "presenters": [
+        "magomed-vagabov"
+      ],
+      "minutes": 13,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-89",
+      "meeting": "2026-03-12",
+      "project": "bot-letmidzhoyn",
+      "presenters": [
+        "kirill-myshkin"
+      ],
+      "minutes": 11,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-90",
+      "meeting": "2026-03-12",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 9,
+      "format": null,
+      "note": "Посоветовали не прятать главное действие",
+      "generated": true
+    },
+    {
+      "id": "demo-91",
+      "meeting": "2026-03-20",
+      "project": "pervyy-rolik-na-yutyub",
+      "presenters": [
+        "masha-troitskaya"
+      ],
+      "minutes": 6,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-92",
+      "meeting": "2026-03-20",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-93",
+      "meeting": "2026-03-20",
+      "project": "search-thru",
+      "presenters": [
+        "magomed-vagabov"
+      ],
+      "minutes": 8,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-94",
+      "meeting": "2026-03-28",
+      "project": "telerupor",
+      "presenters": [
+        "kirill-myshkin"
+      ],
+      "minutes": 9,
+      "format": 3,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-95",
+      "meeting": "2026-03-28",
+      "project": "aside",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 8,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-96",
+      "meeting": "2026-03-28",
+      "project": "illyustratsii-dlya-upakovki",
+      "presenters": [
+        "kristina-dunina"
+      ],
+      "minutes": 8,
+      "format": 2,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-97",
+      "meeting": "2026-03-28",
+      "project": "muzey-neprinyatyh-rabot-stol",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 7,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-98",
+      "meeting": "2026-04-02",
+      "project": "dot-dead",
+      "presenters": [
+        "danya-samoylenko"
+      ],
+      "minutes": 8,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-99",
+      "meeting": "2026-04-02",
+      "project": "prezentatsiya-kak-sobrat-portfolio",
+      "presenters": [
+        "evgeniy-smirnov"
+      ],
+      "minutes": 7,
+      "format": 2,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-100",
+      "meeting": "2026-04-02",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 6,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-101",
+      "meeting": "2026-04-02",
+      "project": "stopfires-org",
+      "presenters": [
+        "rinat-enikeev"
+      ],
+      "minutes": 9,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-102",
+      "meeting": "2026-04-09",
+      "project": "kurs-po-matematike-kotoraya-prigoditsya-v-zhizni",
+      "presenters": [
+        "adam-arutyunov"
+      ],
+      "minutes": 7,
+      "format": null,
+      "note": "Спросили, что будет, если ничего не найдётся",
+      "generated": true
+    },
+    {
+      "id": "demo-103",
+      "meeting": "2026-04-09",
+      "project": "search-thru",
+      "presenters": [
+        "magomed-vagabov"
+      ],
+      "minutes": 12,
+      "format": null,
+      "note": "Предложили сделать заголовок короче",
+      "generated": true
+    },
+    {
+      "id": "demo-104",
+      "meeting": "2026-04-09",
+      "project": "bot-letmidzhoyn",
+      "presenters": [
+        "kirill-myshkin"
+      ],
+      "minutes": 5,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-105",
+      "meeting": "2026-04-17",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 8,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-106",
+      "meeting": "2026-04-17",
+      "project": "prezentatsiya-kak-sobrat-portfolio",
+      "presenters": [
+        "evgeniy-smirnov"
+      ],
+      "minutes": 8,
+      "format": 2,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-107",
+      "meeting": "2026-04-17",
+      "project": "hypetype",
+      "presenters": [
+        "ruslan-mamedov"
+      ],
+      "minutes": 7,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-108",
+      "meeting": "2026-04-24",
+      "project": "telerupor",
+      "presenters": [
+        "kirill-myshkin"
+      ],
+      "minutes": 8,
+      "format": 2,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-109",
+      "meeting": "2026-04-24",
+      "project": "pervyy-rolik-na-yutyub",
+      "presenters": [
+        "masha-troitskaya"
+      ],
+      "minutes": 7,
+      "format": null,
+      "note": "Спросили, как это выглядит с телефона",
+      "generated": true
+    },
+    {
+      "id": "demo-110",
+      "meeting": "2026-04-24",
+      "project": "aside",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 8,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-111",
+      "meeting": "2026-04-24",
+      "project": "search-thru",
+      "presenters": [
+        "magomed-vagabov"
+      ],
+      "minutes": 7,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-112",
+      "meeting": "2026-05-01",
+      "project": "telegram-kanal-ruslan-i-bukvalnyy-chellendzh",
+      "presenters": [
+        "ruslan-mamedov"
+      ],
+      "minutes": 11,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-113",
+      "meeting": "2026-05-01",
+      "project": "kurs-po-matematike-kotoraya-prigoditsya-v-zhizni",
+      "presenters": [
+        "adam-arutyunov"
+      ],
+      "minutes": 9,
+      "format": null,
+      "note": "Спросили, как это выглядит с телефона",
+      "generated": true
+    },
+    {
+      "id": "demo-114",
+      "meeting": "2026-05-01",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 7,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-115",
+      "meeting": "2026-05-15",
+      "project": "pervyy-rolik-na-yutyub",
+      "presenters": [
+        "masha-troitskaya"
+      ],
+      "minutes": 9,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-116",
+      "meeting": "2026-05-15",
+      "project": "stopfires-org",
+      "presenters": [
+        "rinat-enikeev"
+      ],
+      "minutes": 13,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-117",
+      "meeting": "2026-05-15",
+      "project": "past-simple",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-19",
@@ -2545,9 +3498,10 @@
       "presenters": [
         "masha-troitskaya"
       ],
-      "minutes": null,
+      "minutes": 6,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-20",
@@ -2556,9 +3510,10 @@
       "presenters": [
         "daler-alierov"
       ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      "minutes": 6,
+      "format": 2,
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-21",
@@ -2567,9 +3522,10 @@
       "presenters": [
         "artem-ermolaev"
       ],
-      "minutes": null,
+      "minutes": 5,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-22",
@@ -2578,9 +3534,10 @@
       "presenters": [
         "lesha-nikitin"
       ],
-      "minutes": null,
+      "minutes": 5,
       "format": null,
-      "note": null
+      "note": "Предложили добавить пустое состояние",
+      "generated": true
     },
     {
       "id": "demo-23",
@@ -2589,9 +3546,106 @@
       "presenters": [
         "kirill-myshkin"
       ],
-      "minutes": null,
+      "minutes": 5,
       "format": null,
-      "note": null
+      "note": "Посоветовали упростить первый экран",
+      "generated": true
+    },
+    {
+      "id": "demo-118",
+      "meeting": "2026-06-05",
+      "project": "aside",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 5,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-119",
+      "meeting": "2026-06-05",
+      "project": "bot-letmidzhoyn",
+      "presenters": [
+        "kirill-myshkin"
+      ],
+      "minutes": 5,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-120",
+      "meeting": "2026-06-05",
+      "project": "prezentatsiya-kak-sobrat-portfolio",
+      "presenters": [
+        "evgeniy-smirnov"
+      ],
+      "minutes": 6,
+      "format": 3,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-121",
+      "meeting": "2026-06-05",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 5,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-122",
+      "meeting": "2026-06-05",
+      "project": "hypetype",
+      "presenters": [
+        "ruslan-mamedov"
+      ],
+      "minutes": 7,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-123",
+      "meeting": "2026-06-12",
+      "project": "telegram-kanal-kakovo-byt-dizaynerom",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 11,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-124",
+      "meeting": "2026-06-12",
+      "project": "telegram-kanal-ruslan-i-bukvalnyy-chellendzh",
+      "presenters": [
+        "ruslan-mamedov"
+      ],
+      "minutes": 9,
+      "format": null,
+      "note": "Посоветовали упростить первый экран",
+      "generated": true
+    },
+    {
+      "id": "demo-125",
+      "meeting": "2026-06-12",
+      "project": "muzey-neprinyatyh-rabot-stol",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": "Предложили добавить пустое состояние",
+      "generated": true
     },
     {
       "id": "demo-24",
@@ -2600,9 +3654,10 @@
       "presenters": [
         "evgeniy-smirnov"
       ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      "minutes": 3,
+      "format": 2,
+      "note": "Предложили добавить пустое состояние",
+      "generated": true
     },
     {
       "id": "demo-25",
@@ -2611,9 +3666,10 @@
       "presenters": [
         "danya-samoylenko"
       ],
-      "minutes": null,
+      "minutes": 4,
       "format": null,
-      "note": null
+      "note": "Предложили добавить пустое состояние",
+      "generated": true
     },
     {
       "id": "demo-26",
@@ -2622,9 +3678,10 @@
       "presenters": [
         "magomed-vagabov"
       ],
-      "minutes": null,
+      "minutes": 3,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-27",
@@ -2633,9 +3690,10 @@
       "presenters": [
         "kirill-myshkin"
       ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      "minutes": 5,
+      "format": 2,
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-28",
@@ -2644,9 +3702,10 @@
       "presenters": [
         "anastasiya-fomina"
       ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      "minutes": 4,
+      "format": 2,
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-29",
@@ -2655,9 +3714,46 @@
       "presenters": [
         "ruslan-mamedov"
       ],
-      "minutes": null,
+      "minutes": 5,
       "format": null,
-      "note": null
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-126",
+      "meeting": "2026-07-03",
+      "project": "aside",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 10,
+      "format": null,
+      "note": null,
+      "generated": true
+    },
+    {
+      "id": "demo-127",
+      "meeting": "2026-07-03",
+      "project": "prezentatsiya-kak-sobrat-portfolio",
+      "presenters": [
+        "evgeniy-smirnov"
+      ],
+      "minutes": 10,
+      "format": 1,
+      "note": "Похвалили, что уже можно тыкать",
+      "generated": true
+    },
+    {
+      "id": "demo-128",
+      "meeting": "2026-07-03",
+      "project": "pervyy-rolik-na-yutyub",
+      "presenters": [
+        "masha-troitskaya"
+      ],
+      "minutes": 9,
+      "format": null,
+      "note": null,
+      "generated": true
     },
     {
       "id": "demo-30",
@@ -2831,6 +3927,386 @@
     {
       "demo": "demo-36",
       "person": "artem-ermolaev"
+    },
+    {
+      "demo": "demo-3",
+      "person": "roma-kuzhel",
+      "generated": true
+    },
+    {
+      "demo": "demo-4",
+      "person": "elena-chausova",
+      "generated": true
+    },
+    {
+      "demo": "demo-7",
+      "person": "ruslan-mamedov",
+      "generated": true
+    },
+    {
+      "demo": "demo-9",
+      "person": "kristina-marchenko",
+      "generated": true
+    },
+    {
+      "demo": "demo-12",
+      "person": "kristina-marchenko",
+      "generated": true
+    },
+    {
+      "demo": "demo-13",
+      "person": "ekaterina-lakutina",
+      "generated": true
+    },
+    {
+      "demo": "demo-43",
+      "person": "zhenya-arutyunov",
+      "generated": true
+    },
+    {
+      "demo": "demo-44",
+      "person": "zhenya-arutyunov",
+      "generated": true
+    },
+    {
+      "demo": "demo-45",
+      "person": "adam-arutyunov",
+      "generated": true
+    },
+    {
+      "demo": "demo-15",
+      "person": "ruslan-mamedov",
+      "generated": true
+    },
+    {
+      "demo": "demo-51",
+      "person": "marat-habibulin",
+      "generated": true
+    },
+    {
+      "demo": "demo-52",
+      "person": "rustam-mushraipov",
+      "generated": true
+    },
+    {
+      "demo": "demo-53",
+      "person": "marat-habibulin",
+      "generated": true
+    },
+    {
+      "demo": "demo-54",
+      "person": "polina-perevalova",
+      "generated": true
+    },
+    {
+      "demo": "demo-55",
+      "person": "lora-guranina",
+      "generated": true
+    },
+    {
+      "demo": "demo-57",
+      "person": "polina-perevalova",
+      "generated": true
+    },
+    {
+      "demo": "demo-57",
+      "person": "lora-guranina",
+      "generated": true
+    },
+    {
+      "demo": "demo-18",
+      "person": "artem-ermolaev",
+      "generated": true
+    },
+    {
+      "demo": "demo-58",
+      "person": "rustam-mushraipov",
+      "generated": true
+    },
+    {
+      "demo": "demo-58",
+      "person": "zhenya-arutyunov",
+      "generated": true
+    },
+    {
+      "demo": "demo-60",
+      "person": "lesha-nikitin",
+      "generated": true
+    },
+    {
+      "demo": "demo-60",
+      "person": "rustam-mushraipov",
+      "generated": true
+    },
+    {
+      "demo": "demo-64",
+      "person": "tatyana-kashina",
+      "generated": true
+    },
+    {
+      "demo": "demo-64",
+      "person": "lesha-nikitin",
+      "generated": true
+    },
+    {
+      "demo": "demo-65",
+      "person": "ramil-karimov",
+      "generated": true
+    },
+    {
+      "demo": "demo-65",
+      "person": "tatyana-kashina",
+      "generated": true
+    },
+    {
+      "demo": "demo-66",
+      "person": "kirill-chernov",
+      "generated": true
+    },
+    {
+      "demo": "demo-66",
+      "person": "asya-dragun",
+      "generated": true
+    },
+    {
+      "demo": "demo-67",
+      "person": "ramil-karimov",
+      "generated": true
+    },
+    {
+      "demo": "demo-70",
+      "person": "vika-german",
+      "generated": true
+    },
+    {
+      "demo": "demo-70",
+      "person": "kirill-oleynichenko",
+      "generated": true
+    },
+    {
+      "demo": "demo-72",
+      "person": "lesha-nikitin",
+      "generated": true
+    },
+    {
+      "demo": "demo-73",
+      "person": "kristina-marchenko",
+      "generated": true
+    },
+    {
+      "demo": "demo-74",
+      "person": "georgiy-mishurovskiy",
+      "generated": true
+    },
+    {
+      "demo": "demo-78",
+      "person": "masha-troitskaya",
+      "generated": true
+    },
+    {
+      "demo": "demo-79",
+      "person": "polina-perevalova",
+      "generated": true
+    },
+    {
+      "demo": "demo-82",
+      "person": "daler-alierov",
+      "generated": true
+    },
+    {
+      "demo": "demo-84",
+      "person": "rustam-mushraipov",
+      "generated": true
+    },
+    {
+      "demo": "demo-84",
+      "person": "alena-grishkovets",
+      "generated": true
+    },
+    {
+      "demo": "demo-86",
+      "person": "alena-grishkovets",
+      "generated": true
+    },
+    {
+      "demo": "demo-87",
+      "person": "nastya-tulaeva",
+      "generated": true
+    },
+    {
+      "demo": "demo-88",
+      "person": "lesha-nikitin",
+      "generated": true
+    },
+    {
+      "demo": "demo-88",
+      "person": "georgiy-mishurovskiy",
+      "generated": true
+    },
+    {
+      "demo": "demo-89",
+      "person": "lesha-nikitin",
+      "generated": true
+    },
+    {
+      "demo": "demo-90",
+      "person": "kirill-myshkin",
+      "generated": true
+    },
+    {
+      "demo": "demo-92",
+      "person": "magomed-vagabov",
+      "generated": true
+    },
+    {
+      "demo": "demo-93",
+      "person": "masha-troitskaya",
+      "generated": true
+    },
+    {
+      "demo": "demo-101",
+      "person": "polina-perevalova",
+      "generated": true
+    },
+    {
+      "demo": "demo-102",
+      "person": "zhenya-sarnetskiy",
+      "generated": true
+    },
+    {
+      "demo": "demo-103",
+      "person": "zhenya-sarnetskiy",
+      "generated": true
+    },
+    {
+      "demo": "demo-106",
+      "person": "lesha-kram",
+      "generated": true
+    },
+    {
+      "demo": "demo-107",
+      "person": "kristina-marchenko",
+      "generated": true
+    },
+    {
+      "demo": "demo-109",
+      "person": "ruslan-mamedov",
+      "generated": true
+    },
+    {
+      "demo": "demo-110",
+      "person": "kirill-myshkin",
+      "generated": true
+    },
+    {
+      "demo": "demo-111",
+      "person": "marat-habibulin",
+      "generated": true
+    },
+    {
+      "demo": "demo-112",
+      "person": "dmitriy-sivuhin",
+      "generated": true
+    },
+    {
+      "demo": "demo-112",
+      "person": "magomed-vagabov",
+      "generated": true
+    },
+    {
+      "demo": "demo-113",
+      "person": "ruslan-mamedov",
+      "generated": true
+    },
+    {
+      "demo": "demo-114",
+      "person": "adam-arutyunov",
+      "generated": true
+    },
+    {
+      "demo": "demo-20",
+      "person": "masha-troitskaya",
+      "generated": true
+    },
+    {
+      "demo": "demo-21",
+      "person": "daler-alierov",
+      "generated": true
+    },
+    {
+      "demo": "demo-22",
+      "person": "daler-alierov",
+      "generated": true
+    },
+    {
+      "demo": "demo-23",
+      "person": "artem-ermolaev",
+      "generated": true
+    },
+    {
+      "demo": "demo-119",
+      "person": "zhenya-arutyunov",
+      "generated": true
+    },
+    {
+      "demo": "demo-120",
+      "person": "lesha-nikitin",
+      "generated": true
+    },
+    {
+      "demo": "demo-121",
+      "person": "ruslan-mamedov",
+      "generated": true
+    },
+    {
+      "demo": "demo-123",
+      "person": "olga-permyakova",
+      "generated": true
+    },
+    {
+      "demo": "demo-123",
+      "person": "artem-ermolaev",
+      "generated": true
+    },
+    {
+      "demo": "demo-124",
+      "person": "dmitriy-sivuhin",
+      "generated": true
+    },
+    {
+      "demo": "demo-125",
+      "person": "olga-permyakova",
+      "generated": true
+    },
+    {
+      "demo": "demo-24",
+      "person": "kirill-myshkin",
+      "generated": true
+    },
+    {
+      "demo": "demo-25",
+      "person": "anastasiya-fomina",
+      "generated": true
+    },
+    {
+      "demo": "demo-25",
+      "person": "ruslan-mamedov",
+      "generated": true
+    },
+    {
+      "demo": "demo-26",
+      "person": "ruslan-mamedov",
+      "generated": true
+    },
+    {
+      "demo": "demo-27",
+      "person": "evgeniy-smirnov",
+      "generated": true
+    },
+    {
+      "demo": "demo-127",
+      "person": "kristina-marchenko",
+      "generated": true
     }
   ]
 };
