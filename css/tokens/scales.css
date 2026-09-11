@@ -27,5 +27,8 @@
   --ids__duration-instant: 0s;
   --ids__duration-fast: 0.1s;
   --ids__duration-base: 0.5s;
+  --ids__duration-slow: calc(var(--ids__duration-base) * 1.5);
   --ids__easing-base: ease;
+
+  --ids__hover-dot-size: 0.4em;
 }

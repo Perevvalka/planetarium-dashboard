@@ -14,66 +14,130 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="css/tokens/palette.css">
+    <link rel="stylesheet" href="css/tokens/palette.css?v=2026-09-10">
     <link rel="stylesheet" href="css/tokens/colors.css">
     <link rel="stylesheet" href="css/tokens/scales.css">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/page-composition/layout.css">
     <link rel="stylesheet" href="css/components/ids.css">
+    <link rel="stylesheet" href="css/components/hover-dot.css">
     <link rel="stylesheet" href="css/components/theme-toggle.css">
     <style>
-      .plviz-tip {
-        position: fixed;
-        z-index: 100;
-        pointer-events: none;
-        background: var(--ids__text);
-        color: var(--ids__background);
-        padding: 0.5em 0.7em;
-        border-radius: 0.4em;
-        font-size: 0.8em;
-        line-height: 1.45;
-        max-width: 22em;
-        opacity: 0;
-        transition: opacity 0.15s ease;
+      .plviz-shell {
+        --plviz-row: 2.2em;
+        --plviz-sidebar: 10rem;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) var(--plviz-sidebar);
+        gap: var(--ids__gap-l);
+        align-items: start;
+        min-width: 0;
+        width: 100%;
       }
-      .plviz-tip.visible {
-        opacity: 1;
+      .plviz-board {
+        min-width: 0;
       }
-      .plviz-scroll {
-        overflow-x: auto;
+      #plviz-dashboard {
+        min-width: 0;
+      }
+      .plviz-panel {
+        position: sticky;
+        top: 1.5em;
+        width: var(--plviz-sidebar);
+        box-sizing: border-box;
+        padding-left: 1.2em;
+        border-left: 1px solid var(--ids__border);
+        font-size: 0.9em;
+      }
+      .plviz-panel-title {
+        margin: 0 0 0.6em;
+        font-weight: 600;
+      }
+      .plviz-dl {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.35em 0.8em;
+        margin: 0;
+      }
+      .plviz-dl dt {
+        color: var(--ids__text-caption);
+      }
+      .plviz-dl dd {
+        margin: 0;
+      }
+      .plviz-panel-note {
+        margin: 1em 0 0;
+        color: var(--ids__text-caption);
       }
       .plviz-chart {
+        position: relative;
+        width: 100%;
+        min-width: 0;
+        --bars: calc(var(--bar-mins, 0) * var(--plviz-row) * 4 / 60);
+      }
+      .plviz-grid {
         display: grid;
-        grid-template-rows: 2.2em;
-        grid-auto-rows: var(--cell, 44px);
+        width: 100%;
+        min-width: 0;
+        grid-template-columns: repeat(var(--n, 1), minmax(0, 1fr));
+        grid-template-rows: var(--bars) var(--plviz-row);
+        grid-auto-rows: var(--plviz-row);
+      }
+      .plviz-names {
+        position: absolute;
+        inset: 0 auto 0 0;
+        z-index: 2;
+        display: grid;
+        grid-template-rows: var(--bars) var(--plviz-row);
+        grid-auto-rows: var(--plviz-row);
+        pointer-events: none;
       }
       .plviz-name {
-        position: sticky;
-        left: 0;
-        z-index: 2;
-        padding-right: 1em;
-        font-size: 1.15em;
-        line-height: var(--cell, 44px);
+        width: max-content;
+        max-width: 12em;
+        padding-right: 0.8em;
+        font-size: min(1.15em, var(--plviz-row));
+        line-height: 1;
         color: var(--ids__text-caption);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        background: var(--ids__background);
+        align-self: end;
       }
-      .plviz-corner {
-        z-index: 3;
-      }
-      .plviz-head .plviz-name {
+      .plviz-name-all {
         color: var(--ids__text);
       }
       .plviz-month {
+        display: flex;
+        align-items: center;
         min-width: 0;
         font-size: 0.85em;
-        line-height: 2.4;
         color: var(--ids__text-caption);
         padding-left: 0.15em;
         white-space: nowrap;
+        overflow: hidden;
+      }
+      .plviz-bar {
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: flex-start;
+        align-self: end;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .plviz-seg {
+        display: block;
+        width: 100%;
+        flex: none;
+        box-sizing: border-box;
+      }
+      .plviz-seg.talk {
+        background: var(--ids__color-blue-400);
+      }
+      .plviz-seg.demo {
+        background: var(--ids__color-green-400);
+      }
+      .plviz-seg.ids__hover-dot {
         overflow: hidden;
       }
       .plviz-cell {
@@ -89,29 +153,24 @@
         opacity: 0.08;
       }
       .plviz-cell .sum.visit {
-        background: var(--ids__link);
+        background: var(--ids__color-blue-400);
       }
       .plviz-cell .sum.demo {
-        background: var(--ids__success);
+        background: var(--ids__color-green-400);
       }
       .plviz-cell.visit {
-        background: color-mix(in srgb, var(--ids__link) 28%, var(--ids__background));
+        background: color-mix(in srgb, var(--ids__color-blue-400) 28%, var(--ids__background));
       }
       .plviz-cell.demo {
-        background: color-mix(in srgb, var(--ids__success) 32%, var(--ids__background));
-      }
-      .plviz-cell.visit:hover,
-      .plviz-cell.demo:hover,
-      .plviz-cell.sum-cell:hover {
-        outline: 1px solid var(--ids__text);
-        outline-offset: -1px;
-        z-index: 1;
+        background: color-mix(in srgb, var(--ids__color-green-400) 32%, var(--ids__background));
       }
       .plviz-legend {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5em 1.4em;
+        max-width: 100%;
         margin-top: 1em;
+        box-sizing: border-box;
         font-size: 1em;
         color: var(--ids__text-caption);
       }
@@ -126,14 +185,22 @@
         flex: none;
       }
       .plviz-legend .visit {
-        background: color-mix(in srgb, var(--ids__link) 28%, var(--ids__background));
+        background: color-mix(in srgb, var(--ids__color-blue-400) 28%, var(--ids__background));
       }
       .plviz-legend .demo {
-        background: color-mix(in srgb, var(--ids__success) 32%, var(--ids__background));
+        background: color-mix(in srgb, var(--ids__color-green-400) 32%, var(--ids__background));
       }
       @media (width < 768px) {
-        .plviz-name {
-          font-size: 0.9em;
+        .plviz-shell {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .plviz-panel {
+          position: static;
+          width: auto;
+          padding-left: 0;
+          border-left: none;
+          padding-top: 1em;
+          border-top: 1px solid var(--ids__border);
         }
       }
     </style>
@@ -147,29 +214,32 @@
     </header>
 
     <main>
-      <div class="ids__wrapper XL">
+      <div class="ids__wrapper L">
         <div class="section">
           <div class="ids__space XL"></div>
           <div class="ids__text-width">
             <p><a href="index.html">← Главная</a></p>
             <h1>Дашборд</h1>
             <p>
-              Строка — человек, квадратик — встреча. Голубой — был, зелёный — показывал.
+              Строка — человек, клетка — встреча. Голубой — был, зелёный — показывал.
+              Сверху столбик — длительность встречи: зелёные блоки демо от длинного к короткому, голубой — обсуждение.
               Данные — с декабря 2025.
             </p>
           </div>
           <div class="ids__space S"></div>
-          <div class="plviz-scroll">
-            <div id="plviz-dashboard"></div>
+          <div class="plviz-shell">
+            <div class="plviz-board">
+              <div id="plviz-dashboard"></div>
+            </div>
+            <aside class="plviz-panel" id="plviz-panel"></aside>
           </div>
+          <div class="ids__space XL"></div>
         </div>
-
-        <div class="ids__space XL"></div>
       </div>
     </main>
 
     <script src="./js/theme-toggle.js"></script>
     <script src="./js/db.js?v=2026-09-10"></script>
-    <script src="./js/dashboard.js?v=2026-08-27"></script>
+    <script src="./js/dashboard.js?v=2026-09-10e"></script>
   </body>
 </html>

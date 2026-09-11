@@ -15,9 +15,11 @@
   --ids__color-gray-900: rgb(18, 18, 20);
   --ids__color-gray-950: rgb(5, 5, 5);
 
+  --ids__color-blue-400: rgb(0, 130, 255);
   --ids__color-blue-450: rgb(60, 130, 250);
   --ids__color-blue-500: rgb(0, 100, 240);
 
+  --ids__color-green-400: rgb(0, 220, 0);
   --ids__color-green-450: rgb(40, 215, 40);
   --ids__color-green-500: rgb(0, 200, 0);
   --ids__color-green-600: rgb(30, 170, 60);

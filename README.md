@@ -9,7 +9,7 @@
 ├── index.html          # главная — ссылки на страницы
 ├── ops.html            # чек-листы админа
 ├── admin.html          # ввод базы данных
-├── attendance.html     # посещаемость (квадратики)
+├── dashboard.html      # главный датавиз
 ├── dataviz.html        # пять визуализаций
 │
 ├── css/                # каркас IDS
@@ -24,7 +24,7 @@
 │   ├── db.js           # данные планетария
 │   ├── ops.js
 │   ├── admin.js
-│   ├── attendance.js
+│   ├── dashboard.js
 │   └── dataviz.js
 │
 ├── fonts/              # Inter Variable
