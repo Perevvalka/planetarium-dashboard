@@ -1,8 +1,8 @@
 // Дашборд явки Планетария.
-// Строка — человек, квадратик — встреча. Квадратики стык в стык, как в тетрадке.
+// Строка — человек, клетка — встреча. Клетки стык в стык; ширина — доля контейнера.
 // Был — голубой, показывал — зелёный, не был — пусто.
 // Сверху столбики длительности: зелёные блоки — демо от длинного к короткому,
-// голубой сверху — обсуждение. Ширина как у квадратика, 60 мин ≈ 4 клетки.
+// голубой сверху — обсуждение. Ширина как у клетки, 60 мин ≈ 4 строки.
 // Данные — из js/db.js, с декабря 2025.
 
 (() => {
@@ -15,8 +15,6 @@
   }
 
   const CUTOFF = "2025-12-01";
-  // 60 минут ≈ 4 квадратика в высоту; ширина столбика = квадратик.
-  const BAR_GAP = 3;
 
   const MISSED = 0;
   const VISIT = 1;
@@ -192,7 +190,7 @@
         ["участников", String(rows.length)],
         ["демо", String(demosAt.reduce((s, list) => s + list.length, 0))],
       ],
-      "Наведите на квадратик или столбик — здесь появятся детали."
+      "Наведите на клетку или столбик — здесь появятся детали."
     );
 
   const meetingPanel = (i) => {
@@ -269,19 +267,11 @@
     else monthSpans.push({ key, len: 1, start: i });
   });
 
-  const barStack = (b) => {
-    const parts = b.demos.length + (b.talk > 0 ? 1 : 0);
-    const mins = b.demos.reduce((s, d) => s + d.minutes, 0) + b.talk;
-    return { mins, gaps: Math.max(0, parts - 1) };
-  };
-  const tallest = barAt.reduce(
-    (max, b) => {
-      const s = barStack(b);
-      return s.mins > max.mins ? s : max;
-    },
-    { mins: 0, gaps: 0 }
+  const maxBarMins = Math.max(
+    0,
+    ...barAt.map((b) => b.demos.reduce((s, d) => s + d.minutes, 0) + b.talk)
   );
-  const minH = (minutes) => `calc(${minutes} * var(--cell) * 4 / 60)`;
+  const minH = (minutes) => `calc(${minutes} * var(--plviz-row) * 4 / 60)`;
 
   const barsHtml = barAt
     .map((b, i) => {
@@ -339,7 +329,7 @@
     `</div>`;
 
   el.innerHTML =
-    `<div class="plviz-chart" style="--n:${n};--bar-mins:${tallest.mins};--bar-gap-count:${tallest.gaps};--bar-gap:${BAR_GAP}px">` +
+    `<div class="plviz-chart" style="--n:${n};--bar-mins:${maxBarMins}">` +
     namesHtml +
     `<div class="plviz-grid">` +
     barsHtml +
@@ -385,15 +375,4 @@
   });
   shell.addEventListener("pointerleave", showDefault);
   showDefault();
-
-  const chart = el.querySelector(".plviz-chart");
-  const board = el.closest(".plviz-board") || el;
-  const fit = () => {
-    if (!chart || !n) return;
-    const w = board.clientWidth;
-    if (!w) return;
-    chart.style.setProperty("--cell", `${w / n}px`);
-  };
-  fit();
-  if (typeof ResizeObserver !== "undefined") new ResizeObserver(fit).observe(board);
 })();
