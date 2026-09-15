@@ -21,11 +21,19 @@
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/page-composition/layout.css">
     <link rel="stylesheet" href="css/components/ids.css">
-    <link rel="stylesheet" href="css/components/hover-dot.css">
     <link rel="stylesheet" href="css/components/theme-toggle.css">
     <style>
+      header {
+        padding: 0;
+      }
+      .ids__wrapper.L {
+        padding-top: 3rem;
+      }
       .plviz-shell {
-        --plviz-row: 2.2em;
+        --plviz-bar-row: 2.2rem;
+        --plviz-row: calc(2.2rem / 3);
+        --plviz-sum: calc(var(--plviz-row) * 2);
+        --plviz-dates: 1.9rem;
         --plviz-sidebar: 10rem;
         display: grid;
         grid-template-columns: minmax(0, 1fr) var(--plviz-sidebar);
@@ -33,6 +41,8 @@
         align-items: start;
         min-width: 0;
         width: 100%;
+        font-size: 0.7rem;
+        line-height: 1.25;
       }
       .plviz-board {
         min-width: 0;
@@ -40,55 +50,80 @@
       #plviz-dashboard {
         min-width: 0;
       }
-      .plviz-panel {
+      aside.plviz-panel {
         position: sticky;
-        top: 1.5em;
+        top: 3rem;
         width: var(--plviz-sidebar);
         box-sizing: border-box;
-        padding-left: 1.2em;
-        border-left: 1px solid var(--ids__border);
-        font-size: 0.9em;
+        background: color-mix(in srgb, var(--ids__surface) 50%, var(--ids__background));
       }
       .plviz-panel-title {
-        margin: 0 0 0.6em;
+        margin: 0 0 0.7em;
         font-weight: 600;
       }
-      .plviz-dl {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        gap: 0.35em 0.8em;
-        margin: 0;
+      .plviz-field {
+        margin: 0 0 0.7em;
       }
-      .plviz-dl dt {
+      .plviz-field-label {
         color: var(--ids__text-caption);
       }
-      .plviz-dl dd {
+      .plviz-field-value {
         margin: 0;
       }
       .plviz-panel-note {
-        margin: 1em 0 0;
+        margin: 0.7em 0 0;
         color: var(--ids__text-caption);
       }
       .plviz-chart {
         position: relative;
         width: 100%;
         min-width: 0;
-        --bars: calc(var(--bar-mins, 0) * var(--plviz-row) * 4 / 60);
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+        --bars: calc(var(--bar-mins, 0) * var(--plviz-bar-row) * 4 / 60);
       }
+      .plviz-timeline,
+      .plviz-bars,
+      .plviz-summary-grid,
       .plviz-grid {
         display: grid;
         width: 100%;
         min-width: 0;
         grid-template-columns: repeat(var(--n, 1), minmax(0, 1fr));
-        grid-template-rows: var(--bars) var(--plviz-row);
+      }
+      .plviz-timeline {
+        grid-template-rows: var(--plviz-dates);
+        border-top: 1px solid var(--ids__text);
+        padding-top: 0.2em;
+      }
+      .plviz-bars {
+        grid-template-rows: var(--bars);
+      }
+      .plviz-summary,
+      .plviz-matrix {
+        position: relative;
+        min-width: 0;
+      }
+      .plviz-summary-grid {
+        grid-template-rows: var(--plviz-sum);
+      }
+      .plviz-grid {
         grid-auto-rows: var(--plviz-row);
+      }
+      .plviz-summary .plviz-name {
+        position: absolute;
+        inset: 0 auto 0 0;
+        z-index: 3;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
       }
       .plviz-names {
         position: absolute;
         inset: 0 auto 0 0;
-        z-index: 2;
+        z-index: 3;
         display: grid;
-        grid-template-rows: var(--bars) var(--plviz-row);
         grid-auto-rows: var(--plviz-row);
         pointer-events: none;
       }
@@ -96,26 +131,29 @@
         width: max-content;
         max-width: 12em;
         padding-right: 0.8em;
-        font-size: min(1.15em, var(--plviz-row));
         line-height: 1;
         color: var(--ids__text-caption);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        align-self: end;
+        align-self: center;
       }
       .plviz-name-all {
         color: var(--ids__text);
       }
-      .plviz-month {
-        display: flex;
-        align-items: center;
+      .plviz-date {
+        position: relative;
         min-width: 0;
-        font-size: 0.85em;
-        color: var(--ids__text-caption);
-        padding-left: 0.15em;
+        overflow: visible;
+        line-height: 1.15;
+        padding-left: 0.1em;
         white-space: nowrap;
-        overflow: hidden;
+      }
+      .plviz-date.has-month {
+        z-index: 1;
+      }
+      .plviz-date-month {
+        display: block;
       }
       .plviz-bar {
         display: flex;
@@ -137,9 +175,6 @@
       .plviz-seg.demo {
         background: var(--ids__color-green-400);
       }
-      .plviz-seg.ids__hover-dot {
-        overflow: hidden;
-      }
       .plviz-cell {
         box-sizing: border-box;
       }
@@ -159,10 +194,47 @@
         background: var(--ids__color-green-400);
       }
       .plviz-cell.visit {
-        background: color-mix(in srgb, var(--ids__color-blue-400) 28%, var(--ids__background));
+        background: color-mix(in srgb, var(--ids__color-blue-400) 14%, var(--ids__background));
       }
       .plviz-cell.demo {
-        background: color-mix(in srgb, var(--ids__color-green-400) 32%, var(--ids__background));
+        background: color-mix(in srgb, var(--ids__color-green-400) 16%, var(--ids__background));
+      }
+      .plviz-seg:hover,
+      .plviz-cell.visit:hover,
+      .plviz-cell.demo:hover,
+      .plviz-cell.sum-cell:hover {
+        filter: brightness(1.1);
+      }
+      .plviz-sort {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 0 0.7rem;
+      }
+      .plviz-sort button {
+        appearance: none;
+        margin: 0;
+        font: inherit;
+        color: var(--ids__text);
+        background: none;
+        cursor: pointer;
+        padding: 0.35em 0.75em;
+        border: var(--ids__border-width-s) solid color-mix(in srgb, var(--ids__text) 50%, transparent);
+        border-right: 0;
+      }
+      .plviz-sort button:first-child {
+        border-radius: var(--ids__radius-m) 0 0 var(--ids__radius-m);
+      }
+      .plviz-sort button:last-child {
+        border-radius: 0 var(--ids__radius-m) var(--ids__radius-m) 0;
+        border-right: var(--ids__border-width-s) solid color-mix(in srgb, var(--ids__text) 50%, transparent);
+      }
+      .plviz-sort button:hover {
+        background-color: color-mix(in srgb, var(--ids__hover) 10%, transparent);
+      }
+      .plviz-sort button[aria-pressed="true"] {
+        color: var(--ids__text);
+        background-color: color-mix(in srgb, var(--ids__text) 5%, transparent);
+        cursor: default;
       }
       .plviz-legend {
         display: flex;
@@ -171,7 +243,6 @@
         max-width: 100%;
         margin-top: 1em;
         box-sizing: border-box;
-        font-size: 1em;
         color: var(--ids__text-caption);
       }
       .plviz-legend span {
@@ -185,22 +256,19 @@
         flex: none;
       }
       .plviz-legend .visit {
-        background: color-mix(in srgb, var(--ids__color-blue-400) 28%, var(--ids__background));
+        background: color-mix(in srgb, var(--ids__color-blue-400) 14%, var(--ids__background));
       }
       .plviz-legend .demo {
-        background: color-mix(in srgb, var(--ids__color-green-400) 32%, var(--ids__background));
+        background: color-mix(in srgb, var(--ids__color-green-400) 16%, var(--ids__background));
       }
       @media (width < 768px) {
         .plviz-shell {
           grid-template-columns: minmax(0, 1fr);
         }
-        .plviz-panel {
+        aside.plviz-panel {
           position: static;
           width: auto;
-          padding-left: 0;
-          border-left: none;
           padding-top: 1em;
-          border-top: 1px solid var(--ids__border);
         }
       }
     </style>
@@ -216,17 +284,6 @@
     <main>
       <div class="ids__wrapper L">
         <div class="section">
-          <div class="ids__space XL"></div>
-          <div class="ids__text-width">
-            <p><a href="index.html">← Главная</a></p>
-            <h1>Дашборд</h1>
-            <p>
-              Строка — человек, клетка — встреча. Голубой — был, зелёный — показывал.
-              Сверху столбик — длительность встречи: зелёные блоки демо от длинного к короткому, голубой — обсуждение.
-              Данные — с декабря 2025.
-            </p>
-          </div>
-          <div class="ids__space S"></div>
           <div class="plviz-shell">
             <div class="plviz-board">
               <div id="plviz-dashboard"></div>
@@ -240,6 +297,6 @@
 
     <script src="./js/theme-toggle.js"></script>
     <script src="./js/db.js?v=2026-09-11"></script>
-    <script src="./js/dashboard.js?v=2026-09-10e"></script>
+    <script src="./js/dashboard.js?v=2026-09-14g"></script>
   </body>
 </html>

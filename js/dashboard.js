@@ -3,7 +3,7 @@
 // Был — голубой, показывал — зелёный, не был — пусто.
 // Сверху столбики длительности: зелёные блоки — демо от длинного к короткому,
 // голубой сверху — обсуждение. Ширина как у клетки, 60 мин ≈ 4 строки.
-// Данные — из js/db.js, с декабря 2025.
+// Данные — из js/db.js, с марта 2026.
 
 (() => {
   "use strict";
@@ -14,7 +14,7 @@
     return;
   }
 
-  const CUTOFF = "2025-12-01";
+  const CUTOFF = "2026-03-01";
 
   const MISSED = 0;
   const VISIT = 1;
@@ -113,7 +113,7 @@
     });
   });
 
-  const rows = Object.keys(states)
+  const people = Object.keys(states)
     .map((id) => {
       const row = states[id];
       let visits = 0;
@@ -125,30 +125,75 @@
         name: personById[id].name,
         row,
         visits,
-        last: row[n - 1] !== MISSED,
       };
-    })
-    .sort((a, b) => {
-      if (a.last !== b.last) return a.last ? -1 : 1;
-      if (a.visits !== b.visits) return b.visits - a.visits;
+    });
+
+  const scoreLinear = (row) => {
+    let s = 0;
+    row.forEach((v, i) => {
+      if (v !== MISSED) s += i + 1;
+    });
+    return s;
+  };
+
+  const scoreExp = (row, ratio) => {
+    let s = 0;
+    let w = 1;
+    row.forEach((v) => {
+      if (v !== MISSED) s += w;
+      w *= ratio;
+    });
+    return s;
+  };
+
+  people.forEach((p) => {
+    p.score = {
+      linear: scoreLinear(p.row),
+      exp10: scoreExp(p.row, 1.1),
+      exp20: scoreExp(p.row, 1.2),
+    };
+  });
+
+  const SORTS = [
+    {
+      id: "linear",
+      label: "Баланс",
+      title: "Σ (номер встречи). Явка и недавность наравне: счёт = число визитов × средний номер встречи.",
+    },
+    {
+      id: "exp10",
+      label: "+10%",
+      title: "Σ 1.1ⁿ. Каждая следующая встреча на 10% весомее предыдущей.",
+    },
+    {
+      id: "exp20",
+      label: "+20%",
+      title: "Σ 1.2ⁿ. Сильнее тянет тех, кто ходил в хвосте календаря.",
+    },
+  ];
+
+  const sortPeople = (sortId) =>
+    people.slice().sort((a, b) => {
+      const d = (b.score[sortId] || 0) - (a.score[sortId] || 0);
+      if (d) return d;
       return a.name.localeCompare(b.name, "ru");
     });
 
   const totals = dates.map((_, i) => {
-    let people = 0;
+    let peopleN = 0;
     let demos = 0;
-    rows.forEach((r) => {
+    people.forEach((r) => {
       const v = r.row[i];
       if (v === MISSED) return;
-      people++;
+      peopleN++;
       if (v === DEMO) demos++;
     });
-    return { people, demos };
+    return { people: peopleN, demos };
   });
 
   const summaryLayers = (i) => {
     let html = "";
-    rows.forEach((r) => {
+    people.forEach((r) => {
       const v = r.row[i];
       if (v === VISIT) html += `<i class="sum visit"></i>`;
       else if (v === DEMO) html += `<i class="sum demo"></i>`;
@@ -166,32 +211,36 @@
     `${+iso.slice(8, 10)}\u00a0${MONTHS_GEN[+iso.slice(5, 7) - 1]}\u00a0’${iso.slice(2, 4)}`;
 
   const peopleAt = dates.map((_, i) =>
-    rows.filter((r) => r.row[i] !== MISSED).map((r) => r.name)
+    people
+      .filter((r) => r.row[i] !== MISSED)
+      .map((r) => r.name)
+      .sort((a, b) => a.localeCompare(b, "ru"))
   );
 
+  const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+
   const panelHtml = (title, entries, note) => {
-    const rowsHtml = entries
+    const fields = entries
       .filter(([, v]) => v != null && v !== "")
-      .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`)
+      .map(
+        ([k, v]) =>
+          `<div class="plviz-field"><div class="plviz-field-label">${esc(cap(k))}</div><div class="plviz-field-value">${v}</div></div>`
+      )
       .join("");
     return (
       `<p class="plviz-panel-title">${esc(title)}</p>` +
-      `<dl class="plviz-dl">${rowsHtml}</dl>` +
+      fields +
       (note ? `<p class="plviz-panel-note">${note}</p>` : "")
     );
   };
 
   const defaultPanel = () =>
-    panelHtml(
-      "Все встречи",
-      [
-        ["период", `${fmtDate(dates[0])} — ${fmtDate(dates[n - 1])}`],
-        ["встреч", String(n)],
-        ["участников", String(rows.length)],
-        ["демо", String(demosAt.reduce((s, list) => s + list.length, 0))],
-      ],
-      "Наведите на клетку или столбик — здесь появятся детали."
-    );
+    panelHtml("Все встречи", [
+      ["период", `${fmtDate(dates[0])} — ${fmtDate(dates[n - 1])}`],
+      ["встреч", String(n)],
+      ["участников", String(people.length)],
+      ["демо", String(demosAt.reduce((s, list) => s + list.length, 0))],
+    ]);
 
   const meetingPanel = (i) => {
     const t = totals[i];
@@ -255,94 +304,107 @@
   if (!el) return;
 
   if (!n) {
-    el.innerHTML = `<p>Встреч с декабря 2025 в базе пока нет.</p>`;
+    el.innerHTML = `<p>Встреч с марта 2026 в базе пока нет.</p>`;
     return;
   }
-
-  const monthSpans = [];
-  dates.forEach((d, i) => {
-    const key = d.slice(0, 7);
-    const last = monthSpans[monthSpans.length - 1];
-    if (last && last.key === key) last.len++;
-    else monthSpans.push({ key, len: 1, start: i });
-  });
 
   const maxBarMins = Math.max(
     0,
     ...barAt.map((b) => b.demos.reduce((s, d) => s + d.minutes, 0) + b.talk)
   );
-  const minH = (minutes) => `calc(${minutes} * var(--plviz-row) * 4 / 60)`;
+  const minH = (minutes) => `calc(${minutes} * var(--plviz-bar-row) * 4 / 60)`;
+
+  const datesHtml = dates
+    .map((d, i) => {
+      const day = String(+d.slice(8, 10));
+      const prev = dates[i - 1];
+      const isNewMonth = !prev || prev.slice(0, 7) !== d.slice(0, 7);
+      const month = isNewMonth
+        ? `<span class="plviz-date-month">${MONTHS_SHORT[+d.slice(5, 7) - 1]}</span>`
+        : "";
+      const cls = isNewMonth ? "plviz-date has-month" : "plviz-date";
+      return `<div class="${cls}">${day}${month}</div>`;
+    })
+    .join("");
 
   const barsHtml = barAt
     .map((b, i) => {
       const segs = b.demos.map(
         (d) =>
-          `<span class="plviz-seg demo ids__hover-dot" data-i="${i}" data-demo="${esc(d.id)}" style="height:${minH(d.minutes)}"></span>`
+          `<span class="plviz-seg demo" data-i="${i}" data-demo="${esc(d.id)}" style="height:${minH(d.minutes)}"></span>`
       );
       if (b.talk > 0) {
         segs.push(
-          `<span class="plviz-seg talk ids__hover-dot" data-i="${i}" style="height:${minH(b.talk)}"></span>`
+          `<span class="plviz-seg talk" data-i="${i}" style="height:${minH(b.talk)}"></span>`
         );
       }
       return (
-        `<span class="plviz-bar" data-i="${i}" data-row="sum" style="grid-row:1;grid-column:${i + 1}">` +
+        `<span class="plviz-bar" data-i="${i}" data-row="sum">` +
         segs.join("") +
         `</span>`
       );
     })
     .join("");
 
-  const monthsHtml = monthSpans
-    .map((m) => {
-      const label = MONTHS_SHORT[+m.key.slice(5, 7) - 1];
-      const col = m.start + 1;
-      return `<div class="plviz-month" style="grid-row:2;grid-column:${col} / ${col + m.len}">${label}</div>`;
-    })
-    .join("");
-
   const headHtml = dates
     .map(
       (d, i) =>
-        `<span class="plviz-cell sum-cell ids__hover-dot" data-i="${i}" data-row="sum">${summaryLayers(i)}</span>`
+        `<span class="plviz-cell sum-cell" data-i="${i}" data-row="sum">${summaryLayers(i)}</span>`
     )
     .join("");
 
-  const rowsHtml = rows
-    .map((r) =>
-      r.row
-        .map((v, i) => {
-          if (v === MISSED) return `<span class="plviz-cell"></span>`;
-          if (v === VISIT)
-            return `<span class="plviz-cell visit ids__hover-dot" data-i="${i}" data-row="${esc(r.id)}"></span>`;
-          return `<span class="plviz-cell demo ids__hover-dot" data-i="${i}" data-row="${esc(r.id)}"></span>`;
-        })
-        .join("")
-    )
-    .join("");
+  const cellsHtml = (list) =>
+    list
+      .map((r) =>
+        r.row
+          .map((v, i) => {
+            if (v === MISSED) return `<span class="plviz-cell"></span>`;
+            if (v === VISIT)
+              return `<span class="plviz-cell visit" data-i="${i}" data-row="${esc(r.id)}"></span>`;
+            return `<span class="plviz-cell demo" data-i="${i}" data-row="${esc(r.id)}"></span>`;
+          })
+          .join("")
+      )
+      .join("");
 
-  const namesHtml =
+  const namesHtml = (list) =>
     `<div class="plviz-names">` +
-    `<div class="plviz-name"></div>` +
-    `<div class="plviz-name"></div>` +
-    `<div class="plviz-name plviz-name-all">все</div>` +
-    rows.map((r) => `<div class="plviz-name">${esc(r.name)}</div>`).join("") +
+    list.map((r) => `<div class="plviz-name">${esc(r.name)}</div>`).join("") +
+    `</div>`;
+
+  const paintMatrix = (sortId) => {
+    const sorted = sortPeople(sortId);
+    const matrix = el.querySelector(".plviz-matrix");
+    if (!matrix) return;
+    matrix.innerHTML = namesHtml(sorted) + `<div class="plviz-grid">${cellsHtml(sorted)}</div>`;
+  };
+
+  const sortHtml =
+    `<div class="plviz-sort" role="group" aria-label="Сортировка строк">` +
+    SORTS.map(
+      (s, i) =>
+        `<button type="button" data-sort="${s.id}" aria-pressed="${i === 0 ? "true" : "false"}" title="${esc(s.title)}">${esc(s.label)}</button>`
+    ).join("") +
     `</div>`;
 
   el.innerHTML =
+    sortHtml +
     `<div class="plviz-chart" style="--n:${n};--bar-mins:${maxBarMins}">` +
-    namesHtml +
-    `<div class="plviz-grid">` +
-    barsHtml +
-    monthsHtml +
-    `<div class="plviz-head" style="display:contents">${headHtml}</div>` +
-    rowsHtml +
-    `</div></div>` +
+    `<div class="plviz-timeline">${datesHtml}</div>` +
+    `<div class="plviz-bars">${barsHtml}</div>` +
+    `<div class="plviz-summary">` +
+    `<div class="plviz-name plviz-name-all">Все участники</div>` +
+    `<div class="plviz-summary-grid">${headHtml}</div>` +
+    `</div>` +
+    `<div class="plviz-matrix"></div></div>` +
     `<div class="plviz-legend">` +
     `<span><i class="visit"></i>был / обсуждение</span>` +
     `<span><i class="demo"></i>показывал / демо</span>` +
     `</div>`;
 
-  const rowById = Object.fromEntries(rows.map((r) => [r.id, r]));
+  paintMatrix(SORTS[0].id);
+
+  const rowById = Object.fromEntries(people.map((r) => [r.id, r]));
 
   const showDefault = () => {
     if (box) box.innerHTML = defaultPanel();
@@ -375,4 +437,14 @@
   });
   shell.addEventListener("pointerleave", showDefault);
   showDefault();
+
+  el.querySelector(".plviz-sort")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-sort]");
+    if (!btn) return;
+    const sortId = btn.dataset.sort;
+    el.querySelectorAll(".plviz-sort button").forEach((b) => {
+      b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+    });
+    paintMatrix(sortId);
+  });
 })();
