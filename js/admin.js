@@ -13,12 +13,57 @@
 
   const clone = (v) => JSON.parse(JSON.stringify(v));
 
+  const mergeMissingFromSource = (draft, file) => {
+    const added = {
+      persons: 0,
+      projects: [],
+      meetings: 0,
+      demos: 0,
+      attendance: 0,
+      feedback: 0,
+    };
+    const addBy = (key, idOf) => {
+      if (!Array.isArray(draft[key])) draft[key] = [];
+      const have = new Set(draft[key].map(idOf));
+      (file[key] || []).forEach((item) => {
+        const id = idOf(item);
+        if (have.has(id)) return;
+        draft[key].push(clone(item));
+        have.add(id);
+        if (key === "projects") added.projects.push(item.title);
+        else added[key]++;
+      });
+    };
+    addBy("persons", (x) => x.id);
+    addBy("projects", (x) => x.id);
+    addBy("meetings", (x) => x.date);
+    addBy("demos", (x) => x.id);
+    addBy("attendance", (x) => `${x.meeting}::${x.person}`);
+    if (!Array.isArray(draft.feedback)) draft.feedback = [];
+    addBy("feedback", (x) => `${x.demo}::${x.person}`);
+    if (file.aliases && typeof file.aliases === "object") {
+      draft.aliases = { ...file.aliases, ...(draft.aliases || {}) };
+    }
+    return added;
+  };
+
   let db = (() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
         if (!Array.isArray(parsed.feedback)) parsed.feedback = [];
+        const added = mergeMissingFromSource(parsed, source);
+        const extra =
+          added.projects.length +
+          added.persons +
+          added.meetings +
+          added.demos +
+          added.attendance +
+          added.feedback;
+        if (extra) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+        }
         return parsed;
       }
     } catch (_) {}
@@ -133,8 +178,7 @@
       `// Единая база данных Планетария.\n` +
       `// Источник правды для визуализаций и админки.\n` +
       `// Реальные данные: посещения еженедельных встреч + демо-эфиры.\n` +
-      `// generated: true — длительность, формат, фидбэк и демо на еженедельных\n` +
-      `// встречах до августа 2026 дозаполнены по образцу реальных августовских записей.\n\n` +
+      `// generated: true — длительность восстановлена как 45 + число визитов.\n\n` +
       `(() => {\n` +
       `  "use strict";\n\n` +
       `  const PlanetariumDB = ${JSON.stringify(payload, null, 2)};\n\n` +
@@ -163,8 +207,12 @@
     }
   };
 
-  const saveDraft = () => {
+  const persistDraft = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+  };
+
+  const saveDraft = () => {
+    persistDraft();
     renderAll();
   };
 
@@ -256,13 +304,21 @@
       .sort((a, b) => b.date.localeCompare(a.date));
     select.innerHTML = items
       .map((m) => {
-        const label = `${fmtDateRu(m.date)} · ${m.type === "stream" ? "эфир" : "встреча"}`;
-        return `<option value="${m.date}"${m.date === selected ? " selected" : ""}>${label}</option>`;
+        return `<option value="${m.date}"${m.date === selected ? " selected" : ""}>${fmtDateRu(m.date)}</option>`;
       })
       .join("");
   };
 
-  const fillProjectRadios = (host, selected) => {
+  const authorsLabel = (p) => (p.authors || []).map(personName).join(", ");
+
+  const projectMatchesQuery = (p, query) => {
+    if (!query) return true;
+    return normalizeSearch(`${p.title} ${authorsLabel(p)}`).includes(query);
+  };
+
+  const fillProjectRadios = (host, selected, opts = {}) => {
+    const name = opts.name || host?.dataset.radioName || "project";
+    if (host) host.dataset.radioName = name;
     const set = selected || "";
     const picker = host.closest(".pdb-person-picker");
     const search = picker?.querySelector(".pdb-search");
@@ -276,12 +332,16 @@
 
     host.innerHTML = items
       .map((p) => {
-        const match = !query || normalizeSearch(p.title).includes(query);
-        const mark = p.url ? " · ссылка" : "";
+        const match = projectMatchesQuery(p, query);
+        const authors = authorsLabel(p);
+        const extra = [authors, p.url ? "ссылка" : ""].filter(Boolean).join(" · ");
+        const req = name === "project" ? " required" : "";
         return (
           `<label${match ? "" : " hidden"}>` +
-          `<input type="radio" name="project" value="${p.id}"${p.id === set ? " checked" : ""} required> ` +
-          `${escapeHtml(p.title)}${mark}</label>`
+          `<input type="radio" name="${name}" value="${p.id}"${p.id === set ? " checked" : ""}${req}> ` +
+          `<span>${escapeHtml(p.title)}` +
+          (extra ? `<span class="meta"> · ${escapeHtml(extra)}</span>` : "") +
+          `</span></label>`
         );
       })
       .join("");
@@ -295,13 +355,15 @@
       search.dataset.bound = "1";
       search.addEventListener("input", () => {
         const current = host.querySelector("input[type=radio]:checked")?.value || "";
-        fillProjectRadios(host, current);
+        fillProjectRadios(host, current, { name });
       });
     }
   };
 
-  const selectedProjectId = () =>
-    document.querySelector("#demo-project input[type=radio]:checked")?.value || "";
+  const selectedProjectId = (host) =>
+    (host || document.getElementById("demo-project"))?.querySelector(
+      "input[type=radio]:checked"
+    )?.value || "";
 
   const selectedFormat = () =>
     document.querySelector("#demo-format input[name=format]:checked")?.value || "";
@@ -309,6 +371,57 @@
   const projectHasUrl = (projectId) => {
     const p = db.projects.find((x) => x.id === projectId);
     return Boolean(p?.url);
+  };
+
+  const ensureMeeting = (date, extra = {}) => {
+    if (!date) return null;
+    let m = db.meetings.find((x) => x.date === date);
+    if (!m) {
+      m = { date, type: "weekly", minutes: null, note: null };
+      db.meetings.push(m);
+      db.meetings.sort((a, b) => a.date.localeCompare(b.date));
+    }
+    m.type = "weekly";
+    if (Object.prototype.hasOwnProperty.call(extra, "minutes")) m.minutes = extra.minutes;
+    if (Object.prototype.hasOwnProperty.call(extra, "note")) m.note = extra.note;
+    return m;
+  };
+
+  const writeAttendance = (date, people) => {
+    db.attendance = db.attendance.filter((a) => a.meeting !== date);
+    people.forEach((person) => db.attendance.push({ meeting: date, person }));
+  };
+
+  const upsertPerson = ({ id, name, telegram, photo, note }) => {
+    if (id) {
+      const p = db.persons.find((x) => x.id === id);
+      if (!p) return null;
+      p.name = name;
+      p.telegram = telegram;
+      p.photo = photo;
+      p.note = note;
+      return id;
+    }
+    const ids = new Set(db.persons.map((p) => p.id));
+    const newId = uniqueId(slug(name), ids);
+    db.persons.push({ id: newId, name, telegram, photo, note });
+    return newId;
+  };
+
+  const upsertProject = ({ id, title, url, authors, note }) => {
+    if (id) {
+      const p = db.projects.find((x) => x.id === id);
+      if (!p) return null;
+      p.title = title;
+      p.url = url;
+      p.authors = authors;
+      p.note = note;
+      return id;
+    }
+    const ids = new Set(db.projects.map((p) => p.id));
+    const newId = uniqueId(slug(title), ids);
+    db.projects.push({ id: newId, title, url, authors, note });
+    return newId;
   };
 
   const setDemoFormat = (value) => {
@@ -521,7 +634,6 @@
     if (!m) return;
     formMeeting.origDate.value = m.date;
     formMeeting.date.value = m.date;
-    formMeeting.type.value = m.type || "weekly";
     formMeeting.minutes.value = m.minutes ?? "";
     formMeeting.note.value = m.note || "";
     syncMeetingDateLabel();
@@ -533,7 +645,6 @@
   formMeeting.addEventListener("submit", (e) => {
     e.preventDefault();
     const date = formMeeting.date.value;
-    const type = formMeeting.type.value;
     const orig = formMeeting.origDate.value;
     if (!date) return;
 
@@ -554,10 +665,10 @@
 
     let m = db.meetings.find((x) => x.date === date);
     if (!m) {
-      m = { date, type, minutes: null, note: null };
+      m = { date, type: "weekly", minutes: null, note: null };
       db.meetings.push(m);
     }
-    m.type = type;
+    m.type = "weekly";
     m.minutes = numOrNull(formMeeting.minutes.value);
     m.note = empty(formMeeting.note.value);
     db.meetings.sort((a, b) => a.date.localeCompare(b.date));
@@ -602,21 +713,18 @@
   const attendancePeople = document.getElementById("attendance-people");
   const attendanceSummary = document.getElementById("attendance-summary");
 
-  const isWeekly = (m) => m.type === "weekly";
-
   const loadAttendanceForm = () => {
-    const weekly = db.meetings.filter(isWeekly);
     const preferred =
-      attendanceMeeting.value && weekly.some((m) => m.date === attendanceMeeting.value)
+      attendanceMeeting.value && db.meetings.some((m) => m.date === attendanceMeeting.value)
         ? attendanceMeeting.value
-        : weekly.at(-1)?.date;
-    fillMeetingSelect(attendanceMeeting, preferred, isWeekly);
+        : db.meetings.slice().sort((a, b) => a.date.localeCompare(b.date)).at(-1)?.date;
+    fillMeetingSelect(attendanceMeeting, preferred);
     const date = attendanceMeeting.value;
     const selected = db.attendance.filter((a) => a.meeting === date).map((a) => a.person);
     fillPersonChecks(attendancePeople, selected);
     attendanceSummary.textContent = date
       ? `${selected.length} человек · ${fmtDateRu(date)}`
-      : "Нет еженедельных встреч";
+      : "Нет встреч";
   };
 
   attendanceMeeting.addEventListener("change", loadAttendanceForm);
@@ -644,6 +752,8 @@
   const demoProject = document.getElementById("demo-project");
   const demoPresenters = document.getElementById("demo-presenters");
   const demoFeedback = document.getElementById("demo-feedback");
+  const demoPresenterPicker = document.getElementById("demo-presenter-picker");
+  const demoPresenterAuthors = document.getElementById("demo-presenter-authors");
 
   if (!Array.isArray(db.feedback)) db.feedback = [];
 
@@ -659,6 +769,50 @@
   const feedbackForDemo = (demoId) =>
     (db.feedback || []).filter((f) => f.demo === demoId).map((f) => f.person);
 
+  const projectAuthorsOf = (projectId) =>
+    db.projects.find((p) => p.id === projectId)?.authors?.slice() || [];
+
+  const sameIdSet = (a, b) => {
+    if (a.length !== b.length) return false;
+    const set = new Set(a);
+    return b.every((id) => set.has(id));
+  };
+
+  const presenterModeIsAuthor = () =>
+    document.querySelector("#demo-presenter-mode input[name=presenterMode]:checked")
+      ?.value !== "other";
+
+  const setPresenterMode = (mode) => {
+    document.querySelectorAll("#demo-presenter-mode input[name=presenterMode]").forEach((input) => {
+      input.checked = input.value === mode;
+    });
+  };
+
+  const selectedPresenters = () => {
+    const authors = projectAuthorsOf(selectedProjectId());
+    return presenterModeIsAuthor() ? authors : checkedValues(demoPresenters);
+  };
+
+  const syncPresenterUI = () => {
+    const projectId = selectedProjectId();
+    const authors = projectAuthorsOf(projectId);
+    const isAuthor = presenterModeIsAuthor();
+    if (demoPresenterPicker) demoPresenterPicker.hidden = isAuthor;
+    if (demoPresenterAuthors) {
+      if (!isAuthor || !projectId) {
+        demoPresenterAuthors.hidden = true;
+        demoPresenterAuthors.textContent = "";
+      } else if (!authors.length) {
+        demoPresenterAuthors.hidden = false;
+        demoPresenterAuthors.textContent = "У проекта нет авторов";
+      } else {
+        demoPresenterAuthors.hidden = false;
+        demoPresenterAuthors.textContent = authors.map(personName).join(", ");
+      }
+    }
+    if (isAuthor) fillPersonChecks(demoPresenters, authors);
+  };
+
   const clearDemo = () => {
     formDemo.reset();
     formDemo.id.value = "";
@@ -667,6 +821,7 @@
     fillPersonChecks(demoPresenters, []);
     fillPersonChecks(demoFeedback, []);
     setDemoFormat(null);
+    syncPresenterUI();
     syncDemoFormatUI();
     listDemos.querySelectorAll("li").forEach((li) => li.classList.remove("active"));
   };
@@ -677,12 +832,16 @@
     formDemo.id.value = d.id;
     fillMeetingSelect(demoMeeting, d.meeting);
     fillProjectRadios(demoProject, d.project);
+    const authors = projectAuthorsOf(d.project);
+    const isAuthor = authors.length > 0 && sameIdSet(d.presenters, authors);
+    setPresenterMode(isAuthor ? "author" : "other");
     fillPersonChecks(demoPresenters, d.presenters);
     fillPersonChecks(demoFeedback, feedbackForDemo(id));
     // 1–3 только если у проекта ещё нет ссылки; иначе уровень 4 вычисляется сам
     setDemoFormat(projectHasUrl(d.project) ? null : d.format);
     formDemo.minutes.value = d.minutes ?? "";
     formDemo.note.value = d.note || "";
+    syncPresenterUI();
     syncDemoFormatUI();
     listDemos.querySelectorAll("li").forEach((li) => {
       li.classList.toggle("active", li.dataset.id === id);
@@ -690,14 +849,19 @@
   };
 
   demoProject.addEventListener("change", (e) => {
-    if (e.target.name === "project") syncDemoFormatUI();
+    if (e.target.name === "project") {
+      syncPresenterUI();
+      syncDemoFormatUI();
+    }
   });
+
+  document.getElementById("demo-presenter-mode")?.addEventListener("change", syncPresenterUI);
 
   formDemo.addEventListener("submit", (e) => {
     e.preventDefault();
     const meeting = formDemo.meeting.value;
     const project = selectedProjectId();
-    const presenters = checkedValues(demoPresenters);
+    const presenters = selectedPresenters();
     const feedbackPeople = checkedValues(demoFeedback);
     if (!meeting || !project) {
       setStatus("Нужны встреча и проект");
@@ -708,9 +872,8 @@
       return;
     }
 
-    // если даты нет в meetings — добавим как stream
     if (!db.meetings.some((m) => m.date === meeting)) {
-      db.meetings.push({ date: meeting, type: "stream", minutes: null, note: null });
+      db.meetings.push({ date: meeting, type: "weekly", minutes: null, note: null });
       db.meetings.sort((a, b) => a.date.localeCompare(b.date));
     }
 
@@ -789,8 +952,8 @@
     const items = db.projects.slice().sort((a, b) => a.title.localeCompare(b.title, "ru"));
     listProjects.innerHTML = items
       .map((p) => {
-        const match = !query || normalizeSearch(p.title).includes(query);
-        const authors = p.authors.map(personName).join(", ");
+        const match = projectMatchesQuery(p, query);
+        const authors = authorsLabel(p);
         const link = p.url ? " · ссылка" : "";
         return (
           `<li data-id="${p.id}"${match ? "" : " hidden"}${p.id === activeId ? ' class="active"' : ""}>` +
@@ -823,10 +986,7 @@
         const count = db.attendance.filter((a) => a.meeting === m.date).length;
         const demos = db.demos.filter((d) => d.meeting === m.date).length;
         const gen = m.generated ? " · сген." : "";
-        const meta =
-          m.type === "stream"
-            ? `эфир · ${demos} демо${gen}`
-            : `встреча · ${count} чел.${demos ? ` · ${demos} демо` : ""}${gen}`;
+        const meta = `${count} чел.${demos ? ` · ${demos} демо` : ""}${gen}`;
         return (
           `<li data-date="${m.date}"><span>${fmtDateRu(m.date)}</span>` +
           `<span class="meta">${meta}</span></li>`
@@ -864,7 +1024,7 @@
   let summaryDate = "";
 
   const FORMATS = {
-    1: "просто рассказывает",
+    1: "рассказ",
     2: "экран",
     3: "слайды",
     4: "опубликованный продукт",
@@ -876,10 +1036,9 @@
 
   const meetingChecks = (m, presentIds, demos) => {
     const out = [];
-    const weekly = m.type !== "stream";
     const present = new Set(presentIds);
     if (!m.minutes) out.push("у встречи не указана длительность");
-    if (weekly && !presentIds.length) out.push("не отмечено присутствие");
+    if (!presentIds.length) out.push("не отмечено присутствие");
     if (!demos.length) out.push("нет ни одного демо");
     demos.forEach((d) => {
       const title = projectTitle(d.project);
@@ -888,7 +1047,6 @@
       if (!projectHasUrl(d.project) && !d.format) {
         out.push(`«${title}»: нет ни ссылки на проект, ни формата`);
       }
-      if (!weekly) return;
       d.presenters.forEach((p) => {
         if (!present.has(p)) {
           out.push(`${personName(p)} показывает «${title}», но не отмечен в присутствии`);
@@ -904,8 +1062,12 @@
   };
 
   const meetingSummary = (date) => {
-    const m = db.meetings.find((x) => x.date === date);
-    if (!m) return "Выбери встречу в списке выше.";
+    if (!date) return "Укажи дату встречи.";
+    const m = db.meetings.find((x) => x.date === date) || {
+      date,
+      minutes: null,
+      note: null,
+    };
 
     const presentIds = db.attendance
       .filter((a) => a.meeting === date)
@@ -913,11 +1075,7 @@
     const demos = db.demos.filter((d) => d.meeting === date);
     const lines = [humanDate(date)];
 
-    lines.push(
-      `${m.type === "stream" ? "Демо-эфир" : "Еженедельная встреча"} · ` +
-        (m.minutes ? `${m.minutes} мин` : "длительность не указана")
-    );
-    if (m.generated) lines.push("Данные сгенерированы по образцу августа 2026.");
+    lines.push(m.minutes ? `${m.minutes} мин` : "длительность не указана");
     if (m.note) lines.push(`Заметка: ${m.note}`);
 
     lines.push("", `Присутствие — ${presentIds.length}`);
@@ -964,10 +1122,7 @@
             const people = db.attendance.filter((a) => a.meeting === m.date).length;
             const count = db.demos.filter((d) => d.meeting === m.date).length;
             const gen = m.generated ? " · сген." : "";
-            const meta =
-              m.type === "stream"
-                ? `эфир · ${count} демо${gen}`
-                : `${people} чел. · ${count} демо${gen}`;
+            const meta = `${people} чел. · ${count} демо${gen}`;
             return (
               `<li data-date="${m.date}"${m.date === summaryDate ? ' class="active"' : ""}>` +
               `<span>${fmtDateRu(m.date)}</span><span class="meta">${meta}</span></li>`
@@ -1004,7 +1159,11 @@
     renderMeetings();
     fillMeetingSelect(demoMeeting, demoMeeting.value);
     fillProjectRadios(demoProject, selectedProjectId());
-    fillPersonChecks(demoPresenters, checkedValues(demoPresenters));
+    fillPersonChecks(
+      demoPresenters,
+      presenterModeIsAuthor() ? projectAuthorsOf(selectedProjectId()) : checkedValues(demoPresenters)
+    );
+    syncPresenterUI();
     fillPersonChecks(
       demoFeedback,
       formDemo.id.value ? feedbackForDemo(formDemo.id.value) : checkedValues(demoFeedback)
@@ -1012,6 +1171,7 @@
     syncDemoFormatUI();
     loadAttendanceForm();
     renderDemos();
+    refreshLive();
     if (!document.querySelector('[data-panel="summary"]').hidden) renderSummary();
     const preview = document.getElementById("pdb-preview");
     if (preview && !document.querySelector('[data-panel="export"]').hidden) {
@@ -1020,10 +1180,429 @@
   };
 
   // ---------------------------------------------------------------
+  // Режимы: «В прямом эфире» / «Редактура»
+  // ---------------------------------------------------------------
+
+  const MODE_KEY = "planetarium-admin-mode";
+  const liveRoot = document.getElementById("pdb-live");
+  const editRoot = document.getElementById("pdb-edit");
+  const liveDate = document.getElementById("live-date");
+  const liveDateHuman = document.getElementById("live-date-human");
+  const liveDemoList = document.getElementById("live-demo-list");
+  const liveDemoProject = document.getElementById("live-demo-project");
+  const liveProjectPicker = document.getElementById("live-project-picker");
+  const liveProjectCreate = document.getElementById("live-project-create");
+  const liveNewAuthors = document.getElementById("live-new-authors");
+  const liveDemoFeedback = document.getElementById("live-demo-feedback");
+  const liveAttendance = document.getElementById("live-attendance");
+  const liveFormatBlock = document.getElementById("live-format-block");
+  const liveDemoId = document.getElementById("live-demo-id");
+  const liveDemoMinutes = document.getElementById("live-demo-minutes");
+  const liveMeetingMinutes = document.getElementById("live-meeting-minutes");
+  const liveSummaryText = document.getElementById("live-summary-text");
+  const liveDemoStatus = document.getElementById("live-demo-status");
+  const liveDemoDelete = document.getElementById("live-demo-delete");
+  let liveProjectSource = "existing";
+  let adminMode = "live";
+
+  const syncLiveDateLabel = () => {
+    if (liveDateHuman) {
+      liveDateHuman.textContent = liveDate?.value ? fmtDateRu(liveDate.value) : "";
+    }
+  };
+
+  const liveSelectedFormat = () =>
+    document.querySelector("#live-format input[name='live-format']:checked")?.value || "";
+
+  const setLiveFormat = (value) => {
+    document.querySelectorAll("#live-format input[name='live-format']").forEach((input) => {
+      input.checked = value != null && String(input.value) === String(value);
+    });
+  };
+
+  const liveProjectHasUrl = () => {
+    if (liveProjectSource === "new") {
+      return Boolean(empty(document.getElementById("live-new-url")?.value));
+    }
+    return projectHasUrl(selectedProjectId(liveDemoProject));
+  };
+
+  const syncLiveFormatUI = () => {
+    if (!liveFormatBlock) return;
+    const hasProject =
+      liveProjectSource === "new"
+        ? Boolean(document.getElementById("live-new-title")?.value.trim())
+        : Boolean(selectedProjectId(liveDemoProject));
+    const hasUrl = liveProjectHasUrl();
+    liveFormatBlock.hidden = !hasProject || hasUrl;
+    if (hasUrl) setLiveFormat(null);
+  };
+
+  const setLiveProjectSource = (source) => {
+    liveProjectSource = source;
+    document
+      .getElementById("live-project-existing")
+      ?.setAttribute("aria-pressed", source === "existing" ? "true" : "false");
+    document
+      .getElementById("live-project-new")
+      ?.setAttribute("aria-pressed", source === "new" ? "true" : "false");
+    if (liveProjectPicker) liveProjectPicker.hidden = source !== "existing";
+    if (liveProjectCreate) liveProjectCreate.hidden = source !== "new";
+    syncLiveFormatUI();
+  };
+
+  const renderLiveAttendanceSummary = () => {
+    const el = document.getElementById("live-attendance-summary");
+    if (!el) return;
+    const date = liveDate?.value;
+    const n = date ? db.attendance.filter((a) => a.meeting === date).length : 0;
+    el.textContent = date ? `${n} человек · ${fmtDateRu(date)}` : "";
+  };
+
+  const renderLiveSummary = () => {
+    if (!liveSummaryText) return;
+    liveSummaryText.textContent = liveDate?.value
+      ? meetingSummary(liveDate.value)
+      : "Укажи дату встречи.";
+  };
+
+  const renderLiveDemos = () => {
+    if (!liveDemoList) return;
+    const date = liveDate?.value;
+    const items = date
+      ? db.demos.filter((d) => d.meeting === date).sort((a, b) => a.id.localeCompare(b.id))
+      : [];
+    const activeId = liveDemoId?.value;
+    liveDemoList.innerHTML = items.length
+      ? items
+          .map((d) => {
+            const fb = feedbackForDemo(d.id).length;
+            const meta = [d.minutes ? `${d.minutes} мин` : "", fb ? `фидбэк ${fb}` : ""]
+              .filter(Boolean)
+              .join(" · ");
+            return (
+              `<li data-id="${d.id}"${d.id === activeId ? ' class="active"' : ""}>` +
+              `<span>${escapeHtml(projectTitle(d.project))}</span>` +
+              `<span class="meta">${escapeHtml(meta || "без времени")}</span></li>`
+            );
+          })
+          .join("")
+      : `<li class="pdb-empty">Пока нет демо за эту дату</li>`;
+    liveDemoList.querySelectorAll("li[data-id]").forEach((li) => {
+      li.addEventListener("click", () => loadLiveDemo(li.dataset.id));
+    });
+  };
+
+  const clearLiveDemoForm = () => {
+    if (liveDemoId) liveDemoId.value = "";
+    if (liveDemoMinutes) liveDemoMinutes.value = "";
+    const title = document.getElementById("live-new-title");
+    const url = document.getElementById("live-new-url");
+    const note = document.getElementById("live-new-note");
+    if (title) title.value = "";
+    if (url) url.value = "";
+    if (note) note.value = "";
+    if (liveNewAuthors) fillPersonChecks(liveNewAuthors, []);
+    if (liveDemoFeedback) fillPersonChecks(liveDemoFeedback, []);
+    if (liveDemoProject) fillProjectRadios(liveDemoProject, "", { name: "live-project" });
+    setLiveFormat(null);
+    setLiveProjectSource("existing");
+    if (liveDemoDelete) liveDemoDelete.hidden = true;
+    if (liveDemoStatus) liveDemoStatus.textContent = "";
+    renderLiveDemos();
+    syncLiveFormatUI();
+  };
+
+  const loadLiveDemo = (id) => {
+    const d = db.demos.find((x) => x.id === id);
+    if (!d) return;
+    liveDemoId.value = d.id;
+    setLiveProjectSource("existing");
+    fillProjectRadios(liveDemoProject, d.project, { name: "live-project" });
+    liveDemoMinutes.value = d.minutes ?? "";
+    fillPersonChecks(liveDemoFeedback, feedbackForDemo(id));
+    setLiveFormat(projectHasUrl(d.project) ? null : d.format);
+    liveDemoDelete.hidden = false;
+    liveDemoStatus.textContent = `Редактирование: ${projectTitle(d.project)}`;
+    renderLiveDemos();
+    syncLiveFormatUI();
+  };
+
+  const resolveLiveProject = () => {
+    if (liveProjectSource === "new") {
+      const title = document.getElementById("live-new-title").value.trim();
+      const authors = checkedValues(liveNewAuthors);
+      if (!title) {
+        setStatus("Нужно название проекта");
+        return null;
+      }
+      if (!authors.length) {
+        setStatus("Нужен хотя бы один автор");
+        return null;
+      }
+      return upsertProject({
+        title,
+        url: empty(document.getElementById("live-new-url").value),
+        authors,
+        note: empty(document.getElementById("live-new-note").value),
+      });
+    }
+    const id = selectedProjectId(liveDemoProject);
+    if (!id) {
+      setStatus("Выбери проект или добавь новый");
+      return null;
+    }
+    return id;
+  };
+
+  const saveLiveDemo = () => {
+    const date = liveDate.value;
+    if (!date) {
+      setStatus("Сначала укажи дату встречи");
+      return false;
+    }
+    const project = resolveLiveProject();
+    if (!project) return false;
+    const presenters = projectAuthorsOf(project);
+    if (!presenters.length) {
+      setStatus("Нужен хотя бы один автор — они будут показывающими");
+      return false;
+    }
+    ensureMeeting(date);
+    const format = projectHasUrl(project) ? null : numOrNull(liveSelectedFormat());
+    let id = liveDemoId.value;
+    const payload = {
+      meeting: date,
+      project,
+      presenters,
+      minutes: numOrNull(liveDemoMinutes.value),
+      format,
+      note: null,
+    };
+    if (id) {
+      const d = db.demos.find((x) => x.id === id);
+      if (!d) return false;
+      Object.assign(d, payload);
+    } else {
+      id = nextDemoId();
+      db.demos.push({ id, ...payload });
+    }
+    const feedbackPeople = checkedValues(liveDemoFeedback);
+    db.feedback = (db.feedback || []).filter((f) => f.demo !== id);
+    feedbackPeople.forEach((person) => db.feedback.push({ demo: id, person }));
+    persistDraft();
+    liveDemoId.value = id;
+    liveDemoDelete.hidden = false;
+    setLiveProjectSource("existing");
+    fillProjectRadios(liveDemoProject, project, { name: "live-project" });
+    liveDemoStatus.textContent = `Сохранено: ${projectTitle(project)}`;
+    setStatus(`Демо сохранено: ${projectTitle(project)}`, true);
+    renderLiveDemos();
+    renderLiveSummary();
+    syncLiveFormatUI();
+    return true;
+  };
+
+  const liveDemoFormIsEmpty = () => {
+    if (liveDemoId.value) return false;
+    if (liveProjectSource === "new") {
+      return !document.getElementById("live-new-title").value.trim();
+    }
+    return !selectedProjectId(liveDemoProject) && !liveDemoMinutes.value;
+  };
+
+  const saveLiveAttendance = () => {
+    const date = liveDate.value;
+    if (!date) return;
+    ensureMeeting(date);
+    writeAttendance(date, checkedValues(liveAttendance));
+    persistDraft();
+    renderLiveSummary();
+    renderLiveAttendanceSummary();
+  };
+
+  const saveLiveMinutes = () => {
+    const date = liveDate.value;
+    if (!date) return;
+    ensureMeeting(date, { minutes: numOrNull(liveMeetingMinutes.value) });
+    persistDraft();
+    renderLiveSummary();
+  };
+
+  const flushLiveMeeting = () => {
+    if (!liveDate?.value) return;
+    ensureMeeting(liveDate.value, { minutes: numOrNull(liveMeetingMinutes.value) });
+    writeAttendance(liveDate.value, checkedValues(liveAttendance));
+  };
+
+  const loadLiveMeeting = (date) => {
+    liveDate.value = date || todayIso();
+    syncLiveDateLabel();
+    const m = db.meetings.find((x) => x.date === liveDate.value);
+    liveMeetingMinutes.value = m?.minutes ?? "";
+    fillPersonChecks(
+      liveAttendance,
+      db.attendance.filter((a) => a.meeting === liveDate.value).map((a) => a.person)
+    );
+    clearLiveDemoForm();
+    renderLiveAttendanceSummary();
+    renderLiveSummary();
+  };
+
+  const refreshLive = () => {
+    if (!liveDate) return;
+    if (!liveDate.value) {
+      liveDate.value = todayIso();
+      syncLiveDateLabel();
+    }
+    fillProjectRadios(liveDemoProject, selectedProjectId(liveDemoProject), {
+      name: "live-project",
+    });
+    fillPersonChecks(liveNewAuthors, checkedValues(liveNewAuthors));
+    fillPersonChecks(liveDemoFeedback, checkedValues(liveDemoFeedback));
+    const date = liveDate.value;
+    fillPersonChecks(
+      liveAttendance,
+      db.attendance.filter((a) => a.meeting === date).map((a) => a.person)
+    );
+    const m = db.meetings.find((x) => x.date === date);
+    if (document.activeElement !== liveMeetingMinutes) {
+      liveMeetingMinutes.value = m?.minutes ?? liveMeetingMinutes.value;
+    }
+    renderLiveDemos();
+    renderLiveAttendanceSummary();
+    renderLiveSummary();
+    syncLiveFormatUI();
+  };
+
+  const switchMode = (next) => {
+    adminMode = next;
+    localStorage.setItem(MODE_KEY, next);
+    if (liveRoot) liveRoot.hidden = next !== "live";
+    if (editRoot) editRoot.hidden = next !== "edit";
+    document.querySelectorAll(".pdb-modes [data-mode]").forEach((btn) => {
+      btn.setAttribute("aria-selected", btn.dataset.mode === next ? "true" : "false");
+    });
+    if (next === "live") {
+      history.replaceState(null, "", "#live");
+      refreshLive();
+    } else if (location.hash === "#live" || !location.hash.replace(/^#/, "")) {
+      switchTab("persons");
+    }
+  };
+
+  document.querySelectorAll(".pdb-modes [data-mode]").forEach((btn) => {
+    btn.addEventListener("click", () => switchMode(btn.dataset.mode));
+  });
+
+  liveDate?.addEventListener("input", syncLiveDateLabel);
+  liveDate?.addEventListener("change", () => loadLiveMeeting(liveDate.value));
+  document.getElementById("live-today")?.addEventListener("click", () => {
+    loadLiveMeeting(todayIso());
+    liveDate.focus();
+  });
+  document.getElementById("live-project-existing")?.addEventListener("click", () => {
+    setLiveProjectSource("existing");
+  });
+  document.getElementById("live-project-new")?.addEventListener("click", () => {
+    setLiveProjectSource("new");
+    document.getElementById("live-new-title")?.focus();
+  });
+  liveDemoProject?.addEventListener("change", syncLiveFormatUI);
+  document.getElementById("live-new-title")?.addEventListener("input", syncLiveFormatUI);
+  document.getElementById("live-new-url")?.addEventListener("input", syncLiveFormatUI);
+  document.getElementById("live-demo-save")?.addEventListener("click", () => {
+    saveLiveDemo();
+  });
+  document.getElementById("live-demo-another")?.addEventListener("click", () => {
+    if (liveDemoFormIsEmpty() || saveLiveDemo()) clearLiveDemoForm();
+  });
+  liveDemoDelete?.addEventListener("click", () => {
+    const id = liveDemoId.value;
+    if (!id) return;
+    if (!confirm("Удалить демо?")) return;
+    db.demos = db.demos.filter((d) => d.id !== id);
+    db.feedback = (db.feedback || []).filter((f) => f.demo !== id);
+    persistDraft();
+    clearLiveDemoForm();
+    renderLiveSummary();
+    setStatus("Демо удалено");
+  });
+  liveAttendance?.addEventListener("change", saveLiveAttendance);
+  liveMeetingMinutes?.addEventListener("change", saveLiveMinutes);
+
+  const livePersonCreate = document.getElementById("live-person-create");
+  const showLivePersonCreate = (show) => {
+    if (!livePersonCreate) return;
+    livePersonCreate.hidden = !show;
+    const name = document.getElementById("live-new-person-name");
+    const tg = document.getElementById("live-new-person-telegram");
+    if (show) {
+      name?.focus();
+      return;
+    }
+    if (name) name.value = "";
+    if (tg) tg.value = "";
+  };
+
+  document.getElementById("live-person-add")?.addEventListener("click", () => {
+    showLivePersonCreate(true);
+  });
+  document.getElementById("live-person-cancel")?.addEventListener("click", () => {
+    showLivePersonCreate(false);
+  });
+  document.getElementById("live-person-save")?.addEventListener("click", () => {
+    const name = document.getElementById("live-new-person-name")?.value.trim();
+    if (!name) {
+      setStatus("Нужно имя");
+      document.getElementById("live-new-person-name")?.focus();
+      return;
+    }
+    const id = upsertPerson({
+      name,
+      telegram: empty(document.getElementById("live-new-person-telegram")?.value),
+      photo: null,
+      note: null,
+    });
+    const selected = checkedValues(liveAttendance);
+    if (!selected.includes(id)) selected.push(id);
+    if (liveDate.value) {
+      ensureMeeting(liveDate.value);
+      writeAttendance(liveDate.value, selected);
+    }
+    persistDraft();
+    fillPersonChecks(liveAttendance, selected);
+    fillPersonChecks(liveNewAuthors, checkedValues(liveNewAuthors));
+    fillPersonChecks(liveDemoFeedback, checkedValues(liveDemoFeedback));
+    renderLiveAttendanceSummary();
+    renderLiveSummary();
+    showLivePersonCreate(false);
+    setStatus(`Персона добавлена: ${name}`, true);
+  });
+  livePersonCreate?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      document.getElementById("live-person-save")?.click();
+    }
+  });
+  document.getElementById("live-save-draft")?.addEventListener("click", () => {
+    flushLiveMeeting();
+    persistDraft();
+    setStatus("Черновик сохранён в браузере", true);
+    renderLiveSummary();
+  });
+  document.getElementById("live-publish")?.addEventListener("click", () => {
+    flushLiveMeeting();
+    persistDraft();
+    publishToProd();
+  });
+
+  // ---------------------------------------------------------------
   // Toolbar
   // ---------------------------------------------------------------
 
   document.getElementById("pdb-save-draft").addEventListener("click", () => {
+    if (adminMode === "live") flushLiveMeeting();
     saveDraft();
     setStatus("Черновик сохранён в браузере", true);
   });
@@ -1039,6 +1618,7 @@
     clearProject();
     clearMeeting();
     clearDemo();
+    loadLiveMeeting(todayIso());
     renderAll();
     setStatus("Загружено из файла");
   });
@@ -1191,6 +1771,7 @@
   const publishToProd = async () => {
     let token = (tokenInput?.value || "").trim() || localStorage.getItem(GH_TOKEN_KEY) || "";
     if (!token) {
+      switchMode("edit");
       switchTab("export");
       tokenInput?.focus();
       setStatus("Сначала вставь токен GitHub на вкладке «Экспорт»");
@@ -1205,6 +1786,7 @@
       return;
     }
 
+    if (adminMode === "live") flushLiveMeeting();
     saveDraft();
     setStatus("Публикую на прод…");
     publishButtons.forEach((b) => {
@@ -1235,6 +1817,7 @@
       setStatus("Опубликовано на прод. Дашборд обновится через минуту.", true);
     } catch (e) {
       if (e.status === 401 || e.status === 403) {
+        switchMode("edit");
         switchTab("export");
         setStatus("Токен не принят. Проверь права Contents: Read and write.");
       } else {
@@ -1260,15 +1843,31 @@
   fillPersonChecks(projectAuthors, []);
   fillPersonChecks(demoPresenters, []);
   fillPersonChecks(demoFeedback, []);
+  fillPersonChecks(liveNewAuthors, []);
+  fillPersonChecks(liveDemoFeedback, []);
+  fillPersonChecks(liveAttendance, []);
   fillMeetingSelect(demoMeeting);
   fillProjectRadios(demoProject, "");
+  fillProjectRadios(liveDemoProject, "", { name: "live-project" });
   syncMeetingDateLabel();
+  if (liveDate) liveDate.value = todayIso();
+  syncLiveDateLabel();
   renderAll();
   const hashTab = location.hash.replace(/^#/, "");
   const tabIds = [...document.querySelectorAll(".pdb-tabs [role='tab']")].map(
     (t) => t.dataset.tab
   );
-  if (tabIds.includes(hashTab)) switchTab(hashTab);
+  const savedMode = localStorage.getItem(MODE_KEY);
+  if (hashTab === "live") {
+    switchMode("live");
+  } else if (tabIds.includes(hashTab)) {
+    switchMode("edit");
+    switchTab(hashTab);
+  } else if (savedMode === "edit") {
+    switchMode("edit");
+  } else {
+    switchMode("live");
+  }
   if (localStorage.getItem(STORAGE_KEY)) {
     setStatus("Открыт черновик из браузера");
   } else {

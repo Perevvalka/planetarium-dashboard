@@ -2,7 +2,7 @@
 <html lang="ru">
   <head>
     <meta charset="utf-8">
-    <title>База данных — Планетарий</title>
+    <title>Форма ввода данных — Планетарий</title>
     <link rel="icon" type="image/png" href="images/favicon-inverted.png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="preload" href="fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
@@ -173,9 +173,18 @@
         margin: 0;
         padding: 0.12em 0;
       }
+      .pdb-form .pdb-radios label,
+      .pdb-form .pdb-checks label {
+        display: flex;
+      }
       .pdb-checks label[hidden],
-      .pdb-list li[hidden] {
+      .pdb-form .pdb-checks label[hidden],
+      .ids ul.pdb-list > li[hidden] {
         display: none;
+      }
+      .pdb-checks .meta {
+        color: var(--ids__text-caption);
+        font-size: 0.85em;
       }
       .pdb-checks input,
       .pdb-radios input {
@@ -311,6 +320,68 @@
         white-space: pre-wrap;
         word-break: break-word;
       }
+      .pdb-modes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35em 1.2em;
+        margin: 1.5em 0 0;
+      }
+      .pdb-modes button {
+        appearance: none;
+        background: none;
+        border: none;
+        padding: 0;
+        font: inherit;
+        color: var(--ids__text-caption);
+        cursor: pointer;
+      }
+      .pdb-modes button[aria-selected="true"] {
+        color: var(--ids__text);
+      }
+      .pdb-live,
+      .pdb-edit {
+        margin-top: 0.5em;
+      }
+      .pdb-live[hidden],
+      .pdb-edit[hidden] {
+        display: none;
+      }
+      .pdb-live {
+        display: grid;
+        gap: 2.4em;
+        max-width: 36em;
+        padding-bottom: 3em;
+      }
+      .pdb-live-section h2 {
+        font-size: 1.5em;
+        margin: 0 0 0.7em;
+      }
+      .pdb-live-section + .pdb-live-section {
+        border-top: 1px solid var(--ids__border);
+        padding-top: 2.2em;
+      }
+      .pdb-live #live-demo-list {
+        margin-bottom: 0.85em;
+      }
+      .pdb-live .pdb-form {
+        margin-bottom: 0;
+      }
+      .pdb-live .pdb-form[hidden],
+      .pdb-live .pdb-person-picker[hidden],
+      .pdb-live #live-format-block[hidden],
+      .pdb-live #live-demo-delete[hidden] {
+        display: none;
+      }
+      .pdb-live .pdb-actions button[aria-pressed="true"] {
+        background: var(--ids__text);
+        color: var(--ids__background);
+        border-color: var(--ids__text);
+      }
+      .pdb-live-demo-form {
+        display: grid;
+        gap: 0.9em;
+        padding-top: 0.75em;
+      }
     </style>
   </head>
 
@@ -327,11 +398,12 @@
           <div class="ids__space XL"></div>
           <div class="ids__text-width">
             <p><a href="index.html">← Главная</a></p>
-            <h1>База данных</h1>
-            <p>
-              Ввод данных встреч Планетария. Черновик сохраняется в браузере.
-              Когда встреча собрана — кнопка «На прод» записывает базу в репозиторий.
-            </p>
+            <h1>Форма ввода данных</h1>
+
+            <nav class="pdb-modes" role="tablist" aria-label="Режим админки">
+              <button type="button" role="tab" aria-selected="true" data-mode="live">В прямом эфире</button>
+              <button type="button" role="tab" aria-selected="false" data-mode="edit">Редактура</button>
+            </nav>
 
             <div class="pdb-toolbar">
               <button type="button" id="pdb-save-draft">Сохранить черновик</button>
@@ -342,6 +414,122 @@
               <span class="pdb-status" id="pdb-status"></span>
             </div>
 
+            <div class="pdb-live" id="pdb-live">
+              <section class="pdb-live-section">
+                <h2 class="XS">Встреча</h2>
+                <div class="pdb-form">
+                  <label>
+                    <span>Дата *</span>
+                    <div class="pdb-date-row">
+                      <input id="live-date" type="date" required>
+                      <button type="button" id="live-today">Сегодня</button>
+                    </div>
+                    <span class="pdb-date-human" id="live-date-human"></span>
+                  </label>
+                </div>
+              </section>
+
+              <section class="pdb-live-section">
+                <h2 class="XS">Демо</h2>
+                <ul class="pdb-list" id="live-demo-list"></ul>
+                <div class="pdb-live-demo-form" id="live-demo-form">
+                  <input type="hidden" id="live-demo-id" value="">
+                  <div>
+                    <p class="pdb-form-caption">Проект *</p>
+                    <div class="pdb-actions" style="margin-bottom: 0.6em">
+                      <button type="button" id="live-project-existing" aria-pressed="true">Существующий</button>
+                      <button type="button" id="live-project-new" aria-pressed="false">Новый</button>
+                    </div>
+                    <div class="pdb-person-picker" id="live-project-picker">
+                      <input type="search" class="pdb-search" id="live-project-search" placeholder="Поиск по названию или автору…" autocomplete="off" aria-label="Поиск проекта">
+                      <div class="pdb-checks" id="live-demo-project"></div>
+                    </div>
+                    <div class="pdb-form" id="live-project-create" hidden>
+                      <label><span>Название *</span><input id="live-new-title"></label>
+                      <label><span>Ссылка</span><input id="live-new-url" type="url" placeholder="https://"></label>
+                      <label>
+                        <span>Авторы *</span>
+                        <div class="pdb-person-picker">
+                          <input type="search" class="pdb-search" placeholder="Поиск по имени…" autocomplete="off" aria-label="Поиск авторов">
+                          <div class="pdb-checks" id="live-new-authors"></div>
+                        </div>
+                      </label>
+                      <label><span>Заметка</span><textarea id="live-new-note"></textarea></label>
+                    </div>
+                  </div>
+                  <div id="live-format-block" hidden>
+                    <span class="pdb-form-caption">Формат</span>
+                    <div class="pdb-radios" id="live-format">
+                      <label><input type="radio" name="live-format" value="1"> рассказ</label>
+                      <label><input type="radio" name="live-format" value="2"> экран</label>
+                      <label><input type="radio" name="live-format" value="3"> слайды</label>
+                    </div>
+                  </div>
+                  <div class="pdb-form">
+                    <label><span>Длительность (мин)</span><input id="live-demo-minutes" type="number" min="1" step="1"></label>
+                  </div>
+                  <div>
+                    <span class="pdb-form-caption">Фидбэк</span>
+                    <div class="pdb-person-picker">
+                      <input type="search" class="pdb-search" placeholder="Поиск по имени…" autocomplete="off" aria-label="Поиск кто дал фидбэк">
+                      <div class="pdb-checks" id="live-demo-feedback"></div>
+                    </div>
+                  </div>
+                  <div class="pdb-actions">
+                    <button type="button" class="primary" id="live-demo-save">Сохранить демо</button>
+                    <button type="button" id="live-demo-another">Ещё демо</button>
+                    <button type="button" class="danger" id="live-demo-delete" hidden>Удалить</button>
+                  </div>
+                  <p class="pdb-empty" id="live-demo-status"></p>
+                </div>
+              </section>
+
+              <section class="pdb-live-section">
+                <h2 class="XS">Явка</h2>
+                <div class="pdb-form">
+                  <label>
+                    <span>Кто был</span>
+                    <div class="pdb-person-picker">
+                      <input type="search" class="pdb-search" placeholder="Поиск по имени…" autocomplete="off" aria-label="Поиск присутствующих">
+                      <div class="pdb-checks" id="live-attendance"></div>
+                    </div>
+                  </label>
+                  <p class="pdb-empty" id="live-attendance-summary"></p>
+                  <div class="pdb-actions">
+                    <button type="button" id="live-person-add">Добавить персону</button>
+                  </div>
+                  <div class="pdb-form" id="live-person-create" hidden>
+                    <label><span>Имя *</span><input id="live-new-person-name" autocomplete="name"></label>
+                    <label><span>Telegram</span><input id="live-new-person-telegram" placeholder="@username"></label>
+                    <div class="pdb-actions">
+                      <button type="button" class="primary" id="live-person-save">Сохранить</button>
+                      <button type="button" id="live-person-cancel">Отмена</button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="pdb-live-section">
+                <h2 class="XS">Длительность встречи</h2>
+                <div class="pdb-form">
+                  <label><span>Минуты</span><input id="live-meeting-minutes" type="number" min="1" step="1"></label>
+                </div>
+              </section>
+
+              <section class="pdb-live-section">
+                <h2 class="XS">Сводка</h2>
+                <div class="pdb-summary-text" id="live-summary-text"></div>
+              </section>
+
+              <section class="pdb-live-section">
+                <div class="pdb-actions">
+                  <button type="button" id="live-save-draft">Сохранить черновик</button>
+                  <button type="button" class="primary" id="live-publish">На прод</button>
+                </div>
+              </section>
+            </div>
+
+            <div class="pdb-edit" id="pdb-edit" hidden>
             <nav class="pdb-tabs" role="tablist" aria-label="Сущности">
               <button type="button" role="tab" aria-selected="true" data-tab="persons">Персоны</button>
               <button type="button" role="tab" aria-selected="false" data-tab="projects">Проекты</button>
@@ -373,7 +561,7 @@
             <div class="pdb-panel" data-panel="projects" hidden>
               <div class="pdb-entity-pick" style="margin-bottom: 1.5em; max-width: 36em">
                 <p class="pdb-form-caption">Найти и открыть проект — или создай новый</p>
-                <input type="search" class="pdb-search" id="project-list-search" placeholder="Поиск по названию…" autocomplete="off" aria-label="Поиск проектов">
+                <input type="search" class="pdb-search" id="project-list-search" placeholder="Поиск по названию или автору…" autocomplete="off" aria-label="Поиск проектов">
                 <ul class="pdb-list pdb-scroll" id="list-projects"></ul>
                 <div class="pdb-actions">
                   <button type="button" data-clear="project">Новый проект</button>
@@ -402,23 +590,14 @@
             <div class="pdb-panel" data-panel="meetings" hidden>
               <form class="pdb-form" id="form-meeting">
                 <input type="hidden" name="origDate" value="">
-                <div class="pdb-row">
-                  <label>
-                    <span>Дата *</span>
-                    <div class="pdb-date-row">
-                      <input name="date" type="date" required>
-                      <button type="button" id="meeting-today">Сегодня</button>
-                    </div>
-                    <span class="pdb-date-human" id="meeting-date-human"></span>
-                  </label>
-                  <label>
-                    <span>Тип *</span>
-                    <select name="type" required>
-                      <option value="weekly">Еженедельная встреча</option>
-                      <option value="stream">Демо-эфир</option>
-                    </select>
-                  </label>
-                </div>
+                <label>
+                  <span>Дата *</span>
+                  <div class="pdb-date-row">
+                    <input name="date" type="date" required>
+                    <button type="button" id="meeting-today">Сегодня</button>
+                  </div>
+                  <span class="pdb-date-human" id="meeting-date-human"></span>
+                </label>
                 <label><span>Длительность (минуты)</span><input name="minutes" type="number" min="1" step="1"></label>
                 <label><span>Заметка</span><textarea name="note"></textarea></label>
                 <div class="pdb-actions">
@@ -454,27 +633,32 @@
               <form class="pdb-form" id="form-demo">
                 <input type="hidden" name="id" value="">
                 <label>
-                  <span>Встреча / эфир *</span>
+                  <span>Встреча *</span>
                   <select name="meeting" required id="demo-meeting"></select>
                 </label>
                 <div>
                   <span class="pdb-form-caption">Проект *</span>
                   <div class="pdb-person-picker">
-                    <input type="search" class="pdb-search" id="demo-project-search" placeholder="Поиск проекта…" autocomplete="off" aria-label="Поиск проекта">
+                    <input type="search" class="pdb-search" id="demo-project-search" placeholder="Поиск по названию или автору…" autocomplete="off" aria-label="Поиск проекта">
                     <div class="pdb-checks" id="demo-project"></div>
                   </div>
                 </div>
-                <label>
-                  <span>Показывающие *</span>
-                  <div class="pdb-person-picker">
+                <div>
+                  <span class="pdb-form-caption">Показывает автор? *</span>
+                  <div class="pdb-radios" id="demo-presenter-mode">
+                    <label><input type="radio" name="presenterMode" value="author" checked> да</label>
+                    <label><input type="radio" name="presenterMode" value="other"> нет, выберу</label>
+                  </div>
+                  <p class="pdb-empty" id="demo-presenter-authors" style="margin-top:0.35em"></p>
+                  <div class="pdb-person-picker" id="demo-presenter-picker" hidden style="margin-top:0.5em">
                     <input type="search" class="pdb-search" placeholder="Поиск по имени…" autocomplete="off" aria-label="Поиск показывающих">
                     <div class="pdb-checks" id="demo-presenters"></div>
                   </div>
-                </label>
+                </div>
                 <div id="demo-format-block" hidden>
                   <span class="pdb-form-caption">Формат</span>
                   <div class="pdb-radios" id="demo-format">
-                    <label><input type="radio" name="format" value="1"> просто рассказывает</label>
+                    <label><input type="radio" name="format" value="1"> рассказ</label>
                     <label><input type="radio" name="format" value="2"> экран</label>
                     <label><input type="radio" name="format" value="3"> слайды</label>
                   </div>
@@ -536,6 +720,7 @@
               </div>
               <pre id="pdb-preview"></pre>
             </div>
+            </div>
           </div>
           <div class="ids__space XL"></div>
         </div>
@@ -543,7 +728,7 @@
     </main>
 
     <script src="./js/theme-toggle.js"></script>
-    <script src="./js/db.js?v=2026-09-15"></script>
-    <script src="./js/admin.js?v=2026-09-09"></script>
+    <script src="./js/db.js?v=2026-09-15g"></script>
+    <script src="./js/admin.js?v=2026-09-15h"></script>
   </body>
 </html>
