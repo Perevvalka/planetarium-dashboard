@@ -219,16 +219,16 @@
   // Serialize → db.js
   // ---------------------------------------------------------------
 
-  const serializeFile = () => {
+  const serializeFile = (data = db) => {
     const payload = {
-      norm: db.norm,
-      aliases: db.aliases || {},
-      persons: db.persons,
-      projects: db.projects,
-      meetings: db.meetings,
-      attendance: db.attendance,
-      demos: db.demos,
-      feedback: db.feedback || [],
+      norm: data.norm,
+      aliases: data.aliases || {},
+      persons: data.persons,
+      projects: data.projects,
+      meetings: data.meetings,
+      attendance: data.attendance,
+      demos: data.demos,
+      feedback: data.feedback || [],
     };
     return (
       `// Единая база данных Планетария.\n` +
@@ -266,6 +266,13 @@
   const persistDraft = () => {
     localStorage.setItem(storageKey(), JSON.stringify(db));
   };
+
+  const persistAllDrafts = () => {
+    localStorage.setItem(STORAGE_LIVE, JSON.stringify(liveDb));
+    localStorage.setItem(STORAGE_EDIT, JSON.stringify(editDb));
+  };
+
+  const formField = (form, name) => form.elements.namedItem(name);
 
   const saveDraft = () => {
     persistDraft();
@@ -592,7 +599,7 @@
     const p = db.projects.find((x) => x.id === id);
     if (!p) return;
     formProject.id.value = p.id;
-    formProject.title.value = p.title || "";
+    formField(formProject, "title").value = p.title || "";
     formProject.url.value = p.url || "";
     formProject.note.value = p.note || "";
     fillPersonChecks(projectAuthors, p.authors);
@@ -604,7 +611,7 @@
 
   formProject.addEventListener("submit", (e) => {
     e.preventDefault();
-    const title = formProject.title.value.trim();
+    const title = String(formField(formProject, "title")?.value || "").trim();
     const authors = checkedValues(projectAuthors);
     if (!title) return;
     if (!authors.length) {
@@ -1938,6 +1945,63 @@
     if (syncDraftFromSource(db, remoteDb)) persistDraft();
   };
 
+  const applyLiveMeeting = (base) => {
+    const out = clone(base);
+    const date = liveDate?.value;
+    if (!date) return out;
+    mergeMissingFromSource(out, {
+      persons: liveDb.persons,
+      projects: liveDb.projects,
+      meetings: [],
+      demos: [],
+      attendance: [],
+      feedback: [],
+      aliases: liveDb.aliases || {},
+    });
+    const srcMeeting = liveDb.meetings.find((m) => m.date === date);
+    if (srcMeeting) {
+      let meeting = out.meetings.find((m) => m.date === date);
+      if (!meeting) {
+        out.meetings.push(clone(srcMeeting));
+        out.meetings.sort((a, b) => a.date.localeCompare(b.date));
+      } else {
+        meeting.type = srcMeeting.type || meeting.type;
+        meeting.minutes = srcMeeting.minutes;
+        meeting.note = srcMeeting.note;
+      }
+    }
+    out.attendance = (out.attendance || []).filter((a) => a.meeting !== date);
+    (liveDb.attendance || [])
+      .filter((a) => a.meeting === date)
+      .forEach((a) => out.attendance.push(clone(a)));
+    const oldDateDemoIds = new Set(
+      (base.demos || []).filter((d) => d.meeting === date).map((d) => d.id)
+    );
+    out.demos = (out.demos || []).filter((d) => d.meeting !== date);
+    const liveDemos = (liveDb.demos || []).filter((d) => d.meeting === date);
+    liveDemos.forEach((d) => out.demos.push(clone(d)));
+    const liveDemoIds = new Set(liveDemos.map((d) => d.id));
+    out.feedback = (out.feedback || []).filter((f) => !oldDateDemoIds.has(f.demo));
+    (liveDb.feedback || [])
+      .filter((f) => liveDemoIds.has(f.demo))
+      .forEach((f) => out.feedback.push(clone(f)));
+    return out;
+  };
+
+  const adoptPublished = (published) => {
+    if (!published) return;
+    if (adminMode === "edit") {
+      editDb = clone(published);
+      liveDb = clone(published);
+      db = editDb;
+    } else {
+      liveDb = clone(published);
+      db = liveDb;
+      syncDraftFromSource(editDb, published);
+    }
+    persistAllDrafts();
+  };
+
   const publishDbToBranch = async (token, message, files, dbContent, branch) => {
     try {
       await commitFiles(token, message, files, branch);
@@ -1982,10 +2046,21 @@
     });
 
     try {
+      let remoteDb = null;
       try {
-        await pullRemoteDbIntoDraft(token);
+        const remoteText = await readRepoFile("js/db.js", token, GH_BRANCH);
+        remoteDb = parseDbFile(remoteText);
       } catch (_) {}
-      const dbContent = serializeFile();
+      let toWrite = db;
+      if (adminMode === "live") {
+        toWrite = applyLiveMeeting(remoteDb || clone(source));
+      } else if (remoteDb) {
+        syncDraftFromSource(db, remoteDb);
+        persistDraft();
+        toWrite = db;
+      }
+      const dbContent = serializeFile(toWrite);
+      const published = parseDbFile(dbContent);
       const message = `Update PlanetariumDB (${todayIso()}).`;
       const files = [{ path: "js/db.js", content: dbContent }];
       for (const path of ["dashboard.html", "admin.html"]) {
@@ -1996,6 +2071,7 @@
         } catch (_) {}
       }
       await publishDbToBranch(token, message, files, dbContent, GH_BRANCH);
+      adoptPublished(published);
       try {
         await publishDbToBranch(
           token,
