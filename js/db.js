@@ -521,7 +521,7 @@
     },
     {
       "id": "svoy-sayt",
-      "title": "Сайт Виктора Тимофеева",
+      "title": "Свой сайт",
       "url": null,
       "authors": [
         "viktor-timofeev"
@@ -692,7 +692,7 @@
     },
     {
       "id": "sayt-kristiny-marchenko",
-      "title": "Сайт Кристины Марченко",
+      "title": "Свой сайт",
       "url": null,
       "authors": [
         "kristina-marchenko"
@@ -746,7 +746,7 @@
     },
     {
       "id": "obnovlenie-sayta-evgeniya-smirnova",
-      "title": "Обновление сайта Евгения Смирнова",
+      "title": "Обновление своего сайта",
       "url": "https://yevgeniysmirnov.ru/",
       "authors": [
         "evgeniy-smirnov"
@@ -821,16 +821,14 @@
     {
       "date": "2025-10-10",
       "type": "weekly",
-      "minutes": 53,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2025-10-16",
       "type": "weekly",
-      "minutes": 54,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2025-10-23",
@@ -841,23 +839,20 @@
     {
       "date": "2025-11-07",
       "type": "weekly",
-      "minutes": 59,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2025-11-14",
       "type": "weekly",
-      "minutes": 62,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2025-11-21",
       "type": "weekly",
-      "minutes": 58,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2025-11-27",
@@ -868,128 +863,110 @@
     {
       "date": "2025-12-05",
       "type": "weekly",
-      "minutes": 56,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2025-12-12",
       "type": "weekly",
-      "minutes": 56,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-01-16",
       "type": "weekly",
-      "minutes": 59,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-01-23",
       "type": "weekly",
-      "minutes": 52,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-01-29",
       "type": "weekly",
-      "minutes": 51,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-02-06",
       "type": "weekly",
-      "minutes": 58,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-02-21",
       "type": "weekly",
-      "minutes": 55,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-02-27",
       "type": "weekly",
-      "minutes": 53,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-03-07",
       "type": "weekly",
-      "minutes": 59,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-03-12",
       "type": "weekly",
-      "minutes": 58,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-03-20",
       "type": "weekly",
-      "minutes": 56,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-03-28",
       "type": "weekly",
-      "minutes": 59,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-04-02",
       "type": "weekly",
-      "minutes": 56,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-04-09",
       "type": "weekly",
-      "minutes": 60,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-04-17",
       "type": "weekly",
-      "minutes": 58,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-04-24",
       "type": "weekly",
-      "minutes": 62,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-05-01",
       "type": "weekly",
-      "minutes": 54,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-05-15",
       "type": "weekly",
-      "minutes": 55,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-05-25",
@@ -1000,16 +977,14 @@
     {
       "date": "2026-06-05",
       "type": "weekly",
-      "minutes": 56,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-06-12",
       "type": "weekly",
-      "minutes": 58,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-06-25",
@@ -1020,9 +995,8 @@
     {
       "date": "2026-07-03",
       "type": "weekly",
-      "minutes": 55,
-      "note": null,
-      "generated": true
+      "minutes": null,
+      "note": null
     },
     {
       "date": "2026-08-13",
@@ -1052,6 +1026,12 @@
       "date": "2026-09-10",
       "type": "weekly",
       "minutes": 60,
+      "note": null
+    },
+    {
+      "date": "2026-09-16",
+      "type": "weekly",
+      "minutes": null,
       "note": null
     }
   ],
