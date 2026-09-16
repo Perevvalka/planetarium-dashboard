@@ -59,6 +59,11 @@
         padding: 0.55em 0;
         background: var(--ids__background);
       }
+      .pdb-toolbar[hidden],
+      [data-pdb-mode="live"] #pdb-toolbar-edit,
+      [data-pdb-mode="edit"] #pdb-toolbar-live {
+        display: none;
+      }
       .pdb-toolbar .pdb-status {
         color: var(--ids__text-caption);
         font-size: 0.9em;
@@ -439,7 +444,7 @@
       <div class="ids__wrapper">
         <div class="section">
           <div class="ids__space XL"></div>
-          <div class="ids__text-width">
+          <div class="ids__text-width" data-pdb-mode="live">
             <p><a href="index.html">← Главная</a></p>
             <h1>Форма ввода данных</h1>
 
@@ -448,13 +453,19 @@
               <button type="button" role="tab" aria-selected="false" data-mode="edit">Редактура</button>
             </nav>
 
-            <div class="pdb-toolbar">
+            <div class="pdb-toolbar" id="pdb-toolbar-live">
+              <button type="button" class="primary" id="live-publish-top">На прод</button>
+              <button type="button" id="live-reset">Сбросить к файлу</button>
+              <span class="pdb-status" id="pdb-status"></span>
+            </div>
+
+            <div class="pdb-toolbar" id="pdb-toolbar-edit" hidden>
               <button type="button" id="pdb-save-draft">Сохранить черновик</button>
               <button type="button" class="primary" id="pdb-publish-top">На прод</button>
               <button type="button" id="pdb-download">Скачать db.js</button>
               <button type="button" id="pdb-copy">Скопировать db.js</button>
               <button type="button" id="pdb-reset">Сбросить к файлу</button>
-              <span class="pdb-status" id="pdb-status"></span>
+              <span class="pdb-status" id="pdb-status-edit"></span>
             </div>
 
             <div class="pdb-live" id="pdb-live">
@@ -582,6 +593,7 @@
                 <div class="pdb-actions">
                   <button type="button" id="live-save-draft">Сохранить черновик</button>
                   <button type="button" class="primary" id="live-publish">На прод</button>
+                  <button type="button" id="live-download">Скачать db.js</button>
                 </div>
               </section>
             </div>
@@ -787,6 +799,6 @@
 
     <script src="./js/theme-toggle.js"></script>
     <script src="./js/db.js?v=2026-09-16r"></script>
-    <script src="./js/admin.js?v=2026-09-16a"></script>
+    <script src="./js/admin.js?v=2026-09-16c"></script>
   </body>
 </html>
