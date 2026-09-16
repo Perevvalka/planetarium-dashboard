@@ -521,7 +521,7 @@
     },
     {
       "id": "svoy-sayt",
-      "title": "Сайт Виктора Тимофеева",
+      "title": "Свой сайт",
       "url": null,
       "authors": [
         "viktor-timofeev"
@@ -692,7 +692,7 @@
     },
     {
       "id": "sayt-kristiny-marchenko",
-      "title": "Сайт Кристины Марченко",
+      "title": "Свой сайт",
       "url": null,
       "authors": [
         "kristina-marchenko"
@@ -728,7 +728,7 @@
     },
     {
       "id": "ernolaev-space-svoy-sayt",
-      "title": "ernolaev.space — свой сайт",
+      "title": "Свой сайт",
       "url": "https://ermolaev.space",
       "authors": [
         "artem-ermolaev"
@@ -746,7 +746,7 @@
     },
     {
       "id": "obnovlenie-sayta-evgeniya-smirnova",
-      "title": "Обновление сайта Евгения Смирнова",
+      "title": "Свой сайт",
       "url": "https://yevgeniysmirnov.ru/",
       "authors": [
         "evgeniy-smirnov"
