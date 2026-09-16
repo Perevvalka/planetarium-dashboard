@@ -4,12 +4,16 @@
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "planetarium-db-draft";
+  const STORAGE_EDIT = "planetarium-db-draft";
+  const STORAGE_LIVE = "planetarium-db-draft-live";
   const source = window.PlanetariumDB;
   if (!source) {
     console.error("PlanetariumDB не загружена");
     return;
   }
+
+  let adminMode = "live";
+  const storageKey = () => (adminMode === "live" ? STORAGE_LIVE : STORAGE_EDIT);
 
   const clone = (v) => JSON.parse(JSON.stringify(v));
 
@@ -98,27 +102,36 @@
     }
   };
 
-  let db = (() => {
+  const loadStoredDraft = (key) => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed.feedback)) parsed.feedback = [];
-        if (syncDraftFromSource(parsed, source)) {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-        }
-        return parsed;
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed.feedback)) parsed.feedback = [];
+      if (syncDraftFromSource(parsed, source)) {
+        localStorage.setItem(key, JSON.stringify(parsed));
       }
-    } catch (_) {}
+      return parsed;
+    } catch (_) {
+      return null;
+    }
+  };
+
+  const freshDb = () => {
     const base = clone(source);
     if (!Array.isArray(base.feedback)) base.feedback = [];
     return base;
-  })();
+  };
 
-  const statusEl = document.getElementById("pdb-status");
+  let liveDb = loadStoredDraft(STORAGE_LIVE) || freshDb();
+  let editDb = loadStoredDraft(STORAGE_EDIT) || freshDb();
+  let db = liveDb;
+
   const setStatus = (msg, ok) => {
-    statusEl.textContent = msg || "";
-    statusEl.classList.toggle("is-ok", Boolean(ok && msg));
+    document.querySelectorAll(".pdb-status").forEach((el) => {
+      el.textContent = msg || "";
+      el.classList.toggle("is-ok", Boolean(ok && msg));
+    });
   };
 
   const MONTHS_GEN = [
@@ -251,7 +264,7 @@
   };
 
   const persistDraft = () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    localStorage.setItem(storageKey(), JSON.stringify(db));
   };
 
   const saveDraft = () => {
@@ -1304,7 +1317,6 @@
   const liveDemoStatus = document.getElementById("live-demo-status");
   const liveDemoDelete = document.getElementById("live-demo-delete");
   let liveProjectSource = "existing";
-  let adminMode = "live";
 
   const syncLiveDateLabel = () => {
     if (liveDateHuman) {
@@ -1587,18 +1599,28 @@
   };
 
   const switchMode = (next) => {
+    if (next !== adminMode) persistDraft();
     adminMode = next;
+    db = next === "live" ? liveDb : editDb;
     localStorage.setItem(MODE_KEY, next);
+    document.querySelector("[data-pdb-mode]")?.setAttribute("data-pdb-mode", next);
     if (liveRoot) liveRoot.hidden = next !== "live";
     if (editRoot) editRoot.hidden = next !== "edit";
+    const liveToolbar = document.getElementById("pdb-toolbar-live");
+    const editToolbar = document.getElementById("pdb-toolbar-edit");
+    if (liveToolbar) liveToolbar.hidden = next !== "live";
+    if (editToolbar) editToolbar.hidden = next !== "edit";
     document.querySelectorAll(".pdb-modes [data-mode]").forEach((btn) => {
       btn.setAttribute("aria-selected", btn.dataset.mode === next ? "true" : "false");
     });
     if (next === "live") {
       history.replaceState(null, "", "#live");
       refreshLive();
-    } else if (location.hash === "#live" || !location.hash.replace(/^#/, "")) {
-      switchTab("persons");
+    } else {
+      renderAll();
+      if (location.hash === "#live" || !location.hash.replace(/^#/, "")) {
+        switchTab("persons");
+      }
     }
   };
 
@@ -1704,7 +1726,7 @@
   document.getElementById("live-save-draft")?.addEventListener("click", () => {
     flushLiveMeeting();
     persistDraft();
-    setStatus("Черновик сохранён в браузере", true);
+    setStatus("Черновик прямого эфира сохранён в браузере", true);
     renderLiveSummary();
   });
   document.getElementById("live-publish")?.addEventListener("click", () => {
@@ -1712,31 +1734,46 @@
     persistDraft();
     publishToProd();
   });
+  document.getElementById("live-publish-top")?.addEventListener("click", () => {
+    document.getElementById("live-publish")?.click();
+  });
+  document.getElementById("live-download")?.addEventListener("click", () => {
+    flushLiveMeeting();
+    persistDraft();
+    downloadDb();
+  });
+  document.getElementById("live-reset")?.addEventListener("click", () => {
+    if (!confirm("Сбросить черновик прямого эфира и загрузить данные из js/db.js?")) return;
+    localStorage.removeItem(STORAGE_LIVE);
+    liveDb = freshDb();
+    db = liveDb;
+    loadLiveMeeting(todayIso());
+    setStatus("Прямой эфир загружен из файла");
+  });
 
   // ---------------------------------------------------------------
   // Toolbar
   // ---------------------------------------------------------------
 
   document.getElementById("pdb-save-draft").addEventListener("click", () => {
-    if (adminMode === "live") flushLiveMeeting();
     saveDraft();
-    setStatus("Черновик сохранён в браузере", true);
+    setStatus("Черновик редактуры сохранён в браузере", true);
   });
   document.getElementById("pdb-download").addEventListener("click", downloadDb);
   document.getElementById("pdb-download-2").addEventListener("click", downloadDb);
   document.getElementById("pdb-copy").addEventListener("click", copyDb);
   document.getElementById("pdb-copy-2").addEventListener("click", copyDb);
   document.getElementById("pdb-reset").addEventListener("click", () => {
-    if (!confirm("Сбросить черновик и загрузить данные из js/db.js?")) return;
-    localStorage.removeItem(STORAGE_KEY);
-    db = clone(source);
+    if (!confirm("Сбросить черновик редактуры и загрузить данные из js/db.js?")) return;
+    localStorage.removeItem(STORAGE_EDIT);
+    editDb = freshDb();
+    db = editDb;
     clearPerson();
     clearProject();
     clearMeeting();
     clearDemo();
-    loadLiveMeeting(todayIso());
     renderAll();
-    setStatus("Загружено из файла");
+    setStatus("Редактура загружена из файла");
   });
 
   // ---------------------------------------------------------------
@@ -1751,6 +1788,8 @@
   const publishButtons = [
     document.getElementById("pdb-publish"),
     document.getElementById("pdb-publish-top"),
+    document.getElementById("live-publish"),
+    document.getElementById("live-publish-top"),
   ].filter(Boolean);
 
   const utf8ToBase64 = (str) => {
@@ -1911,10 +1950,15 @@
   const publishToProd = async () => {
     let token = (tokenInput?.value || "").trim() || localStorage.getItem(GH_TOKEN_KEY) || "";
     if (!token) {
+      const fromLive = adminMode === "live";
       switchMode("edit");
       switchTab("export");
       tokenInput?.focus();
-      setStatus("Сначала вставь токен GitHub на вкладке «Экспорт»");
+      setStatus(
+        fromLive
+          ? "Сначала вставь токен на вкладке «Экспорт», потом вернись в прямой эфир и нажми «На прод»"
+          : "Сначала вставь токен GitHub на вкладке «Экспорт»"
+      );
       return;
     }
     if (tokenInput) tokenInput.value = token;
@@ -1922,14 +1966,16 @@
 
     if (
       !confirm(
-        "Записать текущую базу в js/db.js на ветке main (прод) и подтянуть её в data-entry-form-upd?"
+        adminMode === "live"
+          ? "Записать встречу из прямого эфира в js/db.js на ветке main и подтянуть её в data-entry-form-upd?"
+          : "Записать черновик редактуры в js/db.js на ветке main и подтянуть его в data-entry-form-upd?"
       )
     ) {
       return;
     }
 
     if (adminMode === "live") flushLiveMeeting();
-    saveDraft();
+    persistDraft();
     setStatus("Публикую на прод…");
     publishButtons.forEach((b) => {
       b.disabled = true;
@@ -2021,8 +2067,12 @@
   } else {
     switchMode("live");
   }
-  if (localStorage.getItem(STORAGE_KEY)) {
-    setStatus("Открыт черновик из браузера");
+  if (localStorage.getItem(storageKey())) {
+    setStatus(
+      adminMode === "live"
+        ? "Открыт черновик прямого эфира"
+        : "Открыт черновик редактуры"
+    );
   } else {
     setStatus(
       `${db.persons.length} персон · ${db.meetings.length} встреч · ${db.demos.length} демо`
