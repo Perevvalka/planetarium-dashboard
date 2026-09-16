@@ -1188,6 +1188,64 @@
   const editRoot = document.getElementById("pdb-edit");
   const liveDate = document.getElementById("live-date");
   const liveDateHuman = document.getElementById("live-date-human");
+  const liveDemoNote = document.getElementById("live-demo-note");
+  const liveStopwatchDisplay = document.getElementById("live-stopwatch-display");
+  const liveStopwatchToggle = document.getElementById("live-stopwatch-toggle");
+  let stopwatchStarted = 0;
+  let stopwatchBase = 0;
+  let stopwatchTimer = null;
+
+  const stopwatchElapsedMs = () =>
+    stopwatchStarted ? stopwatchBase + (Date.now() - stopwatchStarted) : stopwatchBase;
+
+  const fmtStopwatch = (ms) => {
+    const s = Math.floor(ms / 1000);
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  };
+
+  const renderStopwatch = () => {
+    if (liveStopwatchDisplay) liveStopwatchDisplay.textContent = fmtStopwatch(stopwatchElapsedMs());
+  };
+
+  const syncStopwatchMinutes = () => {
+    const ms = stopwatchElapsedMs();
+    if (ms < 1000 || !liveDemoMinutes) return;
+    liveDemoMinutes.value = String(Math.max(1, Math.round(ms / 60000)));
+  };
+
+  const stopStopwatch = () => {
+    if (stopwatchStarted) {
+      stopwatchBase = stopwatchElapsedMs();
+      stopwatchStarted = 0;
+    }
+    if (stopwatchTimer) {
+      clearInterval(stopwatchTimer);
+      stopwatchTimer = null;
+    }
+    if (liveStopwatchToggle) liveStopwatchToggle.textContent = "Старт";
+    renderStopwatch();
+    syncStopwatchMinutes();
+  };
+
+  const startStopwatch = () => {
+    if (stopwatchStarted) return;
+    stopwatchStarted = Date.now();
+    if (liveStopwatchToggle) liveStopwatchToggle.textContent = "Стоп";
+    stopwatchTimer = setInterval(renderStopwatch, 250);
+    renderStopwatch();
+  };
+
+  const resetStopwatch = () => {
+    stopwatchStarted = 0;
+    stopwatchBase = 0;
+    if (stopwatchTimer) {
+      clearInterval(stopwatchTimer);
+      stopwatchTimer = null;
+    }
+    if (liveStopwatchToggle) liveStopwatchToggle.textContent = "Старт";
+    renderStopwatch();
+  };
+
   const liveDemoList = document.getElementById("live-demo-list");
   const liveDemoProject = document.getElementById("live-demo-project");
   const liveProjectPicker = document.getElementById("live-project-picker");
@@ -1296,6 +1354,7 @@
   const clearLiveDemoForm = () => {
     if (liveDemoId) liveDemoId.value = "";
     if (liveDemoMinutes) liveDemoMinutes.value = "";
+    if (liveDemoNote) liveDemoNote.value = "";
     const title = document.getElementById("live-new-title");
     const url = document.getElementById("live-new-url");
     const note = document.getElementById("live-new-note");
@@ -1309,6 +1368,7 @@
     setLiveProjectSource("existing");
     if (liveDemoDelete) liveDemoDelete.hidden = true;
     if (liveDemoStatus) liveDemoStatus.textContent = "";
+    resetStopwatch();
     renderLiveDemos();
     syncLiveFormatUI();
   };
@@ -1320,6 +1380,8 @@
     setLiveProjectSource("existing");
     fillProjectRadios(liveDemoProject, d.project, { name: "live-project" });
     liveDemoMinutes.value = d.minutes ?? "";
+    if (liveDemoNote) liveDemoNote.value = d.note || "";
+    resetStopwatch();
     fillPersonChecks(liveDemoFeedback, feedbackForDemo(id));
     setLiveFormat(projectHasUrl(d.project) ? null : d.format);
     liveDemoDelete.hidden = false;
@@ -1369,6 +1431,7 @@
       return false;
     }
     ensureMeeting(date);
+    stopStopwatch();
     const format = projectHasUrl(project) ? null : numOrNull(liveSelectedFormat());
     let id = liveDemoId.value;
     const payload = {
@@ -1377,7 +1440,7 @@
       presenters,
       minutes: numOrNull(liveDemoMinutes.value),
       format,
-      note: null,
+      note: empty(liveDemoNote?.value),
     };
     if (id) {
       const d = db.demos.find((x) => x.id === id);
@@ -1408,7 +1471,12 @@
     if (liveProjectSource === "new") {
       return !document.getElementById("live-new-title").value.trim();
     }
-    return !selectedProjectId(liveDemoProject) && !liveDemoMinutes.value;
+    return (
+      !selectedProjectId(liveDemoProject) &&
+      !liveDemoMinutes.value &&
+      !liveDemoNote?.value.trim() &&
+      stopwatchElapsedMs() < 1000
+    );
   };
 
   const saveLiveAttendance = () => {
@@ -1511,6 +1579,11 @@
   liveDemoProject?.addEventListener("change", syncLiveFormatUI);
   document.getElementById("live-new-title")?.addEventListener("input", syncLiveFormatUI);
   document.getElementById("live-new-url")?.addEventListener("input", syncLiveFormatUI);
+  liveStopwatchToggle?.addEventListener("click", () => {
+    if (stopwatchStarted) stopStopwatch();
+    else startStopwatch();
+  });
+  document.getElementById("live-stopwatch-reset")?.addEventListener("click", resetStopwatch);
   document.getElementById("live-demo-save")?.addEventListener("click", () => {
     saveLiveDemo();
   });

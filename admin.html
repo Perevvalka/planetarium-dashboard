@@ -382,6 +382,49 @@
         gap: 0.9em;
         padding-top: 0.75em;
       }
+      .pdb-live-note-timer {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 30%;
+        gap: 0.75em;
+        align-items: stretch;
+      }
+      .pdb-live-note-timer label,
+      .pdb-stopwatch {
+        display: grid;
+        gap: 0.35em;
+        font-size: 0.9em;
+      }
+      .pdb-live-note-timer label > span,
+      .pdb-stopwatch > span {
+        color: var(--ids__text-caption);
+      }
+      .pdb-live-note-timer textarea {
+        font: inherit;
+        color: var(--ids__text);
+        background: var(--ids__background);
+        border: 1px solid var(--ids__border);
+        border-radius: 0.35em;
+        padding: 0.45em 0.6em;
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 5.5em;
+        height: 100%;
+        resize: none;
+      }
+      .pdb-stopwatch-time {
+        font-variant-numeric: tabular-nums;
+        font-size: 1.55em;
+        font-weight: 600;
+        line-height: 1.1;
+        margin: 0;
+      }
+      .pdb-stopwatch .pdb-actions {
+        flex-wrap: wrap;
+      }
+      .pdb-stopwatch .pdb-actions button {
+        padding: 0.35em 0.65em;
+        font-size: 0.85em;
+      }
     </style>
   </head>
 
@@ -434,6 +477,20 @@
                 <ul class="pdb-list" id="live-demo-list"></ul>
                 <div class="pdb-live-demo-form" id="live-demo-form">
                   <input type="hidden" id="live-demo-id" value="">
+                  <div class="pdb-live-note-timer">
+                    <label>
+                      <span>Заметка</span>
+                      <textarea id="live-demo-note"></textarea>
+                    </label>
+                    <div class="pdb-stopwatch">
+                      <span>Секундомер</span>
+                      <p class="pdb-stopwatch-time" id="live-stopwatch-display">0:00</p>
+                      <div class="pdb-actions">
+                        <button type="button" id="live-stopwatch-toggle">Старт</button>
+                        <button type="button" id="live-stopwatch-reset">Сброс</button>
+                      </div>
+                    </div>
+                  </div>
                   <div>
                     <p class="pdb-form-caption">Проект *</p>
                     <div class="pdb-actions" style="margin-bottom: 0.6em">
@@ -729,6 +786,6 @@
 
     <script src="./js/theme-toggle.js"></script>
     <script src="./js/db.js?v=2026-09-15g"></script>
-    <script src="./js/admin.js?v=2026-09-15h"></script>
+    <script src="./js/admin.js?v=2026-09-15i"></script>
   </body>
 </html>
