@@ -160,7 +160,7 @@
 
   const FORMATS = {
     1: {
-      label: "просто рассказывает",
+      label: "рассказ",
       short: "рассказ",
       color: "color-mix(in srgb, var(--ids__success) 28%, var(--ids__background))",
     },

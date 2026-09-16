@@ -3,7 +3,8 @@
 // Был — голубой, показывал — зелёный, не был — пусто.
 // Сверху столбики длительности: зелёные блоки — демо от длинного к короткому,
 // голубой сверху — обсуждение. Ширина как у клетки, 60 мин ≈ 4 строки.
-// Данные — из js/db.js, с декабря 2025.
+// Строки: Σ 1.1ⁿ по визитам, каждая следующая встреча на 10% весомее.
+// Данные — из js/db.js, с марта 2026.
 
 (() => {
   "use strict";
@@ -14,14 +15,14 @@
     return;
   }
 
-  const CUTOFF = "2025-12-01";
+  const CUTOFF = "2026-03-01";
 
   const MISSED = 0;
   const VISIT = 1;
   const DEMO = 2;
 
   const FORMATS = {
-    1: "рассказывал",
+    1: "рассказ",
     2: "экран",
     3: "слайды",
     4: "ссылка",
@@ -113,42 +114,45 @@
     });
   });
 
-  const rows = Object.keys(states)
-    .map((id) => {
-      const row = states[id];
-      let visits = 0;
-      row.forEach((v) => {
-        if (v !== MISSED) visits++;
-      });
-      return {
-        id,
-        name: personById[id].name,
-        row,
-        visits,
-        last: row[n - 1] !== MISSED,
-      };
-    })
-    .sort((a, b) => {
-      if (a.last !== b.last) return a.last ? -1 : 1;
-      if (a.visits !== b.visits) return b.visits - a.visits;
-      return a.name.localeCompare(b.name, "ru");
+  const people = Object.keys(states)
+    .map((id) => ({
+      id,
+      name: personById[id].name,
+      row: states[id],
+    }));
+
+  // Каждая следующая встреча на 10% весомее предыдущей.
+  const score = (row) => {
+    let s = 0;
+    let w = 1;
+    row.forEach((v) => {
+      if (v !== MISSED) s += w;
+      w *= 1.1;
     });
+    return s;
+  };
+
+  people.sort((a, b) => {
+    const d = score(b.row) - score(a.row);
+    if (d) return d;
+    return a.name.localeCompare(b.name, "ru");
+  });
 
   const totals = dates.map((_, i) => {
-    let people = 0;
+    let peopleN = 0;
     let demos = 0;
-    rows.forEach((r) => {
+    people.forEach((r) => {
       const v = r.row[i];
       if (v === MISSED) return;
-      people++;
+      peopleN++;
       if (v === DEMO) demos++;
     });
-    return { people, demos };
+    return { people: peopleN, demos };
   });
 
   const summaryLayers = (i) => {
     let html = "";
-    rows.forEach((r) => {
+    people.forEach((r) => {
       const v = r.row[i];
       if (v === VISIT) html += `<i class="sum visit"></i>`;
       else if (v === DEMO) html += `<i class="sum demo"></i>`;
@@ -166,59 +170,62 @@
     `${+iso.slice(8, 10)}\u00a0${MONTHS_GEN[+iso.slice(5, 7) - 1]}\u00a0’${iso.slice(2, 4)}`;
 
   const peopleAt = dates.map((_, i) =>
-    rows.filter((r) => r.row[i] !== MISSED).map((r) => r.name)
+    people
+      .filter((r) => r.row[i] !== MISSED)
+      .map((r) => r.name)
+      .sort((a, b) => a.localeCompare(b, "ru"))
   );
 
+  const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+
   const panelHtml = (title, entries, note) => {
-    const rowsHtml = entries
+    const fields = entries
       .filter(([, v]) => v != null && v !== "")
-      .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`)
+      .map(([k, v]) => {
+        const label = k
+          ? `<div class="plviz-field-label">${esc(/^\d/.test(k) || k === "демо" ? k : cap(k))}</div>`
+          : "";
+        return `<div class="plviz-field">${label}<div class="plviz-field-value">${v}</div></div>`;
+      })
       .join("");
     return (
-      `<p class="plviz-panel-title">${esc(title)}</p>` +
-      `<dl class="plviz-dl">${rowsHtml}</dl>` +
+      (title ? `<p class="plviz-panel-title">${esc(title)}</p>` : "") +
+      fields +
       (note ? `<p class="plviz-panel-note">${note}</p>` : "")
     );
   };
 
   const defaultPanel = () =>
-    panelHtml(
-      "Все встречи",
-      [
-        ["период", `${fmtDate(dates[0])} — ${fmtDate(dates[n - 1])}`],
-        ["встреч", String(n)],
-        ["участников", String(rows.length)],
-        ["демо", String(demosAt.reduce((s, list) => s + list.length, 0))],
-      ],
-      "Наведите на клетку или столбик — здесь появятся детали."
-    );
+    panelHtml("Все встречи", [
+      ["период", `${fmtDate(dates[0])} — ${fmtDate(dates[n - 1])}`],
+      ["встреч", String(n)],
+      ["участников", String(people.length)],
+      ["демо", String(demosAt.reduce((s, list) => s + list.length, 0))],
+    ]);
+
+  const namesLines = (names) =>
+    names
+      .map((name, i) => esc(name) + (i < names.length - 1 ? "," : ""))
+      .join("<br>");
 
   const meetingPanel = (i) => {
     const t = totals[i];
     const b = barAt[i];
     const shown = demosAt[i];
-    const meeting = DB.meetings.find((m) => m.date === dates[i]);
-    const demoLineHtml = shown.length
+    const hasDemos = shown.length > 0;
+    const demoValue = hasDemos
       ? shown.map(demoLine).join("<br>")
-      : "нет";
-    return panelHtml(
-      `Встреча №${i + 1}`,
-      [
-        ["дата", fmtDate(dates[i])],
-        ["длительность", b.total ? `${b.total} мин` : ""],
-        [
-          "были",
-          t.people
-            ? `${t.people} ${plural(t.people, "человек", "человека", "человек")}: ${esc(peopleAt[i].join(", "))}`
-            : "данных о явке нет",
-        ],
-        ["демо", t.demos ? `${t.demos}<br>${demoLineHtml}` : demoLineHtml],
-        ["обсуждение", b.talk ? `${b.talk} мин` : ""],
-      ],
-      meeting?.generated
-        ? "Длительность и демо до августа сгенерированы по образцу августа 2026."
-        : undefined
-    );
+      : "Не фиксировались";
+    const were = t.people
+      ? `${t.people} ${plural(t.people, "человек", "человека", "человек")}:<br>${namesLines(peopleAt[i])}`
+      : "данных о явке нет";
+    const fields = [
+      ["", b.total ? `${b.total} мин` : ""],
+      ["", were],
+      [hasDemos ? `${shown.length} демо` : "демо", demoValue],
+    ];
+    if (hasDemos) fields.push(["обсуждение", b.talk ? `${b.talk} мин` : ""]);
+    return panelHtml(fmtDate(dates[i]), fields);
   };
 
   const demoFields = (d) => {
@@ -232,22 +239,31 @@
     ];
   };
 
+  const talkPanel = (i) =>
+    panelHtml(fmtDate(dates[i]), [
+      ["обсуждение", barAt[i].talk ? `${barAt[i].talk} мин` : ""],
+    ]);
+
   const demoPanel = (d, i) => {
+    const project = projectById[d.project];
+    const title = project ? project.title : d.project;
     const names = d.presenters
       .map((id) => personById[id] && personById[id].name)
-      .filter(Boolean)
-      .join(", ");
+      .filter(Boolean);
+    const head = [fmtDate(dates[i])];
+    if (d.minutes) head.push(`${d.minutes} мин`);
     return panelHtml("Демо", [
-      ["встреча", `№${i + 1} · ${fmtDate(dates[i])}`],
-      ...demoFields(d),
-      ["показывал", esc(names)],
+      ["", head.join(" · ")],
+      ["проект", esc(title)],
+      ["", namesLines(names)],
+      ["формат", FORMATS[formatOf(d)] || ""],
     ]);
   };
 
   const personPanel = (r, i) => {
     const own = demosAt[i].filter((d) => d.presenters.indexOf(r.id) >= 0);
     const extra = own.flatMap(demoFields);
-    return panelHtml(r.name, [["встреча", `№${i + 1} · ${fmtDate(dates[i])}`], ...extra]);
+    return panelHtml(r.name, [["", fmtDate(dates[i])], ...extra]);
   };
 
   const el = document.getElementById("plviz-dashboard");
@@ -255,94 +271,89 @@
   if (!el) return;
 
   if (!n) {
-    el.innerHTML = `<p>Встреч с декабря 2025 в базе пока нет.</p>`;
+    el.innerHTML = `<p>Встреч с марта 2026 в базе пока нет.</p>`;
     return;
   }
-
-  const monthSpans = [];
-  dates.forEach((d, i) => {
-    const key = d.slice(0, 7);
-    const last = monthSpans[monthSpans.length - 1];
-    if (last && last.key === key) last.len++;
-    else monthSpans.push({ key, len: 1, start: i });
-  });
 
   const maxBarMins = Math.max(
     0,
     ...barAt.map((b) => b.demos.reduce((s, d) => s + d.minutes, 0) + b.talk)
   );
-  const minH = (minutes) => `calc(${minutes} * var(--plviz-row) * 4 / 60)`;
+  const minH = (minutes) => `calc(${minutes} * var(--plviz-bar-row) * 4 / 60)`;
+
+  const datesHtml = dates
+    .map((d, i) => {
+      const day = String(+d.slice(8, 10));
+      const prev = dates[i - 1];
+      const isNewMonth = !prev || prev.slice(0, 7) !== d.slice(0, 7);
+      const month = isNewMonth
+        ? `<span class="plviz-date-month">${MONTHS_SHORT[+d.slice(5, 7) - 1]}</span>`
+        : "";
+      const cls = isNewMonth ? "plviz-date has-month" : "plviz-date";
+      return `<div class="${cls}">${day}${month}</div>`;
+    })
+    .join("");
 
   const barsHtml = barAt
     .map((b, i) => {
       const segs = b.demos.map(
         (d) =>
-          `<span class="plviz-seg demo ids__hover-dot" data-i="${i}" data-demo="${esc(d.id)}" style="height:${minH(d.minutes)}"></span>`
+          `<span class="plviz-seg demo" data-i="${i}" data-demo="${esc(d.id)}" style="height:${minH(d.minutes)}"></span>`
       );
       if (b.talk > 0) {
         segs.push(
-          `<span class="plviz-seg talk ids__hover-dot" data-i="${i}" style="height:${minH(b.talk)}"></span>`
+          `<span class="plviz-seg talk" data-i="${i}" style="height:${minH(b.talk)}"></span>`
         );
       }
       return (
-        `<span class="plviz-bar" data-i="${i}" data-row="sum" style="grid-row:1;grid-column:${i + 1}">` +
+        `<span class="plviz-bar" data-i="${i}" data-row="sum">` +
         segs.join("") +
         `</span>`
       );
     })
     .join("");
 
-  const monthsHtml = monthSpans
-    .map((m) => {
-      const label = MONTHS_SHORT[+m.key.slice(5, 7) - 1];
-      const col = m.start + 1;
-      return `<div class="plviz-month" style="grid-row:2;grid-column:${col} / ${col + m.len}">${label}</div>`;
-    })
-    .join("");
-
   const headHtml = dates
     .map(
       (d, i) =>
-        `<span class="plviz-cell sum-cell ids__hover-dot" data-i="${i}" data-row="sum">${summaryLayers(i)}</span>`
+        `<span class="plviz-cell sum-cell" data-i="${i}" data-row="sum">${summaryLayers(i)}</span>`
     )
     .join("");
 
-  const rowsHtml = rows
-    .map((r) =>
-      r.row
-        .map((v, i) => {
-          if (v === MISSED) return `<span class="plviz-cell"></span>`;
-          if (v === VISIT)
-            return `<span class="plviz-cell visit ids__hover-dot" data-i="${i}" data-row="${esc(r.id)}"></span>`;
-          return `<span class="plviz-cell demo ids__hover-dot" data-i="${i}" data-row="${esc(r.id)}"></span>`;
-        })
-        .join("")
-    )
-    .join("");
+  const cellsHtml = (list) =>
+    list
+      .map((r) =>
+        r.row
+          .map((v, i) => {
+            if (v === MISSED) return `<span class="plviz-cell"></span>`;
+            if (v === VISIT)
+              return `<span class="plviz-cell visit" data-i="${i}" data-row="${esc(r.id)}"></span>`;
+            return `<span class="plviz-cell demo" data-i="${i}" data-row="${esc(r.id)}"></span>`;
+          })
+          .join("")
+      )
+      .join("");
 
-  const namesHtml =
+  const namesHtml = (list) =>
     `<div class="plviz-names">` +
-    `<div class="plviz-name"></div>` +
-    `<div class="plviz-name"></div>` +
-    `<div class="plviz-name plviz-name-all">все</div>` +
-    rows.map((r) => `<div class="plviz-name">${esc(r.name)}</div>`).join("") +
+    list.map((r) => `<div class="plviz-name">${esc(r.name)}</div>`).join("") +
     `</div>`;
 
   el.innerHTML =
     `<div class="plviz-chart" style="--n:${n};--bar-mins:${maxBarMins}">` +
-    namesHtml +
-    `<div class="plviz-grid">` +
-    barsHtml +
-    monthsHtml +
-    `<div class="plviz-head" style="display:contents">${headHtml}</div>` +
-    rowsHtml +
-    `</div></div>` +
+    `<div class="plviz-timeline">${datesHtml}</div>` +
+    `<div class="plviz-bars">${barsHtml}</div>` +
+    `<div class="plviz-summary">` +
+    `<div class="plviz-name plviz-name-all">Все участники</div>` +
+    `<div class="plviz-summary-grid">${headHtml}</div>` +
+    `</div>` +
+    `<div class="plviz-matrix">${namesHtml(people)}<div class="plviz-grid">${cellsHtml(people)}</div></div></div>` +
     `<div class="plviz-legend">` +
     `<span><i class="visit"></i>был / обсуждение</span>` +
     `<span><i class="demo"></i>показывал / демо</span>` +
     `</div>`;
 
-  const rowById = Object.fromEntries(rows.map((r) => [r.id, r]));
+  const rowById = Object.fromEntries(people.map((r) => [r.id, r]));
 
   const showDefault = () => {
     if (box) box.innerHTML = defaultPanel();
@@ -358,7 +369,7 @@
         const d = barAt[i].demos.find((x) => x.id === seg.dataset.demo);
         box.innerHTML = d ? demoPanel(d, i) : meetingPanel(i);
       } else {
-        box.innerHTML = meetingPanel(i);
+        box.innerHTML = talkPanel(i);
       }
       return;
     }
