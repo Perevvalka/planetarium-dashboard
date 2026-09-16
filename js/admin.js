@@ -1,5 +1,5 @@
 // Админка единой базы PlanetariumDB.
-// Черновик — localStorage; на прод — кнопка «На прод» (коммит js/db.js в main).
+// Черновик — localStorage; «На прод» пишет js/db.js в main и в data-entry-form-upd.
 
 (() => {
   "use strict";
@@ -12,6 +12,8 @@
   }
 
   const clone = (v) => JSON.parse(JSON.stringify(v));
+
+  const isBlank = (v) => v == null || v === "";
 
   const mergeMissingFromSource = (draft, file) => {
     const added = {
@@ -47,21 +49,62 @@
     return added;
   };
 
+  const fillEmptyFromSource = (draft, file) => {
+    let filled = 0;
+    const fillBy = (key, idOf, fields) => {
+      const srcMap = new Map((file[key] || []).map((item) => [idOf(item), item]));
+      (draft[key] || []).forEach((item) => {
+        const src = srcMap.get(idOf(item));
+        if (!src) return;
+        fields.forEach((field) => {
+          if (isBlank(item[field]) && !isBlank(src[field])) {
+            item[field] = src[field];
+            filled++;
+          }
+        });
+        if ((key === "meetings" || key === "demos") && src.generated) {
+          if (item.minutes === src.minutes && !item.generated) {
+            item.generated = true;
+            filled++;
+          }
+        }
+      });
+    };
+    fillBy("meetings", (x) => x.date, ["minutes", "note"]);
+    fillBy("demos", (x) => x.id, ["minutes", "format", "note"]);
+    fillBy("persons", (x) => x.id, ["name", "telegram", "photo", "note"]);
+    fillBy("projects", (x) => x.id, ["url", "note"]);
+    return filled;
+  };
+
+  const addedCount = (added) =>
+    added.projects.length +
+    added.persons +
+    added.meetings +
+    added.demos +
+    added.attendance +
+    added.feedback;
+
+  const syncDraftFromSource = (draft, file) =>
+    addedCount(mergeMissingFromSource(draft, file)) + fillEmptyFromSource(draft, file);
+
+  const parseDbFile = (text) => {
+    const match = String(text).match(/const PlanetariumDB = (\{[\s\S]*\});/);
+    if (!match) return null;
+    try {
+      return JSON.parse(match[1]);
+    } catch {
+      return null;
+    }
+  };
+
   let db = (() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
         if (!Array.isArray(parsed.feedback)) parsed.feedback = [];
-        const added = mergeMissingFromSource(parsed, source);
-        const extra =
-          added.projects.length +
-          added.persons +
-          added.meetings +
-          added.demos +
-          added.attendance +
-          added.feedback;
-        if (extra) {
+        if (syncDraftFromSource(parsed, source)) {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
         }
         return parsed;
@@ -1703,6 +1746,7 @@
   const GH_TOKEN_KEY = "planetarium-gh-token";
   const GH_REPO = "Perevvalka/planetarium-dashboard";
   const GH_BRANCH = "main";
+  const GH_SYNC_BRANCH = "data-entry-form-upd";
   const tokenInput = document.getElementById("pdb-gh-token");
   const publishButtons = [
     document.getElementById("pdb-publish"),
@@ -1771,22 +1815,29 @@
 
   const ghRepo = (path) => `https://api.github.com/repos/${GH_REPO}${path}`;
 
-  const readRepoFile = async (path, token) => {
+  const readRepoFile = async (path, token, branch = GH_BRANCH) => {
     const file = await ghRequest(
-      `${ghRepo(`/contents/${path}`)}?ref=${GH_BRANCH}`,
+      `${ghRepo(`/contents/${path}`)}?ref=${branch}`,
       token
     );
     return base64ToUtf8(file.content);
   };
 
+  const cacheStamp = () => {
+    const d = new Date();
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    return `${todayIso()}-${hh}${mm}`;
+  };
+
   const bustDbCache = (html) =>
     html.replace(
       /(src=["'][^"']*js\/db\.js)(\?v=[^"']*)?/g,
-      `$1?v=${todayIso()}`
+      `$1?v=${cacheStamp()}`
     );
 
-  const commitFiles = async (token, message, files) => {
-    const ref = await ghRequest(`${ghRepo(`/git/ref/heads/${GH_BRANCH}`)}`, token);
+  const commitFiles = async (token, message, files, branch = GH_BRANCH) => {
+    const ref = await ghRequest(`${ghRepo(`/git/ref/heads/${branch}`)}`, token);
     const headSha = ref.object.sha;
     const commit = await ghRequest(`${ghRepo(`/git/commits/${headSha}`)}`, token);
     const treeItems = [];
@@ -1814,17 +1865,17 @@
         parents: [headSha],
       }),
     });
-    await ghRequest(`${ghRepo(`/git/refs/heads/${GH_BRANCH}`)}`, token, {
+    await ghRequest(`${ghRepo(`/git/refs/heads/${branch}`)}`, token, {
       method: "PATCH",
       body: JSON.stringify({ sha: created.sha }),
     });
   };
 
-  const publishViaContents = async (token, dbContent) => {
+  const publishViaContents = async (token, dbContent, branch = GH_BRANCH) => {
     const apiFile = ghRepo("/contents/js/db.js");
     let sha;
     try {
-      const existing = await ghRequest(`${apiFile}?ref=${GH_BRANCH}`, token);
+      const existing = await ghRequest(`${apiFile}?ref=${branch}`, token);
       sha = existing.sha;
     } catch (e) {
       if (e.status !== 404) throw e;
@@ -1832,13 +1883,29 @@
     const payload = {
       message: `Update PlanetariumDB (${todayIso()}).`,
       content: utf8ToBase64(dbContent),
-      branch: GH_BRANCH,
+      branch,
     };
     if (sha) payload.sha = sha;
     await ghRequest(apiFile, token, {
       method: "PUT",
       body: JSON.stringify(payload),
     });
+  };
+
+  const pullRemoteDbIntoDraft = async (token) => {
+    const remoteText = await readRepoFile("js/db.js", token, GH_BRANCH);
+    const remoteDb = parseDbFile(remoteText);
+    if (!remoteDb) return;
+    if (syncDraftFromSource(db, remoteDb)) persistDraft();
+  };
+
+  const publishDbToBranch = async (token, message, files, dbContent, branch) => {
+    try {
+      await commitFiles(token, message, files, branch);
+    } catch (e) {
+      if (e.status === 401 || e.status === 403) throw e;
+      await publishViaContents(token, dbContent, branch);
+    }
   };
 
   const publishToProd = async () => {
@@ -1854,7 +1921,9 @@
     localStorage.setItem(GH_TOKEN_KEY, token);
 
     if (
-      !confirm("Записать текущую базу в js/db.js на ветке main и выложить на прод?")
+      !confirm(
+        "Записать текущую базу в js/db.js на ветке main (прод) и подтянуть её в data-entry-form-upd?"
+      )
     ) {
       return;
     }
@@ -1866,28 +1935,39 @@
       b.disabled = true;
     });
 
-    const dbContent = serializeFile();
-
     try {
+      try {
+        await pullRemoteDbIntoDraft(token);
+      } catch (_) {}
+      const dbContent = serializeFile();
+      const message = `Update PlanetariumDB (${todayIso()}).`;
       const files = [{ path: "js/db.js", content: dbContent }];
       for (const path of ["dashboard.html", "admin.html"]) {
         try {
-          const html = await readRepoFile(path, token);
+          const html = await readRepoFile(path, token, GH_BRANCH);
           const next = bustDbCache(html);
           if (next !== html) files.push({ path, content: next });
         } catch (_) {}
       }
+      await publishDbToBranch(token, message, files, dbContent, GH_BRANCH);
       try {
-        await commitFiles(
+        await publishDbToBranch(
           token,
-          `Update PlanetariumDB (${todayIso()}).`,
-          files
+          message,
+          [{ path: "js/db.js", content: dbContent }],
+          dbContent,
+          GH_SYNC_BRANCH
+        );
+        setStatus(
+          "Опубликовано на прод и в ветку data-entry-form-upd. Дашборд обновится через минуту.",
+          true
         );
       } catch (e) {
-        if (e.status === 401 || e.status === 403) throw e;
-        await publishViaContents(token, dbContent);
+        setStatus(
+          `Опубликовано на прод. Ветку ${GH_SYNC_BRANCH} обновить не удалось: ${e.message || e}`,
+          true
+        );
       }
-      setStatus("Опубликовано на прод. Дашборд обновится через минуту.", true);
     } catch (e) {
       if (e.status === 401 || e.status === 403) {
         switchMode("edit");
