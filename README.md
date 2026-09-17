@@ -1,6 +1,6 @@
 # planetarium-dashboard
 
-Дашборд Планетария: чек-листы, база встреч, стрики и датавиз.
+Дашборд Планетария: чек-листы, база встреч и посещаемость.
 Вёрстка на каркасе [IDS](https://intuition-tech.github.io/ids/) (CSS-токены и компоненты).
 
 ## Структура
@@ -9,8 +9,7 @@
 ├── index.html          # главная — ссылки на страницы
 ├── ops.html            # чек-листы админа
 ├── admin.html          # ввод базы данных
-├── dashboard.html      # главный датавиз
-├── dataviz.html        # пять визуализаций
+├── dashboard.html      # дашборд посещаемости
 │
 ├── css/                # каркас IDS
 │   ├── tokens/         # палитра, цвета, шкалы
@@ -24,8 +23,7 @@
 │   ├── db.js           # данные планетария
 │   ├── ops.js
 │   ├── admin.js
-│   ├── dashboard.js
-│   └── dataviz.js
+│   └── dashboard.js
 │
 ├── fonts/              # Inter Variable
 ├── images/             # favicon

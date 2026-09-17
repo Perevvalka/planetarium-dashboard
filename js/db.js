@@ -7,14 +7,6 @@
   "use strict";
 
   const PlanetariumDB = {
-  "norm": {
-    "min": 5,
-    "max": 7
-  },
-  "aliases": {
-    "Кристина Мареченко": "Кристина Марченко",
-    "Артем Ермолаев": "Артём Ермолаев"
-  },
   "persons": [
     {
       "id": "adam-arutyunov",
