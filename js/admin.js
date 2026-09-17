@@ -47,9 +47,6 @@
     addBy("attendance", (x) => `${x.meeting}::${x.person}`);
     if (!Array.isArray(draft.feedback)) draft.feedback = [];
     addBy("feedback", (x) => `${x.demo}::${x.person}`);
-    if (file.aliases && typeof file.aliases === "object") {
-      draft.aliases = { ...file.aliases, ...(draft.aliases || {}) };
-    }
     return added;
   };
 
@@ -221,8 +218,6 @@
 
   const serializeFile = (data = db) => {
     const payload = {
-      norm: data.norm,
-      aliases: data.aliases || {},
       persons: data.persons,
       projects: data.projects,
       meetings: data.meetings,
@@ -1956,7 +1951,6 @@
       demos: [],
       attendance: [],
       feedback: [],
-      aliases: liveDb.aliases || {},
     });
     const srcMeeting = liveDb.meetings.find((m) => m.date === date);
     if (srcMeeting) {
