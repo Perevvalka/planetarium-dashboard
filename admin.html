@@ -525,6 +525,13 @@
                       <label><span>Заметка</span><textarea id="live-new-note"></textarea></label>
                     </div>
                   </div>
+                  <div>
+                    <span class="pdb-form-caption">Показывающие *</span>
+                    <div class="pdb-person-picker">
+                      <input type="search" class="pdb-search" placeholder="Поиск по имени…" autocomplete="off" aria-label="Поиск показывающих">
+                      <div class="pdb-checks" id="live-demo-presenters"></div>
+                    </div>
+                  </div>
                   <div id="live-format-block" hidden>
                     <span class="pdb-form-caption">Формат</span>
                     <div class="pdb-radios" id="live-format">
@@ -712,18 +719,13 @@
                     <div class="pdb-checks" id="demo-project"></div>
                   </div>
                 </div>
-                <div>
-                  <span class="pdb-form-caption">Показывает автор? *</span>
-                  <div class="pdb-radios" id="demo-presenter-mode">
-                    <label><input type="radio" name="presenterMode" value="author" checked> да</label>
-                    <label><input type="radio" name="presenterMode" value="other"> нет, выберу</label>
-                  </div>
-                  <p class="pdb-empty" id="demo-presenter-authors" style="margin-top:0.35em"></p>
-                  <div class="pdb-person-picker" id="demo-presenter-picker" hidden style="margin-top:0.5em">
+                <label>
+                  <span>Показывающие *</span>
+                  <div class="pdb-person-picker">
                     <input type="search" class="pdb-search" placeholder="Поиск по имени…" autocomplete="off" aria-label="Поиск показывающих">
                     <div class="pdb-checks" id="demo-presenters"></div>
                   </div>
-                </div>
+                </label>
                 <div id="demo-format-block" hidden>
                   <span class="pdb-form-caption">Формат</span>
                   <div class="pdb-radios" id="demo-format">
@@ -768,7 +770,7 @@
               <p>
                 «На прод» записывает текущую базу в <code>js/db.js</code> на ветке
                 <code>main</code> и подтягивает тот же файл в
-                <code>data-entry-form-upd</code> — копировать код вручную не нужно.
+                <code>wip</code> — копировать код вручную не нужно.
                 Перед этим перечитай встречу на вкладке «Сводка».
               </p>
               <div class="pdb-form" style="margin-top: 1.25em">
@@ -799,6 +801,6 @@
 
     <script src="./js/theme-toggle.js"></script>
     <script src="./js/db.js?v=2026-09-18-1353"></script>
-    <script src="./js/admin.js?v=2026-09-16d"></script>
+    <script src="./js/admin.js?v=2026-09-18a"></script>
   </body>
 </html>
