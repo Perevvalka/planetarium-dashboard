@@ -7,10 +7,6 @@
   "use strict";
 
   const PlanetariumDB = {
-  "aliases": {
-    "Кристина Мареченко": "Кристина Марченко",
-    "Артем Ермолаев": "Артём Ермолаев"
-  },
   "persons": [
     {
       "id": "adam-arutyunov",
@@ -819,15 +815,6 @@
       "note": null
     },
     {
-      "id": "dashbord-planetariya-2",
-      "title": "Дашборд Планетария",
-      "url": null,
-      "authors": [
-        "polina-perevalova"
-      ],
-      "note": null
-    },
-    {
       "id": "kurs-dizayn-s-klodom",
       "title": "Курс «Дизайн с Клодом»",
       "url": null,
@@ -860,6 +847,15 @@
       "url": "https://t.me/cool_triad_bot",
       "authors": [
         "kristina-marchenko"
+      ],
+      "note": null
+    },
+    {
+      "id": "dashbord-planetariya-2",
+      "title": "Дашборд Планетария",
+      "url": null,
+      "authors": [
+        "polina-perevalova"
       ],
       "note": null
     }
