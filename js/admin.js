@@ -391,15 +391,6 @@
   const downloadJson = () =>
     download("planetarium-db.json", serializeJson(), "application/json;charset=utf-8");
 
-  const copyDb = async () => {
-    try {
-      await navigator.clipboard.writeText(serializeFile());
-      setStatus("Скопировано в буфер");
-    } catch {
-      setStatus("Не удалось скопировать");
-    }
-  };
-
   const copyJson = async () => {
     try {
       await navigator.clipboard.writeText(serializeJson());
@@ -1841,19 +1832,10 @@
       document.getElementById("live-person-save")?.click();
     }
   });
-  document.getElementById("live-save-draft")?.addEventListener("click", () => {
-    flushLiveMeeting();
-    persistDraft();
-    setStatus("Черновик прямого эфира сохранён в браузере", true);
-    renderLiveSummary();
-  });
   document.getElementById("live-publish")?.addEventListener("click", () => {
     flushLiveMeeting();
     persistDraft();
     publishToProd();
-  });
-  document.getElementById("live-publish-top")?.addEventListener("click", () => {
-    document.getElementById("live-publish")?.click();
   });
   document.getElementById("live-download")?.addEventListener("click", () => {
     flushLiveMeeting();
@@ -1873,14 +1855,8 @@
   // Toolbar
   // ---------------------------------------------------------------
 
-  document.getElementById("pdb-save-draft").addEventListener("click", () => {
-    saveDraft();
-    setStatus("Черновик редактуры сохранён в браузере", true);
-  });
   document.getElementById("pdb-download").addEventListener("click", downloadDb);
   document.getElementById("pdb-download-2").addEventListener("click", downloadDb);
-  document.getElementById("pdb-copy").addEventListener("click", copyDb);
-  document.getElementById("pdb-copy-2").addEventListener("click", copyDb);
   // В прямом эфире выгружаем то же, что видно на экране: сначала дописываем встречу.
   const flushAndRun = (run) => () => {
     if (adminMode === "live") {
@@ -1919,7 +1895,6 @@
     document.getElementById("pdb-publish"),
     document.getElementById("pdb-publish-top"),
     document.getElementById("live-publish"),
-    document.getElementById("live-publish-top"),
   ].filter(Boolean);
 
   const utf8ToBase64 = (str) => {
@@ -2110,18 +2085,23 @@
     return out;
   };
 
+  // Опубликованное становится обоими черновиками. Долив по недостающим записям
+  // тут не годится: удаление в одном режиме иначе вернётся из другого.
   const adoptPublished = (published) => {
     if (!published) return;
-    if (adminMode === "edit") {
-      editDb = clone(published);
-      liveDb = clone(published);
-      db = editDb;
-    } else {
-      liveDb = clone(published);
-      db = liveDb;
-      syncDraftFromSource(editDb, published);
-    }
+    liveDb = clone(published);
+    editDb = clone(published);
+    db = adminMode === "edit" ? editDb : liveDb;
     persistAllDrafts();
+    if (adminMode === "edit") {
+      clearPerson();
+      clearProject();
+      clearMeeting();
+      clearDemo();
+      renderAll();
+    } else {
+      refreshLive();
+    }
   };
 
   const publishDbToBranch = async (token, message, files, dbContent, branch) => {

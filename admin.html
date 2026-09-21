@@ -59,6 +59,11 @@
         padding: 0.55em 0;
         background: var(--ids__background);
       }
+      #pdb-toolbar-live {
+        position: static;
+        margin-top: 2.2em;
+        margin-bottom: 0;
+      }
       .pdb-toolbar[hidden],
       [data-pdb-mode="live"] #pdb-toolbar-edit,
       [data-pdb-mode="edit"] #pdb-toolbar-live {
@@ -471,18 +476,10 @@
               <button type="button" role="tab" aria-selected="false" data-mode="edit">Редактура</button>
             </nav>
 
-            <div class="pdb-toolbar" id="pdb-toolbar-live">
-              <button type="button" class="primary" id="live-publish-top">На прод</button>
-              <button type="button" id="live-reset">Сбросить к файлу</button>
-              <span class="pdb-status" id="pdb-status"></span>
-            </div>
-
             <div class="pdb-toolbar" id="pdb-toolbar-edit" hidden>
-              <button type="button" id="pdb-save-draft">Сохранить черновик</button>
               <button type="button" class="primary" id="pdb-publish-top">На прод</button>
-              <button type="button" data-download-json>Скачать JSON для сайта</button>
+              <button type="button" class="primary" data-download-json>Скачать JSON для сайта</button>
               <button type="button" id="pdb-download">Скачать db.js</button>
-              <button type="button" id="pdb-copy">Скопировать db.js</button>
               <button type="button" id="pdb-reset">Сбросить к файлу</button>
               <span class="pdb-status" id="pdb-status-edit"></span>
             </div>
@@ -615,14 +612,14 @@
                 <div class="pdb-summary-text" id="live-summary-text"></div>
               </section>
 
-              <section class="pdb-live-section">
-                <div class="pdb-actions">
-                  <button type="button" id="live-save-draft">Сохранить черновик</button>
-                  <button type="button" class="primary" id="live-publish">На прод</button>
-                  <button type="button" data-download-json>Скачать JSON для сайта</button>
-                  <button type="button" id="live-download">Скачать db.js</button>
-                </div>
-              </section>
+            </div>
+
+            <div class="pdb-toolbar" id="pdb-toolbar-live">
+              <button type="button" class="primary" id="live-publish">На прод</button>
+              <button type="button" class="primary" data-download-json>Скачать JSON для сайта</button>
+              <button type="button" id="live-download">Скачать db.js</button>
+              <button type="button" id="live-reset">Сбросить к файлу</button>
+              <span class="pdb-status" id="pdb-status"></span>
             </div>
 
             <div class="pdb-edit" id="pdb-edit" hidden>
@@ -814,7 +811,6 @@
                 <button type="button" class="primary" id="pdb-publish">Опубликовать на прод</button>
                 <button type="button" id="pdb-save-token">Сохранить токен</button>
                 <button type="button" id="pdb-download-2">Скачать db.js</button>
-                <button type="button" id="pdb-copy-2">Скопировать</button>
               </div>
               <pre id="pdb-preview"></pre>
             </div>
@@ -827,6 +823,6 @@
 
     <script src="./js/theme-toggle.js"></script>
     <script src="./js/db.js?v=2026-09-21-1930"></script>
-    <script src="./js/admin.js?v=2026-09-21b"></script>
+    <script src="./js/admin.js?v=2026-09-21d"></script>
   </body>
 </html>
