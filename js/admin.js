@@ -1,5 +1,5 @@
 // Админка единой базы PlanetariumDB.
-// Черновик — localStorage; «На прод» пишет js/db.js в main и в data-entry-form-upd.
+// Черновик — localStorage; «На прод» пишет js/db.js в main и в wip.
 
 (() => {
   "use strict";
@@ -959,8 +959,6 @@
   const demoProject = document.getElementById("demo-project");
   const demoPresenters = document.getElementById("demo-presenters");
   const demoFeedback = document.getElementById("demo-feedback");
-  const demoPresenterPicker = document.getElementById("demo-presenter-picker");
-  const demoPresenterAuthors = document.getElementById("demo-presenter-authors");
 
   if (!Array.isArray(db.feedback)) db.feedback = [];
 
@@ -979,45 +977,10 @@
   const projectAuthorsOf = (projectId) =>
     db.projects.find((p) => p.id === projectId)?.authors?.slice() || [];
 
-  const sameIdSet = (a, b) => {
-    if (a.length !== b.length) return false;
-    const set = new Set(a);
-    return b.every((id) => set.has(id));
-  };
-
-  const presenterModeIsAuthor = () =>
-    document.querySelector("#demo-presenter-mode input[name=presenterMode]:checked")
-      ?.value !== "other";
-
-  const setPresenterMode = (mode) => {
-    document.querySelectorAll("#demo-presenter-mode input[name=presenterMode]").forEach((input) => {
-      input.checked = input.value === mode;
-    });
-  };
-
-  const selectedPresenters = () => {
-    const authors = projectAuthorsOf(selectedProjectId());
-    return presenterModeIsAuthor() ? authors : checkedValues(demoPresenters);
-  };
-
-  const syncPresenterUI = () => {
-    const projectId = selectedProjectId();
-    const authors = projectAuthorsOf(projectId);
-    const isAuthor = presenterModeIsAuthor();
-    if (demoPresenterPicker) demoPresenterPicker.hidden = isAuthor;
-    if (demoPresenterAuthors) {
-      if (!isAuthor || !projectId) {
-        demoPresenterAuthors.hidden = true;
-        demoPresenterAuthors.textContent = "";
-      } else if (!authors.length) {
-        demoPresenterAuthors.hidden = false;
-        demoPresenterAuthors.textContent = "У проекта нет авторов";
-      } else {
-        demoPresenterAuthors.hidden = false;
-        demoPresenterAuthors.textContent = authors.map(personName).join(", ");
-      }
-    }
-    if (isAuthor) fillPersonChecks(demoPresenters, authors);
+  const prefillPresentersIfEmpty = (host, ids) => {
+    if (!host) return;
+    if (checkedValues(host).length) return;
+    fillPersonChecks(host, ids || []);
   };
 
   const clearDemo = () => {
@@ -1028,7 +991,6 @@
     fillPersonChecks(demoPresenters, []);
     fillPersonChecks(demoFeedback, []);
     setDemoFormat(null);
-    syncPresenterUI();
     syncDemoFormatUI();
     listDemos.querySelectorAll("li").forEach((li) => li.classList.remove("active"));
   };
@@ -1039,15 +1001,11 @@
     formDemo.id.value = d.id;
     fillMeetingSelect(demoMeeting, d.meeting);
     fillProjectRadios(demoProject, d.project);
-    const authors = projectAuthorsOf(d.project);
-    const isAuthor = authors.length > 0 && sameIdSet(d.presenters, authors);
-    setPresenterMode(isAuthor ? "author" : "other");
     fillPersonChecks(demoPresenters, d.presenters);
     fillPersonChecks(demoFeedback, feedbackForDemo(id));
     // 1–3 только если у проекта ещё нет ссылки; иначе уровень 4 вычисляется сам
     setDemoFormat(projectHasUrl(d.project) ? null : d.format);
     formDemo.minutes.value = d.minutes ?? "";
-    syncPresenterUI();
     syncDemoFormatUI();
     listDemos.querySelectorAll("li").forEach((li) => {
       li.classList.toggle("active", li.dataset.id === id);
@@ -1056,18 +1014,16 @@
 
   demoProject.addEventListener("change", (e) => {
     if (e.target.name === "project") {
-      syncPresenterUI();
+      prefillPresentersIfEmpty(demoPresenters, projectAuthorsOf(selectedProjectId()));
       syncDemoFormatUI();
     }
   });
-
-  document.getElementById("demo-presenter-mode")?.addEventListener("change", syncPresenterUI);
 
   formDemo.addEventListener("submit", (e) => {
     e.preventDefault();
     const meeting = formDemo.meeting.value;
     const project = selectedProjectId();
-    const presenters = selectedPresenters();
+    const presenters = checkedValues(demoPresenters);
     const feedbackPeople = checkedValues(demoFeedback);
     if (!meeting || !project) {
       setStatus("Нужны встреча и проект");
@@ -1230,15 +1186,6 @@
   const summaryTextEl = document.getElementById("summary-text");
   let summaryDate = "";
 
-  const FORMATS = {
-    1: "рассказ",
-    2: "экран",
-    3: "слайды",
-    4: "опубликованный продукт",
-  };
-
-  const humanDate = (date) => fmtDateRu(date);
-
   const namesOf = (ids) => ids.map(personName).sort((a, b) => a.localeCompare(b, "ru"));
 
   const meetingChecks = (m, presentIds, demos) => {
@@ -1251,9 +1198,6 @@
       const title = projectTitle(d.project);
       if (!d.presenters.length) out.push(`«${title}»: нет показывающих`);
       if (!d.minutes) out.push(`«${title}»: нет длительности`);
-      if (!projectHasUrl(d.project) && !d.format) {
-        out.push(`«${title}»: нет ни ссылки на проект, ни формата`);
-      }
       d.presenters.forEach((p) => {
         if (!present.has(p)) {
           out.push(`${personName(p)} показывает «${title}», но не отмечен в присутствии`);
@@ -1274,7 +1218,7 @@
 
     const presentIds = attendanceOf(date);
     const demos = db.demos.filter((d) => d.meeting === date);
-    const lines = [humanDate(date)];
+    const lines = [fmtDateRu(date)];
 
     lines.push(m.minutes ? `${m.minutes} мин` : "длительность не указана");
 
@@ -1289,13 +1233,9 @@
     if (!demos.length) lines.push("  — пусто");
     demos.forEach((d, i) => {
       const project = db.projects.find((x) => x.id === d.project);
-      const format = projectHasUrl(d.project) ? 4 : d.format;
       lines.push(`  ${i + 1}. ${projectTitle(d.project)}`);
       lines.push(`     — показывает: ${namesOf(d.presenters).join(", ") || "не указано"}`);
-      lines.push(
-        `     — ${d.minutes ? `${d.minutes} мин` : "время не указано"} · ` +
-          (format ? `формат ${format} · ${FORMATS[format]}` : "формат не указан")
-      );
+      lines.push(`     — ${d.minutes ? `${d.minutes} мин` : "время не указано"}`);
       if (project?.url) lines.push(`     — ссылка: ${project.url}`);
       const feedback = feedbackForDemo(d.id);
       if (feedback.length) lines.push(`     — фидбэк: ${namesOf(feedback).join(", ")}`);
@@ -1358,11 +1298,7 @@
     renderMeetings();
     fillMeetingSelect(demoMeeting, demoMeeting.value);
     fillProjectRadios(demoProject, selectedProjectId());
-    fillPersonChecks(
-      demoPresenters,
-      presenterModeIsAuthor() ? projectAuthorsOf(selectedProjectId()) : checkedValues(demoPresenters)
-    );
-    syncPresenterUI();
+    fillPersonChecks(demoPresenters, checkedValues(demoPresenters));
     fillPersonChecks(
       demoFeedback,
       formDemo.id.value ? feedbackForDemo(formDemo.id.value) : checkedValues(demoFeedback)
@@ -1387,6 +1323,7 @@
   const editRoot = document.getElementById("pdb-edit");
   const liveDate = document.getElementById("live-date");
   const liveDateHuman = document.getElementById("live-date-human");
+  const liveDemoNote = document.getElementById("live-demo-note");
   const liveStopwatchDisplay = document.getElementById("live-stopwatch-display");
   const liveStopwatchToggle = document.getElementById("live-stopwatch-toggle");
   let stopwatchStarted = 0;
@@ -1444,11 +1381,13 @@
     renderStopwatch();
   };
 
+  const LIVE_SCRATCH_KEY = "planetarium-live-scratch";
   const liveDemoList = document.getElementById("live-demo-list");
   const liveDemoProject = document.getElementById("live-demo-project");
   const liveProjectPicker = document.getElementById("live-project-picker");
   const liveProjectCreate = document.getElementById("live-project-create");
   const liveNewAuthors = document.getElementById("live-new-authors");
+  const liveDemoPresenters = document.getElementById("live-demo-presenters");
   const liveDemoFeedback = document.getElementById("live-demo-feedback");
   const liveAttendance = document.getElementById("live-attendance");
   const liveFormatBlock = document.getElementById("live-format-block");
@@ -1459,6 +1398,37 @@
   const liveDemoStatus = document.getElementById("live-demo-status");
   const liveDemoDelete = document.getElementById("live-demo-delete");
   let liveProjectSource = "existing";
+
+  const readLiveScratch = () => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(LIVE_SCRATCH_KEY) || "{}");
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const persistLiveScratch = () => {
+    if (!liveDate?.value || !liveDemoNote) return;
+    const all = readLiveScratch();
+    const text = liveDemoNote.value;
+    if (text.trim()) all[liveDate.value] = text;
+    else delete all[liveDate.value];
+    localStorage.setItem(LIVE_SCRATCH_KEY, JSON.stringify(all));
+  };
+
+  const restoreLiveScratch = () => {
+    if (!liveDemoNote) return;
+    liveDemoNote.value = readLiveScratch()[liveDate?.value] || "";
+  };
+
+  const liveSelectedProjectId = () =>
+    liveProjectSource === "new" ? "" : selectedProjectId(liveDemoProject);
+
+  const liveProjectAuthors = () =>
+    liveProjectSource === "new"
+      ? checkedValues(liveNewAuthors)
+      : projectAuthorsOf(liveSelectedProjectId());
 
   const syncLiveDateLabel = () => {
     if (liveDateHuman) {
@@ -1503,6 +1473,7 @@
       ?.setAttribute("aria-pressed", source === "new" ? "true" : "false");
     if (liveProjectPicker) liveProjectPicker.hidden = source !== "existing";
     if (liveProjectCreate) liveProjectCreate.hidden = source !== "new";
+    prefillPresentersIfEmpty(liveDemoPresenters, liveProjectAuthors());
     syncLiveFormatUI();
   };
 
@@ -1556,6 +1527,7 @@
     if (title) title.value = "";
     if (url) url.value = "";
     if (liveNewAuthors) fillPersonChecks(liveNewAuthors, []);
+    if (liveDemoPresenters) fillPersonChecks(liveDemoPresenters, []);
     if (liveDemoFeedback) fillPersonChecks(liveDemoFeedback, []);
     if (liveDemoProject) fillProjectRadios(liveDemoProject, "", { name: "live-project" });
     setLiveFormat(null);
@@ -1575,6 +1547,7 @@
     fillProjectRadios(liveDemoProject, d.project, { name: "live-project" });
     liveDemoMinutes.value = d.minutes ?? "";
     resetStopwatch();
+    fillPersonChecks(liveDemoPresenters, d.presenters);
     fillPersonChecks(liveDemoFeedback, feedbackForDemo(id));
     setLiveFormat(projectHasUrl(d.project) ? null : d.format);
     liveDemoDelete.hidden = false;
@@ -1617,15 +1590,18 @@
     }
     const project = resolveLiveProject();
     if (!project) return false;
-    const presenters = projectAuthorsOf(project);
+    prefillPresentersIfEmpty(liveDemoPresenters, projectAuthorsOf(project));
+    const presenters = checkedValues(liveDemoPresenters);
     if (!presenters.length) {
-      setStatus("Нужен хотя бы один автор — они будут показывающими");
+      setStatus("Нужен хотя бы один показывающий");
       return false;
     }
     ensureMeeting(date);
     stopStopwatch();
     const format = projectHasUrl(project) ? null : numOrNull(liveSelectedFormat());
     let id = liveDemoId.value;
+    const existing = id ? db.demos.find((x) => x.id === id) : null;
+    if (id && !existing) return false;
     const payload = {
       meeting: date,
       project,
@@ -1649,6 +1625,7 @@
     liveDemoDelete.hidden = false;
     setLiveProjectSource("existing");
     fillProjectRadios(liveDemoProject, project, { name: "live-project" });
+    fillPersonChecks(liveDemoPresenters, presenters);
     liveDemoStatus.textContent = `Сохранено: ${projectTitle(project)}`;
     setStatus(`Демо сохранено: ${projectTitle(project)}`, true);
     renderLiveDemos();
@@ -1664,6 +1641,7 @@
     }
     return (
       !selectedProjectId(liveDemoProject) &&
+      !checkedValues(liveDemoPresenters).length &&
       !liveDemoMinutes.value &&
       stopwatchElapsedMs() < 1000
     );
@@ -1700,6 +1678,7 @@
     liveMeetingMinutes.value = m?.minutes ?? "";
     fillPersonChecks(liveAttendance, attendanceOf(liveDate.value));
     clearLiveDemoForm();
+    restoreLiveScratch();
     renderLiveAttendanceSummary();
     renderLiveSummary();
   };
@@ -1714,6 +1693,7 @@
       name: "live-project",
     });
     fillPersonChecks(liveNewAuthors, checkedValues(liveNewAuthors));
+    fillPersonChecks(liveDemoPresenters, checkedValues(liveDemoPresenters));
     fillPersonChecks(liveDemoFeedback, checkedValues(liveDemoFeedback));
     const date = liveDate.value;
     fillPersonChecks(liveAttendance, attendanceOf(date));
@@ -1770,7 +1750,14 @@
     setLiveProjectSource("new");
     document.getElementById("live-new-title")?.focus();
   });
-  liveDemoProject?.addEventListener("change", syncLiveFormatUI);
+  liveDemoProject?.addEventListener("change", () => {
+    prefillPresentersIfEmpty(liveDemoPresenters, liveProjectAuthors());
+    syncLiveFormatUI();
+  });
+  liveNewAuthors?.addEventListener("change", () => {
+    prefillPresentersIfEmpty(liveDemoPresenters, checkedValues(liveNewAuthors));
+  });
+  liveDemoNote?.addEventListener("input", persistLiveScratch);
   document.getElementById("live-new-title")?.addEventListener("input", syncLiveFormatUI);
   document.getElementById("live-new-url")?.addEventListener("input", syncLiveFormatUI);
   liveStopwatchToggle?.addEventListener("click", () => {
@@ -1841,6 +1828,7 @@
     persistDraft();
     fillPersonChecks(liveAttendance, selected);
     fillPersonChecks(liveNewAuthors, checkedValues(liveNewAuthors));
+    fillPersonChecks(liveDemoPresenters, checkedValues(liveDemoPresenters));
     fillPersonChecks(liveDemoFeedback, checkedValues(liveDemoFeedback));
     renderLiveAttendanceSummary();
     renderLiveSummary();
@@ -1925,7 +1913,7 @@
   const GH_TOKEN_KEY = "planetarium-gh-token";
   const GH_REPO = "Perevvalka/planetarium-dashboard";
   const GH_BRANCH = "main";
-  const GH_SYNC_BRANCH = "data-entry-form-upd";
+  const GH_SYNC_BRANCH = "wip";
   const tokenInput = document.getElementById("pdb-gh-token");
   const publishButtons = [
     document.getElementById("pdb-publish"),
@@ -2165,8 +2153,8 @@
     if (
       !confirm(
         adminMode === "live"
-          ? "Записать встречу из прямого эфира в js/db.js на ветке main и подтянуть её в data-entry-form-upd?"
-          : "Записать черновик редактуры в js/db.js на ветке main и подтянуть его в data-entry-form-upd?"
+          ? "Записать встречу из прямого эфира в js/db.js на ветке main и подтянуть её в wip?"
+          : "Записать черновик редактуры в js/db.js на ветке main и подтянуть его в wip?"
       )
     ) {
       return;
@@ -2210,12 +2198,12 @@
         await publishDbToBranch(
           token,
           message,
-          [{ path: "js/db.js", content: dbContent }],
+          files,
           dbContent,
           GH_SYNC_BRANCH
         );
         setStatus(
-          "Опубликовано на прод и в ветку data-entry-form-upd. Дашборд обновится через минуту.",
+          "Опубликовано на прод и в ветку wip. Дашборд обновится через минуту.",
           true
         );
       } catch (e) {
@@ -2253,6 +2241,7 @@
   fillPersonChecks(demoPresenters, []);
   fillPersonChecks(demoFeedback, []);
   fillPersonChecks(liveNewAuthors, []);
+  fillPersonChecks(liveDemoPresenters, []);
   fillPersonChecks(liveDemoFeedback, []);
   fillPersonChecks(liveAttendance, []);
   fillMeetingSelect(demoMeeting);
@@ -2261,6 +2250,7 @@
   syncMeetingDateLabel();
   if (liveDate) liveDate.value = todayIso();
   syncLiveDateLabel();
+  restoreLiveScratch();
   renderAll();
   const hashTab = location.hash.replace(/^#/, "");
   const tabIds = [...document.querySelectorAll(".pdb-tabs [role='tab']")].map(
