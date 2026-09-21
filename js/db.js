@@ -279,6 +279,14 @@
       "id": "egor",
       "name": "Егор",
       "active": true
+    },
+    {
+      "id": "mariya-gribova",
+      "name": "Мария Грибова"
+    },
+    {
+      "id": "nikita-breyk",
+      "name": "Никита Брейк"
     }
   ],
   "projects": [
@@ -586,6 +594,50 @@
       "authors": [
         "polina-perevalova"
       ]
+    },
+    {
+      "id": "dashbord-planetariya",
+      "title": "Дашборд Планетария",
+      "authors": [
+        "zhenya-arutyunov",
+        "polina-perevalova"
+      ]
+    },
+    {
+      "id": "kurs-dizayn-s-klodom",
+      "title": "Курс «Дизайн с Клодом»",
+      "authors": [
+        "artem-ermolaev"
+      ]
+    },
+    {
+      "id": "svoy-sayt-2",
+      "title": "Свой сайт",
+      "authors": [
+        "anastasiya-fomina"
+      ]
+    },
+    {
+      "id": "triema-dvizhok-bloga",
+      "title": "Триема — движок блога",
+      "authors": [
+        "magomed-vagabov"
+      ]
+    },
+    {
+      "id": "bot-cool-triad",
+      "title": "Бот «Cool triad»",
+      "url": "https://t.me/cool_triad_bot",
+      "authors": [
+        "kristina-marchenko"
+      ]
+    },
+    {
+      "id": "dashbord-planetariya-2",
+      "title": "Дашборд Планетария",
+      "authors": [
+        "polina-perevalova"
+      ]
     }
   ],
   "meetings": [
@@ -795,6 +847,11 @@
     },
     {
       "date": "2026-09-10",
+      "type": "weekly",
+      "minutes": 60
+    },
+    {
+      "date": "2026-09-17",
       "type": "weekly",
       "minutes": 60
     }
@@ -1217,6 +1274,23 @@
       "lesha-nikitin",
       "magomed-vagabov",
       "polina-perevalova"
+    ],
+    "2026-09-17": [
+      "anastasiya-fomina",
+      "andrey",
+      "artem-ermolaev",
+      "danya-samoylenko",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "zhenya-arutyunov",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "magomed-vagabov",
+      "marat-habibulin",
+      "mariya-gribova",
+      "nikita-breyk",
+      "polina-perevalova",
+      "rustam-mushraipov"
     ]
   },
   "demos": [
@@ -1670,6 +1744,56 @@
       ],
       "minutes": 3,
       "format": 2
+    },
+    {
+      "id": "demo-53",
+      "meeting": "2026-09-17",
+      "project": "dashbord-planetariya",
+      "presenters": [
+        "zhenya-arutyunov",
+        "polina-perevalova"
+      ],
+      "minutes": 10,
+      "format": 2
+    },
+    {
+      "id": "demo-54",
+      "meeting": "2026-09-17",
+      "project": "kurs-dizayn-s-klodom",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 4,
+      "format": 1
+    },
+    {
+      "id": "demo-55",
+      "meeting": "2026-09-17",
+      "project": "svoy-sayt-2",
+      "presenters": [
+        "anastasiya-fomina"
+      ],
+      "minutes": 4,
+      "format": 2
+    },
+    {
+      "id": "demo-56",
+      "meeting": "2026-09-17",
+      "project": "triema-dvizhok-bloga",
+      "presenters": [
+        "magomed-vagabov"
+      ],
+      "minutes": 5,
+      "format": 2
+    },
+    {
+      "id": "demo-57",
+      "meeting": "2026-09-17",
+      "project": "bot-cool-triad",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 7
     }
   ],
   "feedback": [
@@ -1707,6 +1831,14 @@
     },
     {
       "demo": "demo-49",
+      "person": "zhenya-arutyunov"
+    },
+    {
+      "demo": "demo-55",
+      "person": "artem-ermolaev"
+    },
+    {
+      "demo": "demo-55",
       "person": "zhenya-arutyunov"
     }
   ]
