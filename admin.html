@@ -101,6 +101,21 @@
         min-height: 4.5em;
         resize: vertical;
       }
+      .pdb-form label.pdb-check {
+        display: flex;
+        align-items: center;
+        gap: 0.45em;
+      }
+      .pdb-form .pdb-check > span {
+        color: var(--ids__text);
+      }
+      .pdb-form .pdb-check input {
+        width: 1em;
+        height: 1em;
+        padding: 0;
+        margin: 0;
+        flex-shrink: 0;
+      }
       .pdb-form .pdb-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -387,34 +402,14 @@
         gap: 0.9em;
         padding-top: 0.75em;
       }
-      .pdb-live-note-timer {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 30%;
-        gap: 0.75em;
-        align-items: stretch;
-      }
-      .pdb-live-note-timer label,
       .pdb-stopwatch {
         display: grid;
         gap: 0.35em;
         font-size: 0.9em;
+        justify-items: start;
       }
-      .pdb-live-note-timer label > span,
       .pdb-stopwatch > span {
         color: var(--ids__text-caption);
-      }
-      .pdb-live-note-timer textarea {
-        font: inherit;
-        color: var(--ids__text);
-        background: var(--ids__background);
-        border: 1px solid var(--ids__border);
-        border-radius: 0.35em;
-        padding: 0.45em 0.6em;
-        width: 100%;
-        box-sizing: border-box;
-        min-height: 5.5em;
-        height: 100%;
-        resize: none;
       }
       .pdb-stopwatch-time {
         font-variant-numeric: tabular-nums;
@@ -462,6 +457,7 @@
             <div class="pdb-toolbar" id="pdb-toolbar-edit" hidden>
               <button type="button" id="pdb-save-draft">Сохранить черновик</button>
               <button type="button" class="primary" id="pdb-publish-top">На прод</button>
+              <button type="button" data-download-json>Скачать JSON для сайта</button>
               <button type="button" id="pdb-download">Скачать db.js</button>
               <button type="button" id="pdb-copy">Скопировать db.js</button>
               <button type="button" id="pdb-reset">Сбросить к файлу</button>
@@ -488,18 +484,12 @@
                 <ul class="pdb-list" id="live-demo-list"></ul>
                 <div class="pdb-live-demo-form" id="live-demo-form">
                   <input type="hidden" id="live-demo-id" value="">
-                  <div class="pdb-live-note-timer">
-                    <label>
-                      <span>Заметка</span>
-                      <textarea id="live-demo-note"></textarea>
-                    </label>
-                    <div class="pdb-stopwatch">
-                      <span>Секундомер</span>
-                      <p class="pdb-stopwatch-time" id="live-stopwatch-display">0:00</p>
-                      <div class="pdb-actions">
-                        <button type="button" id="live-stopwatch-toggle">Старт</button>
-                        <button type="button" id="live-stopwatch-reset">Сброс</button>
-                      </div>
+                  <div class="pdb-stopwatch">
+                    <span>Секундомер</span>
+                    <p class="pdb-stopwatch-time" id="live-stopwatch-display">0:00</p>
+                    <div class="pdb-actions">
+                      <button type="button" id="live-stopwatch-toggle">Старт</button>
+                      <button type="button" id="live-stopwatch-reset">Сброс</button>
                     </div>
                   </div>
                   <div>
@@ -522,7 +512,6 @@
                           <div class="pdb-checks" id="live-new-authors"></div>
                         </div>
                       </label>
-                      <label><span>Заметка</span><textarea id="live-new-note"></textarea></label>
                     </div>
                   </div>
                   <div id="live-format-block" hidden>
@@ -569,6 +558,7 @@
                   <div class="pdb-form" id="live-person-create" hidden>
                     <label><span>Имя *</span><input id="live-new-person-name" autocomplete="name"></label>
                     <label><span>Telegram</span><input id="live-new-person-telegram" placeholder="@username"></label>
+                    <label class="pdb-check"><input type="checkbox" id="live-new-person-active"> <span>Активная подписка</span></label>
                     <div class="pdb-actions">
                       <button type="button" class="primary" id="live-person-save">Сохранить</button>
                       <button type="button" id="live-person-cancel">Отмена</button>
@@ -593,6 +583,7 @@
                 <div class="pdb-actions">
                   <button type="button" id="live-save-draft">Сохранить черновик</button>
                   <button type="button" class="primary" id="live-publish">На прод</button>
+                  <button type="button" data-download-json>Скачать JSON для сайта</button>
                   <button type="button" id="live-download">Скачать db.js</button>
                 </div>
               </section>
@@ -613,11 +604,11 @@
               <form class="pdb-form" id="form-person">
                 <input type="hidden" name="id" value="">
                 <label><span>Имя *</span><input name="name" required autocomplete="name"></label>
+                <label class="pdb-check"><input type="checkbox" name="active"> <span>Активная подписка</span></label>
                 <div class="pdb-row">
                   <label><span>Telegram</span><input name="telegram" placeholder="@username"></label>
                   <label><span>Фото (URL)</span><input name="photo" type="url" placeholder="https://"></label>
                 </div>
-                <label><span>Заметка</span><textarea name="note"></textarea></label>
                 <div class="pdb-actions">
                   <button type="submit" class="primary">Сохранить персону</button>
                   <button type="button" data-clear="person">Новая</button>
@@ -648,7 +639,6 @@
                     <div class="pdb-checks" id="project-authors"></div>
                   </div>
                 </label>
-                <label><span>Заметка</span><textarea name="note"></textarea></label>
                 <div class="pdb-actions">
                   <button type="submit" class="primary">Сохранить проект</button>
                   <button type="button" class="danger" data-delete="project">Удалить</button>
@@ -668,7 +658,6 @@
                   <span class="pdb-date-human" id="meeting-date-human"></span>
                 </label>
                 <label><span>Длительность (минуты)</span><input name="minutes" type="number" min="1" step="1"></label>
-                <label><span>Заметка</span><textarea name="note"></textarea></label>
                 <div class="pdb-actions">
                   <button type="submit" class="primary">Сохранить встречу</button>
                   <button type="button" data-clear="meeting">Новая</button>
@@ -741,7 +730,6 @@
                   </div>
                   <span class="pdb-empty" style="margin-top:0.35em">Кто дал фидбэк на это демо — просто факт, без текста.</span>
                 </label>
-                <label><span>Заметка</span><textarea name="note"></textarea></label>
                 <div class="pdb-actions">
                   <button type="submit" class="primary">Сохранить демо</button>
                   <button type="button" data-clear="demo">Новое</button>
@@ -766,10 +754,19 @@
 
             <div class="pdb-panel pdb-export" data-panel="export" hidden>
               <p>
-                «На прод» записывает текущую базу в <code>js/db.js</code> на ветке
+                Для дашборда на сайте нажми «Скачать JSON для сайта» и загрузи файл
+                <code>planetarium-db.json</code> кнопкой «Загрузить JSON» на странице
+                Планетария. Перед этим перечитай встречу на вкладке «Сводка».
+              </p>
+              <div class="pdb-actions" style="margin: 1em 0">
+                <button type="button" class="primary" data-download-json>Скачать JSON для сайта</button>
+                <button type="button" id="pdb-copy-json">Скопировать JSON</button>
+              </div>
+              <p>
+                «На прод» записывает ту же базу в <code>js/db.js</code> на ветке
                 <code>main</code> и подтягивает тот же файл в
-                <code>data-entry-form-upd</code> — копировать код вручную не нужно.
-                Перед этим перечитай встречу на вкладке «Сводка».
+                <code>data-entry-form-upd</code> — это нужно только для репозитория
+                дашборда, сайт данные оттуда не берёт.
               </p>
               <div class="pdb-form" style="margin-top: 1.25em">
                 <label>
@@ -798,7 +795,7 @@
     </main>
 
     <script src="./js/theme-toggle.js"></script>
-    <script src="./js/db.js?v=2026-09-16-1458"></script>
-    <script src="./js/admin.js?v=2026-09-16d"></script>
+    <script src="./js/db.js?v=2026-09-21-1930"></script>
+    <script src="./js/admin.js?v=2026-09-21a"></script>
   </body>
 </html>

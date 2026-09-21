@@ -1,7 +1,10 @@
 // Единая база данных Планетария.
 // Источник правды для визуализаций и админки.
 // Реальные данные: посещения еженедельных встреч + демо-эфиры.
-// generated: true — длительность восстановлена как 45 + число визитов.
+// Пустые поля не хранятся: отсутствие ключа = значение не задано.
+// attendance — явка, сгруппированная по дате встречи.
+// active: true — активная подписка; у остальных поля нет.
+// generated: true — длительность не замерена, а проставлена приблизительно.
 
 (() => {
   "use strict";
@@ -11,422 +14,271 @@
     {
       "id": "adam-arutyunov",
       "name": "Адам Арутюнов",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "alena-grishkovets",
-      "name": "Алёна Гришковец",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Алёна Гришковец"
     },
     {
       "id": "anastasiya-fomina",
-      "name": "Анастасия Фомина",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Анастасия Фомина"
     },
     {
       "id": "anna-safka",
-      "name": "Анна Сафка",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Анна Сафка"
     },
     {
       "id": "artem-ermolaev",
       "name": "Артём Ермолаев",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "asya-dragun",
-      "name": "Ася Драгун",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Ася Драгун"
     },
     {
       "id": "valeriya-romanova",
-      "name": "Валерия Романова",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Валерия Романова"
     },
     {
       "id": "vika-german",
-      "name": "Вика Герман",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Вика Герман"
     },
     {
       "id": "viktor-timofeev",
-      "name": "Виктор Тимофеев",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Виктор Тимофеев"
     },
     {
       "id": "vitaliy",
-      "name": "Виталий",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Виталий"
     },
     {
       "id": "vlad",
-      "name": "Влад",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Влад"
     },
     {
       "id": "vladimir-trifonov",
-      "name": "Владимир Трифонов",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Владимир Трифонов"
     },
     {
       "id": "vova",
-      "name": "Вова",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Вова"
     },
     {
       "id": "georgiy-mishurovskiy",
       "name": "Георгий Мишуровский",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "gleb-tiidt",
-      "name": "Глеб Тиидт",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Глеб Тиидт"
     },
     {
       "id": "gosha",
-      "name": "Гоша",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Гоша"
     },
     {
       "id": "daler-alierov",
       "name": "Далер Алиёров",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "dana",
       "name": "Дана",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "danya-samoylenko",
       "name": "Даня Самойленко",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "darya-degtyareva",
-      "name": "Дарья Дегтярева",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Дарья Дегтярева"
     },
     {
       "id": "dmitriy-sivuhin",
       "name": "Дмитрий Сивухин",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "evgeniy-smirnov",
       "name": "Евгений Смирнов",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "egor-veselov",
       "name": "Егор Веселов",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "ekaterina-lakutina",
-      "name": "Екатерина Лакутина",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Екатерина Лакутина"
     },
     {
       "id": "elena-chausova",
       "name": "Елена Чаусова",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "zhanna-belousova",
       "name": "Жанна Белоусова",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "zhenya-arutyunov",
       "name": "Женя Арутюнов",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "zhenya-sarnetskiy",
       "name": "Женя Сарнецкий",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "zoya",
       "name": "Зоя",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "ilya-narinskiy",
-      "name": "Илья Наринский",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Илья Наринский"
     },
     {
       "id": "ira-zaharova",
-      "name": "Ира Захарова",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Ира Захарова"
     },
     {
       "id": "kirill-myshkin",
-      "name": "Кирилл Мышкин",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Кирилл Мышкин"
     },
     {
       "id": "kirill-oleynichenko",
       "name": "Кирилл Олейниченко",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "kirill-chernov",
-      "name": "Кирилл Чернов",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Кирилл Чернов"
     },
     {
       "id": "kostya-grigorev",
-      "name": "Костя Григорьев",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Костя Григорьев"
     },
     {
       "id": "kristina-dunina",
       "name": "Кристина Дунина",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "kristina-marchenko",
       "name": "Кристина Марченко",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "lesha-kram",
-      "name": "Лёша Крам",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Лёша Крам"
     },
     {
       "id": "lesha-nikitin",
       "name": "Лёша Никитин",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "lora-guranina",
       "name": "Лора Гуранина",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "magomed-vagabov",
       "name": "Магомед Вагабов",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "marat-habibulin",
       "name": "Марат Хабибулин",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "masha-troitskaya",
-      "name": "Маша Троицкая",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Маша Троицкая"
     },
     {
       "id": "nadya-tkacheva",
-      "name": "Надя Ткачева",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Надя Ткачева"
     },
     {
       "id": "nastya-tulaeva",
-      "name": "Настя Тулаева",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Настя Тулаева"
     },
     {
       "id": "olga-permyakova",
       "name": "Ольга Пермякова",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "polina-perevalova",
       "name": "Полина Перевалова",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "ramil-karimov",
-      "name": "Рамиль Каримов",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Рамиль Каримов"
     },
     {
       "id": "rasul-shtibekov",
-      "name": "Расул Штибеков",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Расул Штибеков"
     },
     {
       "id": "rinat-enikeev",
-      "name": "Ринат Еникеев",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Ринат Еникеев"
     },
     {
       "id": "roma-kuzhel",
       "name": "Рома Кужель",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "ruslan-mamedov",
       "name": "Руслан Мамедов",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "rustam-mushraipov",
-      "name": "Рустам Мушраипов",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Рустам Мушраипов"
     },
     {
       "id": "sveta",
       "name": "Света",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "tatyana-kashina",
-      "name": "Татьяна Кашина",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Татьяна Кашина"
     },
     {
       "id": "yulya-kutenko",
-      "name": "Юля Кутьенко",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Юля Кутьенко"
     },
     {
       "id": "andrey",
-      "name": "Андрей Шикарненко",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Андрей Шинкаренко",
+      "active": true
     },
     {
       "id": "ayrat",
-      "name": "Айрат",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "name": "Айрат"
     },
     {
       "id": "sasha-permyakov",
       "name": "Саша Пермяков",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     },
     {
       "id": "egor",
       "name": "Егор",
-      "telegram": null,
-      "photo": null,
-      "note": null
+      "active": true
     }
   ],
   "projects": [
@@ -436,8 +288,7 @@
       "url": "https://t.me/ddrills",
       "authors": [
         "roma-kuzhel"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "telegram-kanal-oy-babonki-glyante-ka",
@@ -445,8 +296,7 @@
       "url": "https://t.me/oibabonky",
       "authors": [
         "elena-chausova"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "bookov",
@@ -454,17 +304,14 @@
       "url": "https://bookov.app/",
       "authors": [
         "kirill-oleynichenko"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "illyustratsii-dlya-upakovki",
       "title": "Иллюстрации для упаковки",
-      "url": null,
       "authors": [
         "kristina-dunina"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "stopfires-org",
@@ -472,8 +319,7 @@
       "url": "http://stopfires.org",
       "authors": [
         "rinat-enikeev"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "telegram-kanal-kakovo-byt-dizaynerom",
@@ -481,8 +327,7 @@
       "url": "https://t.me/kakovo_design",
       "authors": [
         "kristina-marchenko"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "creative-spark-board",
@@ -490,8 +335,7 @@
       "url": "https://creative-spark-board.lovable.app/",
       "authors": [
         "roma-kuzhel"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "telegram-kanal-ruslan-i-bukvalnyy-chellendzh",
@@ -499,8 +343,7 @@
       "url": "https://t.me/simbarus_abc",
       "authors": [
         "ruslan-mamedov"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "podkast-hoba",
@@ -508,17 +351,14 @@
       "url": "https://hoba.mave.digital/",
       "authors": [
         "daler-alierov"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "svoy-sayt",
       "title": "Свой сайт",
-      "url": null,
       "authors": [
         "viktor-timofeev"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "gotitbureau-com-rus",
@@ -526,17 +366,14 @@
       "url": "https://gotitbureau.com/rus",
       "authors": [
         "ira-zaharova"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "detskaya-kniga",
       "title": "Детская книга",
-      "url": null,
       "authors": [
         "ekaterina-lakutina"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "muzey-neprinyatyh-rabot-stol",
@@ -544,8 +381,7 @@
       "url": "https://t.me/stolmuseum",
       "authors": [
         "artem-ermolaev"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "hypetype",
@@ -553,8 +389,7 @@
       "url": "https://simbarus.com/hypetype",
       "authors": [
         "ruslan-mamedov"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "kurs-po-matematike-kotoraya-prigoditsya-v-zhizni",
@@ -562,8 +397,7 @@
       "url": "https://setka.design/math/",
       "authors": [
         "adam-arutyunov"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "pervyy-rolik-na-yutyub",
@@ -571,17 +405,14 @@
       "url": "https://www.youtube.com/watch?v=R3uu2H9HthQ",
       "authors": [
         "masha-troitskaya"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "prilozhenie-dlya-rasshifrovki-vstrech-context",
       "title": "Приложение для расшифровки встреч «Context»",
-      "url": null,
       "authors": [
         "daler-alierov"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "past-simple",
@@ -589,8 +420,7 @@
       "url": "https://past-simple.ru/",
       "authors": [
         "artem-ermolaev"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "aside",
@@ -598,8 +428,7 @@
       "url": "https://aside.city/",
       "authors": [
         "lesha-nikitin"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "bot-letmidzhoyn",
@@ -607,17 +436,14 @@
       "url": "https://letmejoin.myshkin.eu/",
       "authors": [
         "kirill-myshkin"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "prezentatsiya-kak-sobrat-portfolio",
       "title": "Презентация «Как собрать портфолио»",
-      "url": null,
       "authors": [
         "evgeniy-smirnov"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "dot-dead",
@@ -625,8 +451,7 @@
       "url": "https://t.me/danyatutpishet/735",
       "authors": [
         "danya-samoylenko"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "search-thru",
@@ -634,26 +459,21 @@
       "url": "http://searchth.ru/",
       "authors": [
         "magomed-vagabov"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "telerupor",
       "title": "Телерупор",
-      "url": null,
       "authors": [
         "kirill-myshkin"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "kontsept-igry-chayka",
       "title": "Концепт игры «Чайка»",
-      "url": null,
       "authors": [
         "anastasiya-fomina"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "scurrynslide-biblioteka-dlya-drag-and-drop",
@@ -661,8 +481,7 @@
       "url": "https://myshkin.eu/scurry-n-slide",
       "authors": [
         "kirill-myshkin"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "igra-shpion-sredi-nas",
@@ -670,8 +489,7 @@
       "url": "https://apps.apple.com/kz/app/spy-party-game/id6787716143",
       "authors": [
         "marat-habibulin"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "polina-hochet-uchitsya-vo-frantsii",
@@ -679,26 +497,21 @@
       "url": "https://t.me/+XuBW-Kc0t4wzYTYy",
       "authors": [
         "polina-perevalova"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "sayt-kristiny-marchenko",
       "title": "Свой сайт",
-      "url": null,
       "authors": [
         "kristina-marchenko"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "taymer-dlya-chasov",
       "title": "Таймер для часов",
-      "url": null,
       "authors": [
         "andrey"
-      ],
-      "note": "Надо узнать название"
+      ]
     },
     {
       "id": "sayly-ai-english-tutor",
@@ -706,17 +519,14 @@
       "url": "https://t.me/PerfectEnglishTutorBot",
       "authors": [
         "ayrat"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "otslezhivatel-biletov-na-vodnyy-transport",
       "title": "Отслеживатель билетов на водный транспорт",
-      "url": null,
       "authors": [
         "zhenya-arutyunov"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "ernolaev-space-svoy-sayt",
@@ -724,17 +534,14 @@
       "url": "https://ermolaev.space",
       "authors": [
         "artem-ermolaev"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "shrift",
       "title": "Шрифт Михей",
-      "url": null,
       "authors": [
         "magomed-vagabov"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "obnovlenie-sayta-evgeniya-smirnova",
@@ -742,44 +549,35 @@
       "url": "https://yevgeniysmirnov.ru/",
       "authors": [
         "evgeniy-smirnov"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "konsultatsionnyy-klub",
       "title": "Консультационный клуб",
-      "url": null,
       "authors": [
         "zhenya-arutyunov"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "sayt-dannyh-dlya-dnd",
       "title": "Сайт данных для ДНД",
-      "url": null,
       "authors": [
         "ramil-karimov"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "tsifrovaya-prepodavatelskaya",
       "title": "Цифровая преподавательская",
-      "url": null,
       "authors": [
         "kristina-marchenko"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "pechat-knigi-eto-krasivo-a-eto-net",
       "title": "Печать книги «Это красиво, а это нет»",
-      "url": null,
       "authors": [
         "zhenya-arutyunov"
-      ],
-      "note": null
+      ]
     },
     {
       "id": "inst-dlya-tvorchestva",
@@ -787,1692 +585,640 @@
       "url": "https://www.instagram.com/polina_tancy_muzyka/",
       "authors": [
         "polina-perevalova"
-      ],
-      "note": null
+      ]
     }
   ],
   "meetings": [
     {
       "date": "2025-08-28",
-      "type": "stream",
-      "minutes": null,
-      "note": null
+      "type": "stream"
     },
     {
       "date": "2025-09-11",
-      "type": "stream",
-      "minutes": null,
-      "note": null
+      "type": "stream"
     },
     {
       "date": "2025-09-25",
-      "type": "stream",
-      "minutes": null,
-      "note": null
+      "type": "stream"
     },
     {
       "date": "2025-10-10",
       "type": "weekly",
-      "minutes": 53,
-      "note": null,
+      "minutes": 65,
       "generated": true
     },
     {
       "date": "2025-10-16",
       "type": "weekly",
-      "minutes": 54,
-      "note": null,
+      "minutes": 42,
       "generated": true
     },
     {
       "date": "2025-10-23",
-      "type": "stream",
-      "minutes": null,
-      "note": null
+      "type": "stream"
     },
     {
       "date": "2025-11-07",
       "type": "weekly",
-      "minutes": 59,
-      "note": null,
+      "minutes": 62,
       "generated": true
     },
     {
       "date": "2025-11-14",
       "type": "weekly",
-      "minutes": 62,
-      "note": null,
+      "minutes": 55,
       "generated": true
     },
     {
       "date": "2025-11-21",
       "type": "weekly",
-      "minutes": 58,
-      "note": null,
+      "minutes": 54,
       "generated": true
     },
     {
       "date": "2025-11-27",
-      "type": "stream",
-      "minutes": null,
-      "note": null
+      "type": "stream"
     },
     {
       "date": "2025-12-05",
       "type": "weekly",
-      "minutes": 56,
-      "note": null,
+      "minutes": 57,
       "generated": true
     },
     {
       "date": "2025-12-12",
       "type": "weekly",
-      "minutes": 56,
-      "note": null,
+      "minutes": 60,
       "generated": true
     },
     {
       "date": "2026-01-16",
       "type": "weekly",
-      "minutes": 59,
-      "note": null,
+      "minutes": 66,
       "generated": true
     },
     {
       "date": "2026-01-23",
       "type": "weekly",
-      "minutes": 52,
-      "note": null,
+      "minutes": 69,
       "generated": true
     },
     {
       "date": "2026-01-29",
       "type": "weekly",
-      "minutes": 51,
-      "note": null,
+      "minutes": 43,
       "generated": true
     },
     {
       "date": "2026-02-06",
       "type": "weekly",
-      "minutes": 58,
-      "note": null,
+      "minutes": 67,
       "generated": true
     },
     {
       "date": "2026-02-21",
       "type": "weekly",
-      "minutes": 55,
-      "note": null,
+      "minutes": 41,
       "generated": true
     },
     {
       "date": "2026-02-27",
       "type": "weekly",
-      "minutes": 53,
-      "note": null,
+      "minutes": 62,
       "generated": true
     },
     {
       "date": "2026-03-07",
       "type": "weekly",
-      "minutes": 59,
-      "note": null,
+      "minutes": 67,
       "generated": true
     },
     {
       "date": "2026-03-12",
       "type": "weekly",
-      "minutes": 58,
-      "note": null,
+      "minutes": 68,
       "generated": true
     },
     {
       "date": "2026-03-20",
       "type": "weekly",
-      "minutes": 56,
-      "note": null,
+      "minutes": 63,
       "generated": true
     },
     {
       "date": "2026-03-28",
       "type": "weekly",
-      "minutes": 59,
-      "note": null,
+      "minutes": 52,
       "generated": true
     },
     {
       "date": "2026-04-02",
       "type": "weekly",
-      "minutes": 56,
-      "note": null,
+      "minutes": 52,
       "generated": true
     },
     {
       "date": "2026-04-09",
       "type": "weekly",
-      "minutes": 60,
-      "note": null,
+      "minutes": 51,
       "generated": true
     },
     {
       "date": "2026-04-17",
       "type": "weekly",
-      "minutes": 58,
-      "note": null,
+      "minutes": 62,
       "generated": true
     },
     {
       "date": "2026-04-24",
       "type": "weekly",
       "minutes": 62,
-      "note": null,
       "generated": true
     },
     {
       "date": "2026-05-01",
       "type": "weekly",
-      "minutes": 54,
-      "note": null,
+      "minutes": 47,
       "generated": true
     },
     {
       "date": "2026-05-15",
       "type": "weekly",
-      "minutes": 55,
-      "note": null,
+      "minutes": 47,
       "generated": true
     },
     {
       "date": "2026-05-25",
-      "type": "stream",
-      "minutes": null,
-      "note": null
+      "type": "stream"
     },
     {
       "date": "2026-06-05",
       "type": "weekly",
-      "minutes": 56,
-      "note": null,
+      "minutes": 68,
       "generated": true
     },
     {
       "date": "2026-06-12",
       "type": "weekly",
-      "minutes": 58,
-      "note": null,
+      "minutes": 65,
       "generated": true
     },
     {
       "date": "2026-06-25",
-      "type": "stream",
-      "minutes": null,
-      "note": null
+      "type": "stream"
     },
     {
       "date": "2026-07-03",
       "type": "weekly",
-      "minutes": 55,
-      "note": null,
+      "minutes": 42,
       "generated": true
     },
     {
       "date": "2026-08-13",
       "type": "weekly",
-      "minutes": 50,
-      "note": null
+      "minutes": 50
     },
     {
       "date": "2026-08-20",
       "type": "weekly",
-      "minutes": 60,
-      "note": null
+      "minutes": 60
     },
     {
       "date": "2026-08-27",
       "type": "weekly",
-      "minutes": 50,
-      "note": null
+      "minutes": 50
     },
     {
       "date": "2026-09-03",
       "type": "weekly",
-      "minutes": 57,
-      "note": null
+      "minutes": 57
     },
     {
       "date": "2026-09-10",
       "type": "weekly",
-      "minutes": 60,
-      "note": null
+      "minutes": 60
     }
   ],
-  "attendance": [
-    {
-      "meeting": "2025-10-10",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2025-10-10",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2025-10-10",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2025-10-10",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2025-10-10",
-      "person": "adam-arutyunov"
-    },
-    {
-      "meeting": "2025-10-10",
-      "person": "kristina-dunina"
-    },
-    {
-      "meeting": "2025-10-10",
-      "person": "vladimir-trifonov"
-    },
-    {
-      "meeting": "2025-10-10",
-      "person": "viktor-timofeev"
-    },
-    {
-      "meeting": "2025-10-16",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2025-10-16",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2025-10-16",
-      "person": "kristina-dunina"
-    },
-    {
-      "meeting": "2025-10-16",
-      "person": "viktor-timofeev"
-    },
-    {
-      "meeting": "2025-10-16",
-      "person": "artem-ermolaev"
-    },
-    {
-      "meeting": "2025-10-16",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2025-10-16",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2025-10-16",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2025-10-16",
-      "person": "marat-habibulin"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "artem-ermolaev"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "olga-permyakova"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "ekaterina-lakutina"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "gleb-tiidt"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "kirill-oleynichenko"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "kristina-dunina"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "viktor-timofeev"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "daler-alierov"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "marat-habibulin"
-    },
-    {
-      "meeting": "2025-11-07",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "kirill-oleynichenko"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "kristina-dunina"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "elena-chausova"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "rasul-shtibekov"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "gleb-tiidt"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "daler-alierov"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "artem-ermolaev"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "adam-arutyunov"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "marat-habibulin"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "viktor-timofeev"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "asya-dragun"
-    },
-    {
-      "meeting": "2025-11-14",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2025-11-21",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2025-11-21",
-      "person": "lora-guranina"
-    },
-    {
-      "meeting": "2025-11-21",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2025-11-21",
-      "person": "elena-chausova"
-    },
-    {
-      "meeting": "2025-11-21",
-      "person": "kirill-oleynichenko"
-    },
-    {
-      "meeting": "2025-11-21",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2025-11-21",
-      "person": "asya-dragun"
-    },
-    {
-      "meeting": "2025-11-21",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2025-11-21",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2025-11-21",
-      "person": "tatyana-kashina"
-    },
-    {
-      "meeting": "2025-11-21",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2025-11-21",
-      "person": "viktor-timofeev"
-    },
-    {
-      "meeting": "2025-11-21",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2025-12-05",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2025-12-05",
-      "person": "asya-dragun"
-    },
-    {
-      "meeting": "2025-12-05",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2025-12-05",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2025-12-05",
-      "person": "kristina-dunina"
-    },
-    {
-      "meeting": "2025-12-05",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2025-12-05",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2025-12-05",
-      "person": "masha-troitskaya"
-    },
-    {
-      "meeting": "2025-12-05",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2025-12-05",
-      "person": "tatyana-kashina"
-    },
-    {
-      "meeting": "2025-12-05",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2025-12-12",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2025-12-12",
-      "person": "anna-safka"
-    },
-    {
-      "meeting": "2025-12-12",
-      "person": "artem-ermolaev"
-    },
-    {
-      "meeting": "2025-12-12",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2025-12-12",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2025-12-12",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2025-12-12",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2025-12-12",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2025-12-12",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2025-12-12",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2025-12-12",
-      "person": "tatyana-kashina"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "alena-grishkovets"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "vika-german"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "asya-dragun"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "ramil-karimov"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "kirill-chernov"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "kristina-dunina"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "masha-troitskaya"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-01-16",
-      "person": "tatyana-kashina"
-    },
-    {
-      "meeting": "2026-01-23",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-01-23",
-      "person": "alena-grishkovets"
-    },
-    {
-      "meeting": "2026-01-23",
-      "person": "vika-german"
-    },
-    {
-      "meeting": "2026-01-23",
-      "person": "kirill-oleynichenko"
-    },
-    {
-      "meeting": "2026-01-23",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-01-23",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-01-23",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-01-29",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-01-29",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-01-29",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-01-29",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-01-29",
-      "person": "tatyana-kashina"
-    },
-    {
-      "meeting": "2026-01-29",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-02-06",
-      "person": "georgiy-mishurovskiy"
-    },
-    {
-      "meeting": "2026-02-06",
-      "person": "alena-grishkovets"
-    },
-    {
-      "meeting": "2026-02-06",
-      "person": "asya-dragun"
-    },
-    {
-      "meeting": "2026-02-06",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-02-06",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-02-06",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-02-06",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2026-02-06",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-02-06",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-02-06",
-      "person": "masha-troitskaya"
-    },
-    {
-      "meeting": "2026-02-06",
-      "person": "olga-permyakova"
-    },
-    {
-      "meeting": "2026-02-06",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-02-06",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-02-21",
-      "person": "alena-grishkovets"
-    },
-    {
-      "meeting": "2026-02-21",
-      "person": "georgiy-mishurovskiy"
-    },
-    {
-      "meeting": "2026-02-21",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-02-21",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2026-02-21",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-02-21",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-02-21",
-      "person": "masha-troitskaya"
-    },
-    {
-      "meeting": "2026-02-21",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-02-21",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-02-21",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-02-27",
-      "person": "alena-grishkovets"
-    },
-    {
-      "meeting": "2026-02-27",
-      "person": "daler-alierov"
-    },
-    {
-      "meeting": "2026-02-27",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-02-27",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-02-27",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-02-27",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-02-27",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-02-27",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "alena-grishkovets"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "georgiy-mishurovskiy"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "kristina-dunina"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "nastya-tulaeva"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "masha-troitskaya"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "vlad"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "gosha"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "roma-kuzhel"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-03-07",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-03-12",
-      "person": "georgiy-mishurovskiy"
-    },
-    {
-      "meeting": "2026-03-12",
-      "person": "alena-grishkovets"
-    },
-    {
-      "meeting": "2026-03-12",
-      "person": "darya-degtyareva"
-    },
-    {
-      "meeting": "2026-03-12",
-      "person": "zhanna-belousova"
-    },
-    {
-      "meeting": "2026-03-12",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-03-12",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-03-12",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-03-12",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2026-03-12",
-      "person": "magomed-vagabov"
-    },
-    {
-      "meeting": "2026-03-12",
-      "person": "masha-troitskaya"
-    },
-    {
-      "meeting": "2026-03-12",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-03-12",
-      "person": "tatyana-kashina"
-    },
-    {
-      "meeting": "2026-03-12",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-03-20",
-      "person": "alena-grishkovets"
-    },
-    {
-      "meeting": "2026-03-20",
-      "person": "gosha"
-    },
-    {
-      "meeting": "2026-03-20",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-03-20",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2026-03-20",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-03-20",
-      "person": "magomed-vagabov"
-    },
-    {
-      "meeting": "2026-03-20",
-      "person": "masha-troitskaya"
-    },
-    {
-      "meeting": "2026-03-20",
-      "person": "roma-kuzhel"
-    },
-    {
-      "meeting": "2026-03-20",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-03-20",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-03-20",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "adam-arutyunov"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "artem-ermolaev"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "ilya-narinskiy"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "marat-habibulin"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "kostya-grigorev"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "kristina-dunina"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "masha-troitskaya"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "magomed-vagabov"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-03-28",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-04-02",
-      "person": "danya-samoylenko"
-    },
-    {
-      "meeting": "2026-04-02",
-      "person": "evgeniy-smirnov"
-    },
-    {
-      "meeting": "2026-04-02",
-      "person": "egor-veselov"
-    },
-    {
-      "meeting": "2026-04-02",
-      "person": "rinat-enikeev"
-    },
-    {
-      "meeting": "2026-04-02",
-      "person": "olga-permyakova"
-    },
-    {
-      "meeting": "2026-04-02",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-04-02",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2026-04-02",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-04-02",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-04-02",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-04-02",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "adam-arutyunov"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "zhenya-sarnetskiy"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "gosha"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "evgeniy-smirnov"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "lesha-kram"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "magomed-vagabov"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "sveta"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "yulya-kutenko"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "valeriya-romanova"
-    },
-    {
-      "meeting": "2026-04-09",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-04-17",
-      "person": "asya-dragun"
-    },
-    {
-      "meeting": "2026-04-17",
-      "person": "vlad"
-    },
-    {
-      "meeting": "2026-04-17",
-      "person": "magomed-vagabov"
-    },
-    {
-      "meeting": "2026-04-17",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2026-04-17",
-      "person": "evgeniy-smirnov"
-    },
-    {
-      "meeting": "2026-04-17",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-04-17",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-04-17",
-      "person": "lesha-kram"
-    },
-    {
-      "meeting": "2026-04-17",
-      "person": "ramil-karimov"
-    },
-    {
-      "meeting": "2026-04-17",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-04-17",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-04-17",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-04-17",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "evgeniy-smirnov"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "artem-ermolaev"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "zhenya-sarnetskiy"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "magomed-vagabov"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "masha-troitskaya"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "marat-habibulin"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "rinat-enikeev"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "ramil-karimov"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "kirill-chernov"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-04-24",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-05-01",
-      "person": "adam-arutyunov"
-    },
-    {
-      "meeting": "2026-05-01",
-      "person": "dana"
-    },
-    {
-      "meeting": "2026-05-01",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-05-01",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-05-01",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-05-01",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-05-01",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-05-01",
-      "person": "magomed-vagabov"
-    },
-    {
-      "meeting": "2026-05-01",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-05-15",
-      "person": "artem-ermolaev"
-    },
-    {
-      "meeting": "2026-05-15",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-05-15",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-05-15",
-      "person": "evgeniy-smirnov"
-    },
-    {
-      "meeting": "2026-05-15",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-05-15",
-      "person": "masha-troitskaya"
-    },
-    {
-      "meeting": "2026-05-15",
-      "person": "rinat-enikeev"
-    },
-    {
-      "meeting": "2026-05-15",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-05-15",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-05-15",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-06-05",
-      "person": "vova"
-    },
-    {
-      "meeting": "2026-06-05",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-06-05",
-      "person": "evgeniy-smirnov"
-    },
-    {
-      "meeting": "2026-06-05",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2026-06-05",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-06-05",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-06-05",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-06-05",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-06-05",
-      "person": "magomed-vagabov"
-    },
-    {
-      "meeting": "2026-06-05",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-06-05",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-06-12",
-      "person": "artem-ermolaev"
-    },
-    {
-      "meeting": "2026-06-12",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-06-12",
-      "person": "evgeniy-smirnov"
-    },
-    {
-      "meeting": "2026-06-12",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-06-12",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-06-12",
-      "person": "olga-permyakova"
-    },
-    {
-      "meeting": "2026-06-12",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-06-12",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-06-12",
-      "person": "vitaliy"
-    },
-    {
-      "meeting": "2026-06-12",
-      "person": "anastasiya-fomina"
-    },
-    {
-      "meeting": "2026-06-12",
-      "person": "nadya-tkacheva"
-    },
-    {
-      "meeting": "2026-06-12",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-06-12",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-07-03",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-07-03",
-      "person": "evgeniy-smirnov"
-    },
-    {
-      "meeting": "2026-07-03",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-07-03",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-07-03",
-      "person": "masha-troitskaya"
-    },
-    {
-      "meeting": "2026-07-03",
-      "person": "olga-permyakova"
-    },
-    {
-      "meeting": "2026-07-03",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-07-03",
-      "person": "zoya"
-    },
-    {
-      "meeting": "2026-07-03",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-07-03",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-08-13",
-      "person": "andrey"
-    },
-    {
-      "meeting": "2026-08-13",
-      "person": "danya-samoylenko"
-    },
-    {
-      "meeting": "2026-08-13",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-08-13",
-      "person": "evgeniy-smirnov"
-    },
-    {
-      "meeting": "2026-08-13",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2026-08-13",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-08-13",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-08-13",
-      "person": "magomed-vagabov"
-    },
-    {
-      "meeting": "2026-08-13",
-      "person": "marat-habibulin"
-    },
-    {
-      "meeting": "2026-08-13",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-08-13",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-08-13",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "ayrat"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "artem-ermolaev"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "zhenya-sarnetskiy"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "kirill-myshkin"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "magomed-vagabov"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "marat-habibulin"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "olga-permyakova"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "ruslan-mamedov"
-    },
-    {
-      "meeting": "2026-08-20",
-      "person": "sasha-permyakov"
-    },
-    {
-      "meeting": "2026-08-27",
-      "person": "artem-ermolaev"
-    },
-    {
-      "meeting": "2026-08-27",
-      "person": "danya-samoylenko"
-    },
-    {
-      "meeting": "2026-08-27",
-      "person": "evgeniy-smirnov"
-    },
-    {
-      "meeting": "2026-08-27",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-08-27",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-08-27",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-08-27",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-08-27",
-      "person": "ramil-karimov"
-    },
-    {
-      "meeting": "2026-09-03",
-      "person": "andrey"
-    },
-    {
-      "meeting": "2026-09-03",
-      "person": "artem-ermolaev"
-    },
-    {
-      "meeting": "2026-09-03",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-09-03",
-      "person": "evgeniy-smirnov"
-    },
-    {
-      "meeting": "2026-09-03",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-09-03",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-09-03",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-09-03",
-      "person": "olga-permyakova"
-    },
-    {
-      "meeting": "2026-09-03",
-      "person": "polina-perevalova"
-    },
-    {
-      "meeting": "2026-09-03",
-      "person": "rustam-mushraipov"
-    },
-    {
-      "meeting": "2026-09-10",
-      "person": "andrey"
-    },
-    {
-      "meeting": "2026-09-10",
-      "person": "artem-ermolaev"
-    },
-    {
-      "meeting": "2026-09-10",
-      "person": "dmitriy-sivuhin"
-    },
-    {
-      "meeting": "2026-09-10",
-      "person": "evgeniy-smirnov"
-    },
-    {
-      "meeting": "2026-09-10",
-      "person": "egor"
-    },
-    {
-      "meeting": "2026-09-10",
-      "person": "zhenya-arutyunov"
-    },
-    {
-      "meeting": "2026-09-10",
-      "person": "kristina-marchenko"
-    },
-    {
-      "meeting": "2026-09-10",
-      "person": "lesha-nikitin"
-    },
-    {
-      "meeting": "2026-09-10",
-      "person": "magomed-vagabov"
-    },
-    {
-      "meeting": "2026-09-10",
-      "person": "polina-perevalova"
-    }
-  ],
+  "attendance": {
+    "2025-10-10": [
+      "polina-perevalova",
+      "zhenya-arutyunov",
+      "kristina-marchenko",
+      "ruslan-mamedov",
+      "adam-arutyunov",
+      "kristina-dunina",
+      "vladimir-trifonov",
+      "viktor-timofeev"
+    ],
+    "2025-10-16": [
+      "kristina-marchenko",
+      "polina-perevalova",
+      "kristina-dunina",
+      "viktor-timofeev",
+      "artem-ermolaev",
+      "ruslan-mamedov",
+      "rustam-mushraipov",
+      "lesha-nikitin",
+      "marat-habibulin"
+    ],
+    "2025-11-07": [
+      "zhenya-arutyunov",
+      "ruslan-mamedov",
+      "artem-ermolaev",
+      "kristina-marchenko",
+      "olga-permyakova",
+      "ekaterina-lakutina",
+      "gleb-tiidt",
+      "kirill-oleynichenko",
+      "kristina-dunina",
+      "viktor-timofeev",
+      "daler-alierov",
+      "rustam-mushraipov",
+      "marat-habibulin",
+      "polina-perevalova"
+    ],
+    "2025-11-14": [
+      "zhenya-arutyunov",
+      "kirill-oleynichenko",
+      "kristina-dunina",
+      "elena-chausova",
+      "polina-perevalova",
+      "rasul-shtibekov",
+      "lesha-nikitin",
+      "kristina-marchenko",
+      "gleb-tiidt",
+      "ruslan-mamedov",
+      "daler-alierov",
+      "artem-ermolaev",
+      "adam-arutyunov",
+      "marat-habibulin",
+      "viktor-timofeev",
+      "asya-dragun",
+      "rustam-mushraipov"
+    ],
+    "2025-11-21": [
+      "zhenya-arutyunov",
+      "lora-guranina",
+      "kirill-myshkin",
+      "elena-chausova",
+      "kirill-oleynichenko",
+      "polina-perevalova",
+      "asya-dragun",
+      "kristina-marchenko",
+      "ruslan-mamedov",
+      "tatyana-kashina",
+      "dmitriy-sivuhin",
+      "viktor-timofeev",
+      "rustam-mushraipov"
+    ],
+    "2025-12-05": [
+      "polina-perevalova",
+      "asya-dragun",
+      "zhenya-arutyunov",
+      "kirill-myshkin",
+      "kristina-dunina",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "masha-troitskaya",
+      "ruslan-mamedov",
+      "tatyana-kashina",
+      "rustam-mushraipov"
+    ],
+    "2025-12-12": [
+      "polina-perevalova",
+      "anna-safka",
+      "artem-ermolaev",
+      "dmitriy-sivuhin",
+      "zhenya-arutyunov",
+      "kirill-myshkin",
+      "kristina-marchenko",
+      "ruslan-mamedov",
+      "lesha-nikitin",
+      "rustam-mushraipov",
+      "tatyana-kashina"
+    ],
+    "2026-01-16": [
+      "polina-perevalova",
+      "alena-grishkovets",
+      "vika-german",
+      "zhenya-arutyunov",
+      "asya-dragun",
+      "ramil-karimov",
+      "kirill-chernov",
+      "kristina-marchenko",
+      "kristina-dunina",
+      "lesha-nikitin",
+      "masha-troitskaya",
+      "ruslan-mamedov",
+      "rustam-mushraipov",
+      "tatyana-kashina"
+    ],
+    "2026-01-23": [
+      "polina-perevalova",
+      "alena-grishkovets",
+      "vika-german",
+      "kirill-oleynichenko",
+      "kristina-marchenko",
+      "ruslan-mamedov",
+      "rustam-mushraipov"
+    ],
+    "2026-01-29": [
+      "kristina-marchenko",
+      "rustam-mushraipov",
+      "lesha-nikitin",
+      "ruslan-mamedov",
+      "tatyana-kashina",
+      "zhenya-arutyunov"
+    ],
+    "2026-02-06": [
+      "georgiy-mishurovskiy",
+      "alena-grishkovets",
+      "asya-dragun",
+      "dmitriy-sivuhin",
+      "lesha-nikitin",
+      "kristina-marchenko",
+      "kirill-myshkin",
+      "ruslan-mamedov",
+      "rustam-mushraipov",
+      "masha-troitskaya",
+      "olga-permyakova",
+      "polina-perevalova",
+      "zhenya-arutyunov"
+    ],
+    "2026-02-21": [
+      "alena-grishkovets",
+      "georgiy-mishurovskiy",
+      "dmitriy-sivuhin",
+      "kirill-myshkin",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "masha-troitskaya",
+      "rustam-mushraipov",
+      "zhenya-arutyunov",
+      "polina-perevalova"
+    ],
+    "2026-02-27": [
+      "alena-grishkovets",
+      "daler-alierov",
+      "kristina-marchenko",
+      "dmitriy-sivuhin",
+      "rustam-mushraipov",
+      "ruslan-mamedov",
+      "zhenya-arutyunov",
+      "polina-perevalova"
+    ],
+    "2026-03-07": [
+      "alena-grishkovets",
+      "georgiy-mishurovskiy",
+      "kristina-dunina",
+      "kristina-marchenko",
+      "nastya-tulaeva",
+      "lesha-nikitin",
+      "masha-troitskaya",
+      "rustam-mushraipov",
+      "ruslan-mamedov",
+      "vlad",
+      "gosha",
+      "roma-kuzhel",
+      "zhenya-arutyunov",
+      "polina-perevalova"
+    ],
+    "2026-03-12": [
+      "georgiy-mishurovskiy",
+      "alena-grishkovets",
+      "darya-degtyareva",
+      "zhanna-belousova",
+      "dmitriy-sivuhin",
+      "lesha-nikitin",
+      "kristina-marchenko",
+      "kirill-myshkin",
+      "magomed-vagabov",
+      "masha-troitskaya",
+      "rustam-mushraipov",
+      "tatyana-kashina",
+      "zhenya-arutyunov"
+    ],
+    "2026-03-20": [
+      "alena-grishkovets",
+      "gosha",
+      "dmitriy-sivuhin",
+      "kirill-myshkin",
+      "kristina-marchenko",
+      "magomed-vagabov",
+      "masha-troitskaya",
+      "roma-kuzhel",
+      "rustam-mushraipov",
+      "zhenya-arutyunov",
+      "polina-perevalova"
+    ],
+    "2026-03-28": [
+      "adam-arutyunov",
+      "artem-ermolaev",
+      "ilya-narinskiy",
+      "marat-habibulin",
+      "dmitriy-sivuhin",
+      "kirill-myshkin",
+      "kostya-grigorev",
+      "kristina-marchenko",
+      "kristina-dunina",
+      "masha-troitskaya",
+      "magomed-vagabov",
+      "lesha-nikitin",
+      "rustam-mushraipov",
+      "zhenya-arutyunov"
+    ],
+    "2026-04-02": [
+      "danya-samoylenko",
+      "evgeniy-smirnov",
+      "egor-veselov",
+      "rinat-enikeev",
+      "olga-permyakova",
+      "kristina-marchenko",
+      "kirill-myshkin",
+      "dmitriy-sivuhin",
+      "rustam-mushraipov",
+      "lesha-nikitin",
+      "polina-perevalova"
+    ],
+    "2026-04-09": [
+      "adam-arutyunov",
+      "zhenya-sarnetskiy",
+      "kirill-myshkin",
+      "gosha",
+      "kristina-marchenko",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "lesha-kram",
+      "lesha-nikitin",
+      "magomed-vagabov",
+      "rustam-mushraipov",
+      "sveta",
+      "yulya-kutenko",
+      "valeriya-romanova",
+      "zhenya-arutyunov"
+    ],
+    "2026-04-17": [
+      "asya-dragun",
+      "vlad",
+      "magomed-vagabov",
+      "kirill-myshkin",
+      "evgeniy-smirnov",
+      "dmitriy-sivuhin",
+      "kristina-marchenko",
+      "lesha-kram",
+      "ramil-karimov",
+      "ruslan-mamedov",
+      "rustam-mushraipov",
+      "polina-perevalova",
+      "zhenya-arutyunov"
+    ],
+    "2026-04-24": [
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "artem-ermolaev",
+      "zhenya-sarnetskiy",
+      "magomed-vagabov",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "kirill-myshkin",
+      "masha-troitskaya",
+      "marat-habibulin",
+      "rustam-mushraipov",
+      "ruslan-mamedov",
+      "rinat-enikeev",
+      "ramil-karimov",
+      "kirill-chernov",
+      "polina-perevalova",
+      "zhenya-arutyunov"
+    ],
+    "2026-05-01": [
+      "adam-arutyunov",
+      "dana",
+      "dmitriy-sivuhin",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "rustam-mushraipov",
+      "ruslan-mamedov",
+      "magomed-vagabov",
+      "polina-perevalova"
+    ],
+    "2026-05-15": [
+      "artem-ermolaev",
+      "ruslan-mamedov",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "kristina-marchenko",
+      "masha-troitskaya",
+      "rinat-enikeev",
+      "rustam-mushraipov",
+      "zhenya-arutyunov",
+      "polina-perevalova"
+    ],
+    "2026-06-05": [
+      "vova",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "kirill-myshkin",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "rustam-mushraipov",
+      "ruslan-mamedov",
+      "magomed-vagabov",
+      "zhenya-arutyunov",
+      "polina-perevalova"
+    ],
+    "2026-06-12": [
+      "artem-ermolaev",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "olga-permyakova",
+      "ruslan-mamedov",
+      "rustam-mushraipov",
+      "vitaliy",
+      "anastasiya-fomina",
+      "nadya-tkacheva",
+      "polina-perevalova",
+      "zhenya-arutyunov"
+    ],
+    "2026-07-03": [
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "masha-troitskaya",
+      "olga-permyakova",
+      "rustam-mushraipov",
+      "zoya",
+      "zhenya-arutyunov",
+      "polina-perevalova"
+    ],
+    "2026-08-13": [
+      "andrey",
+      "danya-samoylenko",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "kirill-myshkin",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "magomed-vagabov",
+      "marat-habibulin",
+      "polina-perevalova",
+      "ruslan-mamedov",
+      "rustam-mushraipov"
+    ],
+    "2026-08-20": [
+      "ayrat",
+      "artem-ermolaev",
+      "dmitriy-sivuhin",
+      "zhenya-arutyunov",
+      "zhenya-sarnetskiy",
+      "kirill-myshkin",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "magomed-vagabov",
+      "marat-habibulin",
+      "olga-permyakova",
+      "polina-perevalova",
+      "ruslan-mamedov",
+      "sasha-permyakov"
+    ],
+    "2026-08-27": [
+      "artem-ermolaev",
+      "danya-samoylenko",
+      "evgeniy-smirnov",
+      "zhenya-arutyunov",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "polina-perevalova",
+      "ramil-karimov"
+    ],
+    "2026-09-03": [
+      "andrey",
+      "artem-ermolaev",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "zhenya-arutyunov",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "olga-permyakova",
+      "polina-perevalova",
+      "rustam-mushraipov"
+    ],
+    "2026-09-10": [
+      "andrey",
+      "artem-ermolaev",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "egor",
+      "zhenya-arutyunov",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "magomed-vagabov",
+      "polina-perevalova"
+    ]
+  },
   "demos": [
     {
       "id": "demo-1",
@@ -2480,10 +1226,7 @@
       "project": "telegram-kanal-s-uprazhneniyami-dlya-dizaynerov",
       "presenters": [
         "roma-kuzhel"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-2",
@@ -2491,10 +1234,7 @@
       "project": "telegram-kanal-oy-babonki-glyante-ka",
       "presenters": [
         "elena-chausova"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-3",
@@ -2502,10 +1242,7 @@
       "project": "bookov",
       "presenters": [
         "kirill-oleynichenko"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-4",
@@ -2513,10 +1250,7 @@
       "project": "illyustratsii-dlya-upakovki",
       "presenters": [
         "kristina-dunina"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-5",
@@ -2524,10 +1258,7 @@
       "project": "stopfires-org",
       "presenters": [
         "rinat-enikeev"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-6",
@@ -2535,10 +1266,7 @@
       "project": "telegram-kanal-kakovo-byt-dizaynerom",
       "presenters": [
         "kristina-marchenko"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-7",
@@ -2546,10 +1274,7 @@
       "project": "creative-spark-board",
       "presenters": [
         "roma-kuzhel"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-8",
@@ -2557,10 +1282,7 @@
       "project": "telegram-kanal-ruslan-i-bukvalnyy-chellendzh",
       "presenters": [
         "ruslan-mamedov"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-9",
@@ -2568,10 +1290,7 @@
       "project": "podkast-hoba",
       "presenters": [
         "daler-alierov"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-10",
@@ -2579,10 +1298,7 @@
       "project": "svoy-sayt",
       "presenters": [
         "viktor-timofeev"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-11",
@@ -2590,10 +1306,7 @@
       "project": "gotitbureau-com-rus",
       "presenters": [
         "ira-zaharova"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-12",
@@ -2601,10 +1314,7 @@
       "project": "detskaya-kniga",
       "presenters": [
         "ekaterina-lakutina"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-13",
@@ -2612,10 +1322,7 @@
       "project": "telegram-kanal-kakovo-byt-dizaynerom",
       "presenters": [
         "kristina-marchenko"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-14",
@@ -2623,10 +1330,7 @@
       "project": "telegram-kanal-ruslan-i-bukvalnyy-chellendzh",
       "presenters": [
         "ruslan-mamedov"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-15",
@@ -2634,10 +1338,7 @@
       "project": "muzey-neprinyatyh-rabot-stol",
       "presenters": [
         "artem-ermolaev"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-16",
@@ -2645,10 +1346,7 @@
       "project": "hypetype",
       "presenters": [
         "ruslan-mamedov"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-17",
@@ -2656,10 +1354,7 @@
       "project": "muzey-neprinyatyh-rabot-stol",
       "presenters": [
         "artem-ermolaev"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-18",
@@ -2667,10 +1362,7 @@
       "project": "kurs-po-matematike-kotoraya-prigoditsya-v-zhizni",
       "presenters": [
         "adam-arutyunov"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-19",
@@ -2678,10 +1370,7 @@
       "project": "pervyy-rolik-na-yutyub",
       "presenters": [
         "masha-troitskaya"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-20",
@@ -2689,10 +1378,7 @@
       "project": "prilozhenie-dlya-rasshifrovki-vstrech-context",
       "presenters": [
         "daler-alierov"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-21",
@@ -2700,10 +1386,7 @@
       "project": "past-simple",
       "presenters": [
         "artem-ermolaev"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-22",
@@ -2711,10 +1394,7 @@
       "project": "aside",
       "presenters": [
         "lesha-nikitin"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-23",
@@ -2722,10 +1402,7 @@
       "project": "bot-letmidzhoyn",
       "presenters": [
         "kirill-myshkin"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-24",
@@ -2733,10 +1410,7 @@
       "project": "prezentatsiya-kak-sobrat-portfolio",
       "presenters": [
         "evgeniy-smirnov"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-25",
@@ -2744,10 +1418,7 @@
       "project": "dot-dead",
       "presenters": [
         "danya-samoylenko"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-26",
@@ -2755,10 +1426,7 @@
       "project": "search-thru",
       "presenters": [
         "magomed-vagabov"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-27",
@@ -2766,10 +1434,7 @@
       "project": "telerupor",
       "presenters": [
         "kirill-myshkin"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-28",
@@ -2777,10 +1442,7 @@
       "project": "kontsept-igry-chayka",
       "presenters": [
         "anastasiya-fomina"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-29",
@@ -2788,10 +1450,7 @@
       "project": "hypetype",
       "presenters": [
         "ruslan-mamedov"
-      ],
-      "minutes": null,
-      "format": null,
-      "note": null
+      ]
     },
     {
       "id": "demo-30",
@@ -2800,9 +1459,7 @@
       "presenters": [
         "kirill-myshkin"
       ],
-      "minutes": 12,
-      "format": null,
-      "note": "Дима сказал, что там не апостров, а кавычки"
+      "minutes": 12
     },
     {
       "id": "demo-31",
@@ -2811,9 +1468,7 @@
       "presenters": [
         "marat-habibulin"
       ],
-      "minutes": 6,
-      "format": null,
-      "note": "Кристина сказала, что можно добавить имена к участникам игры"
+      "minutes": 6
     },
     {
       "id": "demo-32",
@@ -2822,9 +1477,7 @@
       "presenters": [
         "polina-perevalova"
       ],
-      "minutes": 6,
-      "format": null,
-      "note": "Марат, Кирилл и Кристина сказали как можно обойтись без прикручивания АПИ: поболтать с нейросетью, создать базу данных упражнений и положить в код"
+      "minutes": 6
     },
     {
       "id": "demo-33",
@@ -2834,8 +1487,7 @@
         "kristina-marchenko"
       ],
       "minutes": 5,
-      "format": 2,
-      "note": "Дима оценил шрифт Onest как норм."
+      "format": 2
     },
     {
       "id": "demo-34",
@@ -2845,8 +1497,7 @@
         "andrey"
       ],
       "minutes": 4,
-      "format": 2,
-      "note": null
+      "format": 2
     },
     {
       "id": "demo-35",
@@ -2855,9 +1506,7 @@
       "presenters": [
         "marat-habibulin"
       ],
-      "minutes": 4,
-      "format": null,
-      "note": null
+      "minutes": 4
     },
     {
       "id": "demo-36",
@@ -2866,9 +1515,7 @@
       "presenters": [
         "artem-ermolaev"
       ],
-      "minutes": 3,
-      "format": null,
-      "note": null
+      "minutes": 3
     },
     {
       "id": "demo-37",
@@ -2878,8 +1525,7 @@
         "zhenya-arutyunov"
       ],
       "minutes": 7,
-      "format": 2,
-      "note": null
+      "format": 2
     },
     {
       "id": "demo-38",
@@ -2888,9 +1534,7 @@
       "presenters": [
         "ayrat"
       ],
-      "minutes": 5,
-      "format": null,
-      "note": null
+      "minutes": 5
     },
     {
       "id": "demo-39",
@@ -2900,8 +1544,7 @@
         "magomed-vagabov"
       ],
       "minutes": 7,
-      "format": 2,
-      "note": null
+      "format": 2
     },
     {
       "id": "demo-40",
@@ -2910,9 +1553,7 @@
       "presenters": [
         "evgeniy-smirnov"
       ],
-      "minutes": 8,
-      "format": null,
-      "note": null
+      "minutes": 8
     },
     {
       "id": "demo-41",
@@ -2922,8 +1563,7 @@
         "zhenya-arutyunov"
       ],
       "minutes": 15,
-      "format": 1,
-      "note": null
+      "format": 1
     },
     {
       "id": "demo-42",
@@ -2933,8 +1573,7 @@
         "ramil-karimov"
       ],
       "minutes": 7,
-      "format": 2,
-      "note": null
+      "format": 2
     },
     {
       "id": "demo-43",
@@ -2944,8 +1583,7 @@
         "kristina-marchenko"
       ],
       "minutes": 6,
-      "format": 2,
-      "note": null
+      "format": 2
     },
     {
       "id": "demo-44",
@@ -2954,9 +1592,7 @@
       "presenters": [
         "evgeniy-smirnov"
       ],
-      "minutes": 5,
-      "format": null,
-      "note": null
+      "minutes": 5
     },
     {
       "id": "demo-45",
@@ -2966,8 +1602,7 @@
         "zhenya-arutyunov"
       ],
       "minutes": 2,
-      "format": 1,
-      "note": null
+      "format": 1
     },
     {
       "id": "demo-46",
@@ -2977,8 +1612,7 @@
         "andrey"
       ],
       "minutes": 5,
-      "format": 2,
-      "note": null
+      "format": 2
     },
     {
       "id": "demo-47",
@@ -2988,8 +1622,7 @@
         "zhenya-arutyunov"
       ],
       "minutes": 9,
-      "format": 2,
-      "note": null
+      "format": 2
     },
     {
       "id": "demo-48",
@@ -2999,8 +1632,7 @@
         "zhenya-arutyunov"
       ],
       "minutes": 7,
-      "format": 1,
-      "note": null
+      "format": 1
     },
     {
       "id": "demo-49",
@@ -3009,9 +1641,7 @@
       "presenters": [
         "artem-ermolaev"
       ],
-      "minutes": 6,
-      "format": null,
-      "note": null
+      "minutes": 6
     },
     {
       "id": "demo-50",
@@ -3020,9 +1650,7 @@
       "presenters": [
         "evgeniy-smirnov"
       ],
-      "minutes": 6,
-      "format": null,
-      "note": null
+      "minutes": 6
     },
     {
       "id": "demo-51",
@@ -3031,9 +1659,7 @@
       "presenters": [
         "polina-perevalova"
       ],
-      "minutes": 5,
-      "format": null,
-      "note": null
+      "minutes": 5
     },
     {
       "id": "demo-52",
@@ -3043,8 +1669,7 @@
         "magomed-vagabov"
       ],
       "minutes": 3,
-      "format": 2,
-      "note": null
+      "format": 2
     }
   ],
   "feedback": [

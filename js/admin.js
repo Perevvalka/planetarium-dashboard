@@ -19,6 +19,65 @@
 
   const isBlank = (v) => v == null || v === "";
 
+  // Пустые поля в базе не хранятся: вместо null просто нет ключа.
+  const setField = (obj, key, value) => {
+    if (isBlank(value)) delete obj[key];
+    else obj[key] = value;
+  };
+
+  const compactItem = (obj) => {
+    const out = {};
+    Object.entries(obj).forEach(([key, value]) => {
+      if (!isBlank(value)) out[key] = value;
+    });
+    return out;
+  };
+
+  // Приводит базу любой версии к текущей схеме: явка — объект «дата → id людей»,
+  // пустые поля и заметки не хранятся. Нужно для старых черновиков и файлов с прода.
+  const normalizeDb = (data) => {
+    const out = data && typeof data === "object" ? data : {};
+    ["persons", "projects", "meetings", "demos", "feedback"].forEach((key) => {
+      if (!Array.isArray(out[key])) out[key] = [];
+    });
+
+    if (Array.isArray(out.attendance)) {
+      const byDate = {};
+      out.attendance.forEach((a) => {
+        if (!a || !a.meeting || !a.person) return;
+        if (!byDate[a.meeting]) byDate[a.meeting] = [];
+        if (!byDate[a.meeting].includes(a.person)) byDate[a.meeting].push(a.person);
+      });
+      out.attendance = byDate;
+    } else if (!out.attendance || typeof out.attendance !== "object") {
+      out.attendance = {};
+    } else {
+      Object.entries(out.attendance).forEach(([date, people]) => {
+        if (!Array.isArray(people) || !people.length) delete out.attendance[date];
+      });
+    }
+
+    const prune = (item, keys) => {
+      delete item.note;
+      keys.forEach((key) => {
+        if (isBlank(item[key])) delete item[key];
+      });
+    };
+    out.persons.forEach((p) => {
+      prune(p, ["telegram", "photo"]);
+      if (p.active !== true) delete p.active;
+    });
+    out.projects.forEach((p) => prune(p, ["url"]));
+    out.meetings.forEach((m) => {
+      prune(m, ["minutes"]);
+      if (!m.generated) delete m.generated;
+    });
+    out.demos.forEach((d) => prune(d, ["minutes", "format"]));
+    return out;
+  };
+
+  normalizeDb(source);
+
   const mergeMissingFromSource = (draft, file) => {
     const added = {
       persons: 0,
@@ -44,7 +103,16 @@
     addBy("projects", (x) => x.id);
     addBy("meetings", (x) => x.date);
     addBy("demos", (x) => x.id);
-    addBy("attendance", (x) => `${x.meeting}::${x.person}`);
+    if (!draft.attendance || typeof draft.attendance !== "object") draft.attendance = {};
+    Object.entries(file.attendance || {}).forEach(([date, people]) => {
+      if (!Array.isArray(draft.attendance[date])) draft.attendance[date] = [];
+      const list = draft.attendance[date];
+      people.forEach((person) => {
+        if (list.includes(person)) return;
+        list.push(person);
+        added.attendance++;
+      });
+    });
     if (!Array.isArray(draft.feedback)) draft.feedback = [];
     addBy("feedback", (x) => `${x.demo}::${x.person}`);
     return added;
@@ -71,10 +139,10 @@
         }
       });
     };
-    fillBy("meetings", (x) => x.date, ["minutes", "note"]);
-    fillBy("demos", (x) => x.id, ["minutes", "format", "note"]);
-    fillBy("persons", (x) => x.id, ["name", "telegram", "photo", "note"]);
-    fillBy("projects", (x) => x.id, ["url", "note"]);
+    fillBy("meetings", (x) => x.date, ["minutes"]);
+    fillBy("demos", (x) => x.id, ["minutes", "format"]);
+    fillBy("persons", (x) => x.id, ["name", "telegram", "photo"]);
+    fillBy("projects", (x) => x.id, ["url"]);
     return filled;
   };
 
@@ -86,14 +154,50 @@
     added.attendance +
     added.feedback;
 
+  // Черновик старше подписок: переносим флаги из файла целиком, иначе при выгрузке
+  // на сайт они пропали бы. Если в черновике есть хоть один флаг — подписки уже
+  // ведут в нём, и снятую галку возвращать нельзя.
+  const adoptActiveFlags = (draft, file) => {
+    const anyActive = (list) => (list || []).some((p) => p.active);
+    if (!anyActive(file.persons) || anyActive(draft.persons)) return 0;
+    const fromFile = new Map((file.persons || []).map((p) => [p.id, p]));
+    let filled = 0;
+    (draft.persons || []).forEach((p) => {
+      if (!fromFile.get(p.id)?.active) return;
+      p.active = true;
+      filled++;
+    });
+    return filled;
+  };
+
+  // Значения, которые в файле уже другие: черновик их перекроет при выгрузке.
+  const staleFields = (draft, file) => {
+    const out = [];
+    const persons = new Map((draft.persons || []).map((p) => [p.id, p]));
+    (file.persons || []).forEach((p) => {
+      const mine = persons.get(p.id);
+      if (!mine) return;
+      if (mine.name !== p.name) out.push(`${p.name}: имя`);
+      if (Boolean(mine.active) !== Boolean(p.active)) out.push(`${p.name}: подписка`);
+    });
+    const meetings = new Map((draft.meetings || []).map((m) => [m.date, m]));
+    (file.meetings || []).forEach((m) => {
+      const mine = meetings.get(m.date);
+      if (mine && (mine.minutes ?? null) !== (m.minutes ?? null)) out.push(`${m.date}: минуты`);
+    });
+    return out;
+  };
+
   const syncDraftFromSource = (draft, file) =>
-    addedCount(mergeMissingFromSource(draft, file)) + fillEmptyFromSource(draft, file);
+    addedCount(mergeMissingFromSource(draft, file)) +
+    fillEmptyFromSource(draft, file) +
+    adoptActiveFlags(draft, file);
 
   const parseDbFile = (text) => {
     const match = String(text).match(/const PlanetariumDB = (\{[\s\S]*\});/);
     if (!match) return null;
     try {
-      return JSON.parse(match[1]);
+      return normalizeDb(JSON.parse(match[1]));
     } catch {
       return null;
     }
@@ -103,22 +207,16 @@
     try {
       const raw = localStorage.getItem(key);
       if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed.feedback)) parsed.feedback = [];
-      if (syncDraftFromSource(parsed, source)) {
-        localStorage.setItem(key, JSON.stringify(parsed));
-      }
+      const parsed = normalizeDb(JSON.parse(raw));
+      syncDraftFromSource(parsed, source);
+      localStorage.setItem(key, JSON.stringify(parsed));
       return parsed;
     } catch (_) {
       return null;
     }
   };
 
-  const freshDb = () => {
-    const base = clone(source);
-    if (!Array.isArray(base.feedback)) base.feedback = [];
-    return base;
-  };
+  const freshDb = () => normalizeDb(clone(source));
 
   let liveDb = loadStoredDraft(STORAGE_LIVE) || freshDb();
   let editDb = loadStoredDraft(STORAGE_EDIT) || freshDb();
@@ -213,46 +311,99 @@
   };
 
   // ---------------------------------------------------------------
-  // Serialize → db.js
+  // Serialize → planetarium-db.json и js/db.js
   // ---------------------------------------------------------------
 
-  const serializeFile = (data = db) => {
-    const payload = {
-      persons: data.persons,
-      projects: data.projects,
-      meetings: data.meetings,
-      attendance: data.attendance,
-      demos: data.demos,
+  const dbPayload = (data = db) => {
+    const attendance = {};
+    Object.keys(data.attendance || {})
+      .sort((a, b) => a.localeCompare(b))
+      .forEach((date) => {
+        const people = data.attendance[date];
+        if (Array.isArray(people) && people.length) attendance[date] = people;
+      });
+    return {
+      persons: data.persons.map((p) =>
+        compactItem({
+          id: p.id,
+          name: p.name,
+          active: p.active ? true : undefined,
+          telegram: p.telegram,
+          photo: p.photo,
+        })
+      ),
+      projects: data.projects.map((p) =>
+        compactItem({ id: p.id, title: p.title, url: p.url, authors: p.authors })
+      ),
+      meetings: data.meetings.map((m) =>
+        compactItem({
+          date: m.date,
+          type: m.type,
+          minutes: m.minutes,
+          generated: m.generated ? true : undefined,
+        })
+      ),
+      attendance,
+      demos: data.demos.map((d) =>
+        compactItem({
+          id: d.id,
+          meeting: d.meeting,
+          project: d.project,
+          presenters: d.presenters,
+          minutes: d.minutes,
+          format: d.format,
+        })
+      ),
       feedback: data.feedback || [],
     };
-    return (
-      `// Единая база данных Планетария.\n` +
-      `// Источник правды для визуализаций и админки.\n` +
-      `// Реальные данные: посещения еженедельных встреч + демо-эфиры.\n` +
-      `// generated: true — длительность восстановлена как 45 + число визитов.\n\n` +
-      `(() => {\n` +
-      `  "use strict";\n\n` +
-      `  const PlanetariumDB = ${JSON.stringify(payload, null, 2)};\n\n` +
-      `  if (typeof window !== "undefined") window.PlanetariumDB = PlanetariumDB;\n` +
-      `  if (typeof module !== "undefined" && module.exports) module.exports = PlanetariumDB;\n` +
-      `})();\n`
-    );
   };
 
-  const downloadDb = () => {
-    const blob = new Blob([serializeFile()], { type: "text/javascript;charset=utf-8" });
+  // Файл для загрузки на сайт: чистый JSON, без JS-обёртки.
+  const serializeJson = (data = db) => `${JSON.stringify(dbPayload(data), null, 2)}\n`;
+
+  const serializeFile = (data = db) =>
+    `// Единая база данных Планетария.\n` +
+    `// Источник правды для визуализаций и админки.\n` +
+    `// Реальные данные: посещения еженедельных встреч + демо-эфиры.\n` +
+    `// Пустые поля не хранятся: отсутствие ключа = значение не задано.\n` +
+    `// attendance — явка, сгруппированная по дате встречи.\n` +
+    `// active: true — активная подписка; у остальных поля нет.\n` +
+    `// generated: true — длительность не замерена, а проставлена приблизительно.\n\n` +
+    `(() => {\n` +
+    `  "use strict";\n\n` +
+    `  const PlanetariumDB = ${JSON.stringify(dbPayload(data), null, 2)};\n\n` +
+    `  if (typeof window !== "undefined") window.PlanetariumDB = PlanetariumDB;\n` +
+    `  if (typeof module !== "undefined" && module.exports) module.exports = PlanetariumDB;\n` +
+    `})();\n`;
+
+  const download = (name, text, type) => {
+    const blob = new Blob([text], { type });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "db.js";
+    a.download = name;
     a.click();
     URL.revokeObjectURL(a.href);
-    setStatus("Файл db.js скачан");
+    setStatus(`Файл ${name} скачан`);
   };
+
+  const downloadDb = () => download("db.js", serializeFile(), "text/javascript;charset=utf-8");
+
+  const downloadJson = () =>
+    download("planetarium-db.json", serializeJson(), "application/json;charset=utf-8");
 
   const copyDb = async () => {
     try {
       await navigator.clipboard.writeText(serializeFile());
       setStatus("Скопировано в буфер");
+    } catch {
+      setStatus("Не удалось скопировать");
+    }
+  };
+
+  const copyJson = async () => {
+    try {
+      await navigator.clipboard.writeText(serializeJson());
+      setStatus("JSON скопирован в буфер");
     } catch {
       setStatus("Не удалось скопировать");
     }
@@ -431,55 +582,87 @@
     return Boolean(p?.url);
   };
 
+  // Введённая руками длительность перестаёт быть восстановленной по формуле.
+  const setMeetingMinutes = (meeting, minutes) => {
+    if (minutes === (meeting.minutes ?? null)) return;
+    setField(meeting, "minutes", minutes);
+    delete meeting.generated;
+  };
+
   const ensureMeeting = (date, extra = {}) => {
     if (!date) return null;
     let m = db.meetings.find((x) => x.date === date);
     if (!m) {
-      m = { date, type: "weekly", minutes: null, note: null };
+      m = { date, type: "weekly" };
       db.meetings.push(m);
       db.meetings.sort((a, b) => a.date.localeCompare(b.date));
     }
     m.type = "weekly";
-    if (Object.prototype.hasOwnProperty.call(extra, "minutes")) m.minutes = extra.minutes;
-    if (Object.prototype.hasOwnProperty.call(extra, "note")) m.note = extra.note;
+    if (Object.prototype.hasOwnProperty.call(extra, "minutes")) {
+      setMeetingMinutes(m, extra.minutes);
+    }
     return m;
   };
 
+  const attendanceOf = (date) => db.attendance[date] || [];
+
   const writeAttendance = (date, people) => {
-    db.attendance = db.attendance.filter((a) => a.meeting !== date);
-    people.forEach((person) => db.attendance.push({ meeting: date, person }));
+    if (people.length) db.attendance[date] = people.slice();
+    else delete db.attendance[date];
   };
 
-  const upsertPerson = ({ id, name, telegram, photo, note }) => {
-    if (id) {
-      const p = db.persons.find((x) => x.id === id);
-      if (!p) return null;
-      p.name = name;
-      p.telegram = telegram;
-      p.photo = photo;
-      p.note = note;
+  const moveAttendance = (from, to) => {
+    if (from === to || !db.attendance[from]) return;
+    db.attendance[to] = db.attendance[from];
+    delete db.attendance[from];
+  };
+
+  const dropPersonFromAttendance = (person) => {
+    Object.keys(db.attendance).forEach((date) => {
+      writeAttendance(date, db.attendance[date].filter((p) => p !== person));
+    });
+  };
+
+  const upsertPerson = ({ id, name, active, telegram, photo }) => {
+    const person = id ? db.persons.find((x) => x.id === id) : null;
+    if (id && !person) return null;
+    if (person) {
+      person.name = name;
+      setField(person, "active", active ? true : null);
+      setField(person, "telegram", telegram);
+      setField(person, "photo", photo);
       return id;
     }
     const ids = new Set(db.persons.map((p) => p.id));
     const newId = uniqueId(slug(name), ids);
-    db.persons.push({ id: newId, name, telegram, photo, note });
+    db.persons.push(
+      compactItem({ id: newId, name, active: active ? true : undefined, telegram, photo })
+    );
     return newId;
   };
 
-  const upsertProject = ({ id, title, url, authors, note }) => {
-    if (id) {
-      const p = db.projects.find((x) => x.id === id);
-      if (!p) return null;
-      p.title = title;
-      p.url = url;
-      p.authors = authors;
-      p.note = note;
+  const upsertProject = ({ id, title, url, authors }) => {
+    const project = id ? db.projects.find((x) => x.id === id) : null;
+    if (id && !project) return null;
+    if (project) {
+      project.title = title;
+      setField(project, "url", url);
+      project.authors = authors;
       return id;
     }
     const ids = new Set(db.projects.map((p) => p.id));
     const newId = uniqueId(slug(title), ids);
-    db.projects.push({ id: newId, title, url, authors, note });
+    db.projects.push(compactItem({ id: newId, title, url, authors }));
     return newId;
+  };
+
+  const writeDemo = (demo, { meeting, project, presenters, minutes, format }) => {
+    demo.meeting = meeting;
+    demo.project = project;
+    demo.presenters = presenters;
+    setField(demo, "minutes", minutes);
+    setField(demo, "format", format);
+    return demo;
   };
 
   const setDemoFormat = (value) => {
@@ -514,9 +697,9 @@
     if (!p) return;
     formPerson.id.value = p.id;
     formPerson.name.value = p.name || "";
+    formPerson.active.checked = Boolean(p.active);
     formPerson.telegram.value = p.telegram || "";
     formPerson.photo.value = p.photo || "";
-    formPerson.note.value = p.note || "";
     listPersons.querySelectorAll("li").forEach((li) => {
       li.classList.toggle("active", li.dataset.id === id);
     });
@@ -526,25 +709,14 @@
     e.preventDefault();
     const name = formPerson.name.value.trim();
     if (!name) return;
-    let id = formPerson.id.value;
-    if (id) {
-      const p = db.persons.find((x) => x.id === id);
-      if (!p) return;
-      p.name = name;
-      p.telegram = empty(formPerson.telegram.value);
-      p.photo = empty(formPerson.photo.value);
-      p.note = empty(formPerson.note.value);
-    } else {
-      const ids = new Set(db.persons.map((p) => p.id));
-      id = uniqueId(slug(name), ids);
-      db.persons.push({
-        id,
-        name,
-        telegram: empty(formPerson.telegram.value),
-        photo: empty(formPerson.photo.value),
-        note: empty(formPerson.note.value),
-      });
-    }
+    const id = upsertPerson({
+      id: formPerson.id.value,
+      name,
+      active: formPerson.active.checked,
+      telegram: empty(formPerson.telegram.value),
+      photo: empty(formPerson.photo.value),
+    });
+    if (!id) return;
     saveDraft();
     loadPerson(id);
     revealListItem(listPersons, `[data-id="${CSS.escape(id)}"]`);
@@ -558,7 +730,7 @@
     if (!id) return;
     if (!confirm("Удалить персону и её связи (присутствие, авторство, показы)?")) return;
     db.persons = db.persons.filter((p) => p.id !== id);
-    db.attendance = db.attendance.filter((a) => a.person !== id);
+    dropPersonFromAttendance(id);
     db.feedback = (db.feedback || []).filter((f) => f.person !== id);
     db.projects.forEach((p) => {
       p.authors = p.authors.filter((a) => a !== id);
@@ -596,7 +768,6 @@
     formProject.id.value = p.id;
     formField(formProject, "title").value = p.title || "";
     formProject.url.value = p.url || "";
-    formProject.note.value = p.note || "";
     fillPersonChecks(projectAuthors, p.authors);
     listProjects.querySelectorAll("li").forEach((li) => {
       li.classList.toggle("active", li.dataset.id === id);
@@ -619,25 +790,8 @@
       formProject.url.focus();
       return;
     }
-    let id = formProject.id.value;
-    if (id) {
-      const p = db.projects.find((x) => x.id === id);
-      if (!p) return;
-      p.title = title;
-      p.url = url;
-      p.authors = authors;
-      p.note = empty(formProject.note.value);
-    } else {
-      const ids = new Set(db.projects.map((p) => p.id));
-      id = uniqueId(slug(title), ids);
-      db.projects.push({
-        id,
-        title,
-        url,
-        authors,
-        note: empty(formProject.note.value),
-      });
-    }
+    const id = upsertProject({ id: formProject.id.value, title, url, authors });
+    if (!id) return;
     formProject.classList.remove("pdb-url-needed");
     saveDraft();
     loadProject(id);
@@ -693,7 +847,6 @@
     formMeeting.origDate.value = m.date;
     formMeeting.date.value = m.date;
     formMeeting.minutes.value = m.minutes ?? "";
-    formMeeting.note.value = m.note || "";
     syncMeetingDateLabel();
     listMeetings.querySelectorAll("li").forEach((li) => {
       li.classList.toggle("active", li.dataset.date === date);
@@ -711,9 +864,7 @@
         setStatus("Встреча с такой датой уже есть");
         return;
       }
-      db.attendance.forEach((a) => {
-        if (a.meeting === orig) a.meeting = date;
-      });
+      moveAttendance(orig, date);
       db.demos.forEach((d) => {
         if (d.meeting === orig) d.meeting = date;
       });
@@ -723,12 +874,11 @@
 
     let m = db.meetings.find((x) => x.date === date);
     if (!m) {
-      m = { date, type: "weekly", minutes: null, note: null };
+      m = { date, type: "weekly" };
       db.meetings.push(m);
     }
     m.type = "weekly";
-    m.minutes = numOrNull(formMeeting.minutes.value);
-    m.note = empty(formMeeting.note.value);
+    setMeetingMinutes(m, numOrNull(formMeeting.minutes.value));
     db.meetings.sort((a, b) => a.date.localeCompare(b.date));
     saveDraft();
     loadMeeting(date);
@@ -744,7 +894,7 @@
     if (!confirm("Удалить встречу, присутствие и демо за эту дату?")) return;
     const removedDemos = new Set(db.demos.filter((d) => d.meeting === date).map((d) => d.id));
     db.meetings = db.meetings.filter((m) => m.date !== date);
-    db.attendance = db.attendance.filter((a) => a.meeting !== date);
+    delete db.attendance[date];
     db.demos = db.demos.filter((d) => d.meeting !== date);
     db.feedback = (db.feedback || []).filter((f) => !removedDemos.has(f.demo));
     clearMeeting();
@@ -778,7 +928,7 @@
         : db.meetings.slice().sort((a, b) => a.date.localeCompare(b.date)).at(-1)?.date;
     fillMeetingSelect(attendanceMeeting, preferred);
     const date = attendanceMeeting.value;
-    const selected = db.attendance.filter((a) => a.meeting === date).map((a) => a.person);
+    const selected = attendanceOf(date);
     fillPersonChecks(attendancePeople, selected);
     attendanceSummary.textContent = date
       ? `${selected.length} человек · ${fmtDateRu(date)}`
@@ -792,8 +942,7 @@
     const date = attendanceMeeting.value;
     if (!date) return;
     const people = checkedValues(attendancePeople);
-    db.attendance = db.attendance.filter((a) => a.meeting !== date);
-    people.forEach((person) => db.attendance.push({ meeting: date, person }));
+    writeAttendance(date, people);
     saveDraft();
     loadAttendanceForm();
     flashSubmit(formAttendance, "Сохранено");
@@ -898,7 +1047,6 @@
     // 1–3 только если у проекта ещё нет ссылки; иначе уровень 4 вычисляется сам
     setDemoFormat(projectHasUrl(d.project) ? null : d.format);
     formDemo.minutes.value = d.minutes ?? "";
-    formDemo.note.value = d.note || "";
     syncPresenterUI();
     syncDemoFormatUI();
     listDemos.querySelectorAll("li").forEach((li) => {
@@ -931,7 +1079,7 @@
     }
 
     if (!db.meetings.some((m) => m.date === meeting)) {
-      db.meetings.push({ date: meeting, type: "weekly", minutes: null, note: null });
+      db.meetings.push({ date: meeting, type: "weekly" });
       db.meetings.sort((a, b) => a.date.localeCompare(b.date));
     }
 
@@ -946,15 +1094,14 @@
       presenters,
       minutes: numOrNull(formDemo.minutes.value),
       format,
-      note: empty(formDemo.note.value),
     };
     if (id) {
       const d = db.demos.find((x) => x.id === id);
       if (!d) return;
-      Object.assign(d, payload);
+      writeDemo(d, payload);
     } else {
       id = nextDemoId();
-      db.demos.push({ id, ...payload });
+      db.demos.push(writeDemo({ id }, payload));
     }
 
     // факт фидбэка: уникальная пара персона×демо
@@ -993,11 +1140,13 @@
   const renderPersons = () => {
     const items = db.persons.slice().sort((a, b) => a.name.localeCompare(b.name, "ru"));
     listPersons.innerHTML = items
-      .map(
-        (p) =>
+      .map((p) => {
+        const meta = [p.active ? "подписка" : "", p.telegram || p.id].filter(Boolean).join(" · ");
+        return (
           `<li data-id="${p.id}"><span>${escapeHtml(p.name)}</span>` +
-          `<span class="meta">${p.telegram ? escapeHtml(p.telegram) : p.id}</span></li>`
-      )
+          `<span class="meta">${escapeHtml(meta)}</span></li>`
+        );
+      })
       .join("");
     listPersons.querySelectorAll("li").forEach((li) => {
       li.addEventListener("click", () => loadPerson(li.dataset.id));
@@ -1041,7 +1190,7 @@
     const items = db.meetings.slice().sort((a, b) => b.date.localeCompare(a.date));
     listMeetings.innerHTML = items
       .map((m) => {
-        const count = db.attendance.filter((a) => a.meeting === m.date).length;
+        const count = attendanceOf(m.date).length;
         const demos = db.demos.filter((d) => d.meeting === m.date).length;
         const gen = m.generated ? " · сген." : "";
         const meta = `${count} чел.${demos ? ` · ${demos} демо` : ""}${gen}`;
@@ -1121,20 +1270,13 @@
 
   const meetingSummary = (date) => {
     if (!date) return "Укажи дату встречи.";
-    const m = db.meetings.find((x) => x.date === date) || {
-      date,
-      minutes: null,
-      note: null,
-    };
+    const m = db.meetings.find((x) => x.date === date) || { date };
 
-    const presentIds = db.attendance
-      .filter((a) => a.meeting === date)
-      .map((a) => a.person);
+    const presentIds = attendanceOf(date);
     const demos = db.demos.filter((d) => d.meeting === date);
     const lines = [humanDate(date)];
 
     lines.push(m.minutes ? `${m.minutes} мин` : "длительность не указана");
-    if (m.note) lines.push(`Заметка: ${m.note}`);
 
     lines.push("", `Присутствие — ${presentIds.length}`);
     if (presentIds.length) {
@@ -1157,7 +1299,6 @@
       if (project?.url) lines.push(`     — ссылка: ${project.url}`);
       const feedback = feedbackForDemo(d.id);
       if (feedback.length) lines.push(`     — фидбэк: ${namesOf(feedback).join(", ")}`);
-      if (d.note) lines.push(`     — заметка: ${d.note}`);
     });
 
     const checks = meetingChecks(m, presentIds, demos);
@@ -1177,7 +1318,7 @@
     summaryMeetings.innerHTML = items.length
       ? items
           .map((m) => {
-            const people = db.attendance.filter((a) => a.meeting === m.date).length;
+            const people = attendanceOf(m.date).length;
             const count = db.demos.filter((d) => d.meeting === m.date).length;
             const gen = m.generated ? " · сген." : "";
             const meta = `${people} чел. · ${count} демо${gen}`;
@@ -1246,7 +1387,6 @@
   const editRoot = document.getElementById("pdb-edit");
   const liveDate = document.getElementById("live-date");
   const liveDateHuman = document.getElementById("live-date-human");
-  const liveDemoNote = document.getElementById("live-demo-note");
   const liveStopwatchDisplay = document.getElementById("live-stopwatch-display");
   const liveStopwatchToggle = document.getElementById("live-stopwatch-toggle");
   let stopwatchStarted = 0;
@@ -1370,7 +1510,7 @@
     const el = document.getElementById("live-attendance-summary");
     if (!el) return;
     const date = liveDate?.value;
-    const n = date ? db.attendance.filter((a) => a.meeting === date).length : 0;
+    const n = date ? attendanceOf(date).length : 0;
     el.textContent = date ? `${n} человек · ${fmtDateRu(date)}` : "";
   };
 
@@ -1411,13 +1551,10 @@
   const clearLiveDemoForm = () => {
     if (liveDemoId) liveDemoId.value = "";
     if (liveDemoMinutes) liveDemoMinutes.value = "";
-    if (liveDemoNote) liveDemoNote.value = "";
     const title = document.getElementById("live-new-title");
     const url = document.getElementById("live-new-url");
-    const note = document.getElementById("live-new-note");
     if (title) title.value = "";
     if (url) url.value = "";
-    if (note) note.value = "";
     if (liveNewAuthors) fillPersonChecks(liveNewAuthors, []);
     if (liveDemoFeedback) fillPersonChecks(liveDemoFeedback, []);
     if (liveDemoProject) fillProjectRadios(liveDemoProject, "", { name: "live-project" });
@@ -1437,7 +1574,6 @@
     setLiveProjectSource("existing");
     fillProjectRadios(liveDemoProject, d.project, { name: "live-project" });
     liveDemoMinutes.value = d.minutes ?? "";
-    if (liveDemoNote) liveDemoNote.value = d.note || "";
     resetStopwatch();
     fillPersonChecks(liveDemoFeedback, feedbackForDemo(id));
     setLiveFormat(projectHasUrl(d.project) ? null : d.format);
@@ -1463,7 +1599,6 @@
         title,
         url: empty(document.getElementById("live-new-url").value),
         authors,
-        note: empty(document.getElementById("live-new-note").value),
       });
     }
     const id = selectedProjectId(liveDemoProject);
@@ -1497,15 +1632,14 @@
       presenters,
       minutes: numOrNull(liveDemoMinutes.value),
       format,
-      note: empty(liveDemoNote?.value),
     };
     if (id) {
       const d = db.demos.find((x) => x.id === id);
       if (!d) return false;
-      Object.assign(d, payload);
+      writeDemo(d, payload);
     } else {
       id = nextDemoId();
-      db.demos.push({ id, ...payload });
+      db.demos.push(writeDemo({ id }, payload));
     }
     const feedbackPeople = checkedValues(liveDemoFeedback);
     db.feedback = (db.feedback || []).filter((f) => f.demo !== id);
@@ -1531,7 +1665,6 @@
     return (
       !selectedProjectId(liveDemoProject) &&
       !liveDemoMinutes.value &&
-      !liveDemoNote?.value.trim() &&
       stopwatchElapsedMs() < 1000
     );
   };
@@ -1565,10 +1698,7 @@
     syncLiveDateLabel();
     const m = db.meetings.find((x) => x.date === liveDate.value);
     liveMeetingMinutes.value = m?.minutes ?? "";
-    fillPersonChecks(
-      liveAttendance,
-      db.attendance.filter((a) => a.meeting === liveDate.value).map((a) => a.person)
-    );
+    fillPersonChecks(liveAttendance, attendanceOf(liveDate.value));
     clearLiveDemoForm();
     renderLiveAttendanceSummary();
     renderLiveSummary();
@@ -1586,10 +1716,7 @@
     fillPersonChecks(liveNewAuthors, checkedValues(liveNewAuthors));
     fillPersonChecks(liveDemoFeedback, checkedValues(liveDemoFeedback));
     const date = liveDate.value;
-    fillPersonChecks(
-      liveAttendance,
-      db.attendance.filter((a) => a.meeting === date).map((a) => a.person)
-    );
+    fillPersonChecks(liveAttendance, attendanceOf(date));
     const m = db.meetings.find((x) => x.date === date);
     if (document.activeElement !== liveMeetingMinutes) {
       liveMeetingMinutes.value = m?.minutes ?? liveMeetingMinutes.value;
@@ -1683,6 +1810,8 @@
     }
     if (name) name.value = "";
     if (tg) tg.value = "";
+    const active = document.getElementById("live-new-person-active");
+    if (active) active.checked = false;
   };
 
   document.getElementById("live-person-add")?.addEventListener("click", () => {
@@ -1700,9 +1829,8 @@
     }
     const id = upsertPerson({
       name,
+      active: document.getElementById("live-new-person-active")?.checked,
       telegram: empty(document.getElementById("live-new-person-telegram")?.value),
-      photo: null,
-      note: null,
     });
     const selected = checkedValues(liveAttendance);
     if (!selected.includes(id)) selected.push(id);
@@ -1765,6 +1893,18 @@
   document.getElementById("pdb-download-2").addEventListener("click", downloadDb);
   document.getElementById("pdb-copy").addEventListener("click", copyDb);
   document.getElementById("pdb-copy-2").addEventListener("click", copyDb);
+  // В прямом эфире выгружаем то же, что видно на экране: сначала дописываем встречу.
+  const flushAndRun = (run) => () => {
+    if (adminMode === "live") {
+      flushLiveMeeting();
+      persistDraft();
+    }
+    run();
+  };
+  document
+    .querySelectorAll("[data-download-json]")
+    .forEach((btn) => btn.addEventListener("click", flushAndRun(downloadJson)));
+  document.getElementById("pdb-copy-json")?.addEventListener("click", flushAndRun(copyJson));
   document.getElementById("pdb-reset").addEventListener("click", () => {
     if (!confirm("Сбросить черновик редактуры и загрузить данные из js/db.js?")) return;
     localStorage.removeItem(STORAGE_EDIT);
@@ -1941,7 +2081,7 @@
   };
 
   const applyLiveMeeting = (base) => {
-    const out = clone(base);
+    const out = normalizeDb(clone(base));
     const date = liveDate?.value;
     if (!date) return out;
     mergeMissingFromSource(out, {
@@ -1949,7 +2089,7 @@
       projects: liveDb.projects,
       meetings: [],
       demos: [],
-      attendance: [],
+      attendance: {},
       feedback: [],
     });
     const srcMeeting = liveDb.meetings.find((m) => m.date === date);
@@ -1960,14 +2100,14 @@
         out.meetings.sort((a, b) => a.date.localeCompare(b.date));
       } else {
         meeting.type = srcMeeting.type || meeting.type;
-        meeting.minutes = srcMeeting.minutes;
-        meeting.note = srcMeeting.note;
+        setField(meeting, "minutes", srcMeeting.minutes);
+        if (srcMeeting.generated) meeting.generated = true;
+        else delete meeting.generated;
       }
     }
-    out.attendance = (out.attendance || []).filter((a) => a.meeting !== date);
-    (liveDb.attendance || [])
-      .filter((a) => a.meeting === date)
-      .forEach((a) => out.attendance.push(clone(a)));
+    const livePeople = liveDb.attendance?.[date];
+    if (livePeople && livePeople.length) out.attendance[date] = clone(livePeople);
+    else delete out.attendance[date];
     const oldDateDemoIds = new Set(
       (base.demos || []).filter((d) => d.meeting === date).map((d) => d.id)
     );
@@ -2138,10 +2278,15 @@
     switchMode("live");
   }
   if (localStorage.getItem(storageKey())) {
+    const opened =
+      adminMode === "live" ? "Открыт черновик прямого эфира" : "Открыт черновик редактуры";
+    const stale = staleFields(db, source);
     setStatus(
-      adminMode === "live"
-        ? "Открыт черновик прямого эфира"
-        : "Открыт черновик редактуры"
+      stale.length
+        ? `${opened}. Он старше js/db.js — расхождений: ${stale.length} (${stale
+            .slice(0, 3)
+            .join(", ")}${stale.length > 3 ? "…" : ""}). Если правки не нужны — «Сбросить к файлу».`
+        : opened
     );
   } else {
     setStatus(
