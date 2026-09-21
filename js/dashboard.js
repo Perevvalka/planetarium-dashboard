@@ -98,11 +98,14 @@
     return states[id];
   };
 
-  DB.attendance.forEach((a) => {
-    const slot = slotOf[a.meeting];
-    if (slot === undefined || !personById[a.person]) return;
-    const row = trackOf(a.person);
-    if (row[slot] === MISSED) row[slot] = VISIT;
+  Object.entries(DB.attendance || {}).forEach(([date, people]) => {
+    const slot = slotOf[date];
+    if (slot === undefined) return;
+    people.forEach((id) => {
+      if (!personById[id]) return;
+      const row = trackOf(id);
+      if (row[slot] === MISSED) row[slot] = VISIT;
+    });
   });
 
   DB.demos.forEach((d) => {
