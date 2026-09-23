@@ -263,7 +263,7 @@
     },
     {
       "id": "andrey",
-      "name": "Андрей Шинкаренко",
+      "name": "Андрей Шикарненко",
       "active": true
     },
     {
@@ -604,6 +604,13 @@
       ]
     },
     {
+      "id": "dashbord-planetariya-2",
+      "title": "Дашборд Планетария",
+      "authors": [
+        "polina-perevalova"
+      ]
+    },
+    {
       "id": "kurs-dizayn-s-klodom",
       "title": "Курс «Дизайн с Клодом»",
       "authors": [
@@ -631,13 +638,6 @@
       "authors": [
         "kristina-marchenko"
       ]
-    },
-    {
-      "id": "dashbord-planetariya-2",
-      "title": "Дашборд Планетария",
-      "authors": [
-        "polina-perevalova"
-      ]
     }
   ],
   "meetings": [
@@ -656,13 +656,13 @@
     {
       "date": "2025-10-10",
       "type": "weekly",
-      "minutes": 65,
+      "minutes": 53,
       "generated": true
     },
     {
       "date": "2025-10-16",
       "type": "weekly",
-      "minutes": 42,
+      "minutes": 54,
       "generated": true
     },
     {
@@ -672,19 +672,19 @@
     {
       "date": "2025-11-07",
       "type": "weekly",
-      "minutes": 62,
+      "minutes": 59,
       "generated": true
     },
     {
       "date": "2025-11-14",
       "type": "weekly",
-      "minutes": 55,
+      "minutes": 62,
       "generated": true
     },
     {
       "date": "2025-11-21",
       "type": "weekly",
-      "minutes": 54,
+      "minutes": 58,
       "generated": true
     },
     {
@@ -694,91 +694,91 @@
     {
       "date": "2025-12-05",
       "type": "weekly",
-      "minutes": 57,
+      "minutes": 56,
       "generated": true
     },
     {
       "date": "2025-12-12",
       "type": "weekly",
-      "minutes": 60,
+      "minutes": 56,
       "generated": true
     },
     {
       "date": "2026-01-16",
       "type": "weekly",
-      "minutes": 66,
+      "minutes": 59,
       "generated": true
     },
     {
       "date": "2026-01-23",
       "type": "weekly",
-      "minutes": 69,
+      "minutes": 52,
       "generated": true
     },
     {
       "date": "2026-01-29",
       "type": "weekly",
-      "minutes": 43,
+      "minutes": 51,
       "generated": true
     },
     {
       "date": "2026-02-06",
       "type": "weekly",
-      "minutes": 67,
+      "minutes": 58,
       "generated": true
     },
     {
       "date": "2026-02-21",
       "type": "weekly",
-      "minutes": 41,
+      "minutes": 55,
       "generated": true
     },
     {
       "date": "2026-02-27",
       "type": "weekly",
-      "minutes": 62,
+      "minutes": 53,
       "generated": true
     },
     {
       "date": "2026-03-07",
       "type": "weekly",
-      "minutes": 67,
+      "minutes": 59,
       "generated": true
     },
     {
       "date": "2026-03-12",
       "type": "weekly",
-      "minutes": 68,
+      "minutes": 58,
       "generated": true
     },
     {
       "date": "2026-03-20",
       "type": "weekly",
-      "minutes": 63,
+      "minutes": 56,
       "generated": true
     },
     {
       "date": "2026-03-28",
       "type": "weekly",
-      "minutes": 52,
+      "minutes": 59,
       "generated": true
     },
     {
       "date": "2026-04-02",
       "type": "weekly",
-      "minutes": 52,
+      "minutes": 56,
       "generated": true
     },
     {
       "date": "2026-04-09",
       "type": "weekly",
-      "minutes": 51,
+      "minutes": 60,
       "generated": true
     },
     {
       "date": "2026-04-17",
       "type": "weekly",
-      "minutes": 62,
+      "minutes": 58,
       "generated": true
     },
     {
@@ -790,13 +790,13 @@
     {
       "date": "2026-05-01",
       "type": "weekly",
-      "minutes": 47,
+      "minutes": 54,
       "generated": true
     },
     {
       "date": "2026-05-15",
       "type": "weekly",
-      "minutes": 47,
+      "minutes": 55,
       "generated": true
     },
     {
@@ -806,13 +806,13 @@
     {
       "date": "2026-06-05",
       "type": "weekly",
-      "minutes": 68,
+      "minutes": 56,
       "generated": true
     },
     {
       "date": "2026-06-12",
       "type": "weekly",
-      "minutes": 65,
+      "minutes": 58,
       "generated": true
     },
     {
@@ -822,7 +822,7 @@
     {
       "date": "2026-07-03",
       "type": "weekly",
-      "minutes": 42,
+      "minutes": 55,
       "generated": true
     },
     {
