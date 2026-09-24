@@ -287,6 +287,11 @@
       "id": "nikita-breyk",
       "name": "Никита Брейк",
       "active": true
+    },
+    {
+      "id": "egor",
+      "name": "Егор",
+      "active": true
     }
   ],
   "projects": [
@@ -638,6 +643,13 @@
       "authors": [
         "kristina-marchenko"
       ]
+    },
+    {
+      "id": "sayt-kursa-dizayn-s-klodom",
+      "title": "Сайт курса Дизайн с Клодом",
+      "authors": [
+        "artem-ermolaev"
+      ]
     }
   ],
   "meetings": [
@@ -854,6 +866,11 @@
       "date": "2026-09-17",
       "type": "weekly",
       "minutes": 60
+    },
+    {
+      "date": "2026-09-24",
+      "type": "weekly",
+      "minutes": 45
     }
   ],
   "attendance": {
@@ -1289,6 +1306,15 @@
       "marat-habibulin",
       "mariya-gribova",
       "nikita-breyk",
+      "polina-perevalova",
+      "rustam-mushraipov"
+    ],
+    "2026-09-24": [
+      "artem-ermolaev",
+      "dmitriy-sivuhin",
+      "zhenya-arutyunov",
+      "zhenya-sarnetskiy",
+      "kristina-marchenko",
       "polina-perevalova",
       "rustam-mushraipov"
     ]
@@ -1794,6 +1820,36 @@
         "kristina-marchenko"
       ],
       "minutes": 7
+    },
+    {
+      "id": "demo-58",
+      "meeting": "2026-09-24",
+      "project": "dashbord-planetariya",
+      "presenters": [
+        "zhenya-arutyunov"
+      ],
+      "minutes": 7,
+      "format": 2
+    },
+    {
+      "id": "demo-59",
+      "meeting": "2026-09-24",
+      "project": "sayt-kristiny-marchenko",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 8,
+      "format": 4
+    },
+    {
+      "id": "demo-60",
+      "meeting": "2026-09-24",
+      "project": "sayt-kursa-dizayn-s-klodom",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 3,
+      "format": 2
     }
   ],
   "feedback": [
@@ -1839,6 +1895,14 @@
     },
     {
       "demo": "demo-55",
+      "person": "zhenya-arutyunov"
+    },
+    {
+      "demo": "demo-60",
+      "person": "zhenya-arutyunov"
+    },
+    {
+      "demo": "demo-59",
       "person": "zhenya-arutyunov"
     }
   ]
