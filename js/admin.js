@@ -1205,6 +1205,18 @@
 
   const namesOf = (ids) => ids.map(personName).sort((a, b) => a.localeCompare(b, "ru"));
 
+  const SUMMARY_FORMATS = {
+    1: "на словах",
+    2: "шер экрана",
+    3: "слайды",
+    4: "ссылка на работающую штуку",
+  };
+
+  const demoFormatLabel = (demo, project) => {
+    const code = demo.format || (project?.url ? 4 : null);
+    return SUMMARY_FORMATS[code] || "формат не указан";
+  };
+
   const meetingChecks = (m, presentIds, demos) => {
     const out = [];
     const present = new Set(presentIds);
@@ -1253,6 +1265,7 @@
       lines.push(`  ${i + 1}. ${projectTitle(d.project)}`);
       lines.push(`     — показывает: ${namesOf(d.presenters).join(", ") || "не указано"}`);
       lines.push(`     — ${d.minutes ? `${d.minutes} мин` : "время не указано"}`);
+      lines.push(`     — ${demoFormatLabel(d, project)}`);
       if (project?.url) lines.push(`     — ссылка: ${project.url}`);
       const feedback = feedbackForDemo(d.id);
       if (feedback.length) lines.push(`     — фидбэк: ${namesOf(feedback).join(", ")}`);
