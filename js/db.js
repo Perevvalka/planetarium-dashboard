@@ -287,6 +287,11 @@
       "id": "nikita-breyk",
       "name": "Никита Брейк",
       "active": true
+    },
+    {
+      "id": "egor",
+      "name": "Егор",
+      "active": true
     }
   ],
   "projects": [
