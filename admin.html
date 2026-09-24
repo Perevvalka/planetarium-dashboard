@@ -394,6 +394,7 @@
       .pdb-live .pdb-form[hidden],
       .pdb-live .pdb-person-picker[hidden],
       .pdb-live #live-format-block[hidden],
+      .pdb-live #live-existing-url-block[hidden],
       .pdb-live #live-demo-delete[hidden] {
         display: none;
       }
@@ -537,6 +538,12 @@
                           <input type="search" class="pdb-search" placeholder="Поиск по имени…" autocomplete="off" aria-label="Поиск авторов">
                           <div class="pdb-checks" id="live-new-authors"></div>
                         </div>
+                      </label>
+                    </div>
+                    <div class="pdb-form" id="live-existing-url-block" hidden>
+                      <label>
+                        <span>Ссылка</span>
+                        <input id="live-existing-url" type="url" placeholder="https://">
                       </label>
                     </div>
                   </div>
@@ -823,6 +830,6 @@
 
     <script src="./js/theme-toggle.js"></script>
     <script src="./js/db.js?v=2026-09-24-1955"></script>
-    <script src="./js/admin.js?v=2026-09-24a"></script>
+    <script src="./js/admin.js?v=2026-09-24b"></script>
   </body>
 </html>

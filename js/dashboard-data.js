@@ -82,7 +82,7 @@
     const personById = Object.fromEntries(persons.map((p) => [p.id, p]));
     const projectById = Object.fromEntries((db.projects || []).map((p) => [p.id, p]));
     const attendance = db.attendance || {};
-    const formatCode = (d) => (projectById[d.project]?.url ? 4 : d.format);
+    const formatCode = (d) => d.format || (projectById[d.project]?.url ? 4 : null);
     const matches = (d) => !filters.format || formatCode(d) === filters.format;
     const demos = db.demos.filter((d) => d.presenters.some((id) => personById[id]));
 
@@ -196,8 +196,10 @@
     ];
   };
 
-  // Код формата демо: проект со ссылкой — всегда «ссылка на работающую штуку».
-  const demoFormatCode = (m, demo) => (m.projectById[demo.project]?.url ? 4 : demo.format);
+  // Формат хранится на демо. Ссылка проекта даёт 4 только если у демо формата нет
+  // (старые записи, когда ссылка уже была в момент показа).
+  const demoFormatCode = (m, demo) =>
+    demo.format || (m.projectById[demo.project]?.url ? 4 : null);
 
   const demoFormat = (m, demo) => {
     const code = demoFormatCode(m, demo);

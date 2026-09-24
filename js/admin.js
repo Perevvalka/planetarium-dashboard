@@ -579,6 +579,18 @@
     return Boolean(p?.url);
   };
 
+  // Формат живёт на демо: старые записи с 1–3 не переписываются, когда у проекта
+  // позже появляется ссылка. Новое демо со ссылкой — 4.
+  const demoHasHistoricFormat = (demo) => Boolean(demo?.format && demo.format !== 4);
+
+  const demoFormatOnSave = (existing, hasUrl, picked) => {
+    if (hasUrl) {
+      if (demoHasHistoricFormat(existing)) return existing.format;
+      return 4;
+    }
+    return picked;
+  };
+
   // Введённая руками длительность перестаёт быть восстановленной по формуле.
   const setMeetingMinutes = (meeting, minutes) => {
     if (minutes === (meeting.minutes ?? null)) return;
@@ -671,9 +683,13 @@
   const syncDemoFormatUI = () => {
     const block = document.getElementById("demo-format-block");
     const projectId = selectedProjectId();
+    const editing = formDemo.id.value
+      ? db.demos.find((d) => d.id === formDemo.id.value)
+      : null;
+    const historic = demoHasHistoricFormat(editing);
     const hasUrl = projectId && projectHasUrl(projectId);
-    if (block) block.hidden = !projectId || hasUrl;
-    if (hasUrl) setDemoFormat(null);
+    if (block) block.hidden = !projectId || (hasUrl && !historic);
+    if (hasUrl && !historic) setDemoFormat(null);
   };
 
   // ---------------------------------------------------------------
@@ -1000,8 +1016,7 @@
     fillProjectRadios(demoProject, d.project);
     fillPersonChecks(demoPresenters, d.presenters);
     fillPersonChecks(demoFeedback, feedbackForDemo(id));
-    // 1–3 только если у проекта ещё нет ссылки; иначе уровень 4 вычисляется сам
-    setDemoFormat(projectHasUrl(d.project) ? null : d.format);
+    setDemoFormat(demoHasHistoricFormat(d) ? d.format : null);
     formDemo.minutes.value = d.minutes ?? "";
     syncDemoFormatUI();
     listDemos.querySelectorAll("li").forEach((li) => {
@@ -1036,9 +1051,14 @@
       db.meetings.sort((a, b) => a.date.localeCompare(b.date));
     }
 
-    // есть ссылка → формат 4 вычисляется, в демо не храним;
-    // нет ссылки → вручную 1–3
-    const format = projectHasUrl(project) ? null : numOrNull(selectedFormat());
+    const existing = formDemo.id.value
+      ? db.demos.find((d) => d.id === formDemo.id.value)
+      : null;
+    const format = demoFormatOnSave(
+      existing,
+      projectHasUrl(project),
+      numOrNull(selectedFormat())
+    );
 
     let id = formDemo.id.value;
     const payload = {
@@ -1442,22 +1462,42 @@
     });
   };
 
-  const liveProjectHasUrl = () => {
+  const liveExistingUrlBlock = document.getElementById("live-existing-url-block");
+  const liveExistingUrl = document.getElementById("live-existing-url");
+
+  const liveUrlValue = () => {
     if (liveProjectSource === "new") {
-      return Boolean(empty(document.getElementById("live-new-url")?.value));
+      return empty(document.getElementById("live-new-url")?.value);
     }
-    return projectHasUrl(selectedProjectId(liveDemoProject));
+    return empty(liveExistingUrl?.value);
+  };
+
+  const liveProjectHasUrl = () => Boolean(liveUrlValue());
+
+  const liveEditingDemo = () =>
+    liveDemoId?.value ? db.demos.find((d) => d.id === liveDemoId.value) : null;
+
+  const syncLiveProjectUrlUI = () => {
+    const existing = liveProjectSource === "existing";
+    const id = selectedProjectId(liveDemoProject);
+    if (liveExistingUrlBlock) liveExistingUrlBlock.hidden = !existing || !id;
+    if (!existing || !id || !liveExistingUrl) return;
+    if (liveExistingUrl.dataset.projectId === id) return;
+    liveExistingUrl.value = db.projects.find((p) => p.id === id)?.url || "";
+    liveExistingUrl.dataset.projectId = id;
   };
 
   const syncLiveFormatUI = () => {
+    syncLiveProjectUrlUI();
     if (!liveFormatBlock) return;
     const hasProject =
       liveProjectSource === "new"
         ? Boolean(document.getElementById("live-new-title")?.value.trim())
         : Boolean(selectedProjectId(liveDemoProject));
     const hasUrl = liveProjectHasUrl();
-    liveFormatBlock.hidden = !hasProject || hasUrl;
-    if (hasUrl) setLiveFormat(null);
+    const historic = demoHasHistoricFormat(liveEditingDemo());
+    liveFormatBlock.hidden = !hasProject || (hasUrl && !historic);
+    if (hasUrl && !historic) setLiveFormat(null);
   };
 
   const setLiveProjectSource = (source) => {
@@ -1523,6 +1563,10 @@
     const url = document.getElementById("live-new-url");
     if (title) title.value = "";
     if (url) url.value = "";
+    if (liveExistingUrl) {
+      liveExistingUrl.value = "";
+      delete liveExistingUrl.dataset.projectId;
+    }
     if (liveNewAuthors) fillPersonChecks(liveNewAuthors, []);
     if (liveDemoPresenters) fillPersonChecks(liveDemoPresenters, []);
     if (liveDemoFeedback) fillPersonChecks(liveDemoFeedback, []);
@@ -1546,7 +1590,11 @@
     resetStopwatch();
     fillPersonChecks(liveDemoPresenters, d.presenters);
     fillPersonChecks(liveDemoFeedback, feedbackForDemo(id));
-    setLiveFormat(projectHasUrl(d.project) ? null : d.format);
+    if (liveExistingUrl) {
+      liveExistingUrl.value = db.projects.find((p) => p.id === d.project)?.url || "";
+      liveExistingUrl.dataset.projectId = d.project;
+    }
+    setLiveFormat(demoHasHistoricFormat(d) ? d.format : null);
     liveDemoDelete.hidden = false;
     liveDemoStatus.textContent = `Редактирование: ${projectTitle(d.project)}`;
     renderLiveDemos();
@@ -1576,6 +1624,9 @@
       setStatus("Выбери проект или добавь новый");
       return null;
     }
+    const url = empty(liveExistingUrl?.value);
+    const project = db.projects.find((p) => p.id === id);
+    if (project && url) setField(project, "url", url);
     return id;
   };
 
@@ -1595,10 +1646,14 @@
     }
     ensureMeeting(date);
     stopStopwatch();
-    const format = projectHasUrl(project) ? null : numOrNull(liveSelectedFormat());
     let id = liveDemoId.value;
     const existing = id ? db.demos.find((x) => x.id === id) : null;
     if (id && !existing) return false;
+    const format = demoFormatOnSave(
+      existing,
+      Boolean(liveUrlValue() || projectHasUrl(project)),
+      numOrNull(liveSelectedFormat())
+    );
     const payload = {
       meeting: date,
       project,
@@ -1749,8 +1804,15 @@
   });
   liveDemoProject?.addEventListener("change", () => {
     prefillPresentersIfEmpty(liveDemoPresenters, liveProjectAuthors());
+    if (liveExistingUrl) {
+      const id = selectedProjectId(liveDemoProject);
+      liveExistingUrl.value = id ? db.projects.find((p) => p.id === id)?.url || "" : "";
+      if (id) liveExistingUrl.dataset.projectId = id;
+      else delete liveExistingUrl.dataset.projectId;
+    }
     syncLiveFormatUI();
   });
+  liveExistingUrl?.addEventListener("input", syncLiveFormatUI);
   liveNewAuthors?.addEventListener("change", () => {
     prefillPresentersIfEmpty(liveDemoPresenters, checkedValues(liveNewAuthors));
   });
