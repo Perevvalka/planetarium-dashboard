@@ -1,52 +1,33 @@
-// Дашборд явки Планетария.
-// Строка — человек, клетка — встреча. Клетки стык в стык; ширина — доля контейнера.
-// Был — голубой, показывал — зелёный, не был — пусто.
-// Сверху столбики длительности: зелёные блоки — демо от длинного к короткому,
-// голубой сверху — обсуждение. Ширина как у клетки, 60 мин ≈ 4 строки.
-// Строки: Σ 1.1ⁿ по визитам, каждая следующая встреча на 10% весомее.
-// Данные — из js/db.js, с марта 2026.
+// Дашборд явки Планетария — локальная копия дашборда с сайта.
+// Строка — человек, клетка — встреча: пропуск тёмный, был — синий, показывал — зелёный.
+// Сверху столбики длительности: зелёные сегменты — демо от длинного к короткому,
+// синий снизу — обсуждение. Высота считается от самой долгой встречи, как на сайте.
+// Модель данных — js/dashboard-data.js, база — js/db.js.
 
 (() => {
   "use strict";
 
   const DB = window.PlanetariumDB;
+  const D = window.PlanetariumDashboardData;
   if (!DB) {
     console.error("PlanetariumDB не загружена. Подключите js/db.js перед dashboard.js");
     return;
   }
+  if (!D) {
+    console.error("Модель не загружена. Подключите js/dashboard-data.js перед dashboard.js");
+    return;
+  }
 
-  const CUTOFF = "2026-03-01";
+  const { MISSED, VISIT, DEMO, DEMO_OTHER, FORMAT_FILTER } = D;
 
-  const MISSED = 0;
-  const VISIT = 1;
-  const DEMO = 2;
-
-  const FORMATS = {
-    1: "рассказ",
-    2: "экран",
-    3: "слайды",
-    4: "ссылка",
-  };
-
-  const MONTHS_SHORT = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
-  const MONTHS_GEN = [
-    "января", "февраля", "марта", "апреля", "мая", "июня",
-    "июля", "августа", "сентября", "октября", "ноября", "декабря",
+  const AUDIENCE = [
+    [true, "Активные подписчики"],
+    [false, "вся история"],
   ];
 
-  const personById = Object.fromEntries(DB.persons.map((p) => [p.id, p]));
-  const projectById = Object.fromEntries(DB.projects.map((p) => [p.id, p]));
-
-  const dates = DB.meetings
-    .filter((m) => m.type === "weekly" && m.date >= CUTOFF)
-    .map((m) => m.date)
-    .sort();
-  const n = dates.length;
-  const slotOf = {};
-  dates.forEach((d, i) => (slotOf[d] = i));
-  const meetingMin = Object.fromEntries(
-    DB.meetings.map((m) => [m.date, m.minutes || 0])
-  );
+  const board = document.getElementById("plviz-dashboard");
+  const panelBox = document.getElementById("plviz-panel");
+  if (!board) return;
 
   const esc = (s) =>
     String(s)
@@ -55,338 +36,300 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
 
-  const formatOf = (d) => {
-    const project = projectById[d.project];
-    if (project && project.url) return 4;
-    return d.format;
-  };
+  let activeOnly = true;
+  let format = 0;
+  let model = null;
 
-  const demoLine = (d) => {
-    const project = projectById[d.project];
-    const title = project ? project.title : d.project;
-    const parts = [esc(title)];
-    const fmt = FORMATS[formatOf(d)];
-    if (fmt) parts.push(fmt);
-    if (d.minutes) parts.push(`${d.minutes} мин`);
-    return parts.join(" · ");
-  };
+  // Что под курсором. Совпадает с Target на сайте.
+  let target = { kind: "all" };
+  let hotCol = -1;
+  let hotRow = "";
 
-  const demosAt = dates.map(() => []);
-  DB.demos.forEach((d) => {
-    const slot = slotOf[d.meeting];
-    if (slot === undefined) return;
-    demosAt[slot].push(d);
-  });
+  // Ссылки на узлы, которые подсвечиваются без перерисовки.
+  let colCells = [];
+  let colSegs = [];
+  let rowEls = {};
+  let cellAt = {};
+  let demoLabels = [];
 
-  const barAt = dates.map((date, i) => {
-    const demos = demosAt[i]
-      .filter((d) => d.minutes > 0)
-      .slice()
-      .sort((a, b) => b.minutes - a.minutes || a.id.localeCompare(b.id));
-    const demoMin = demos.reduce((s, d) => s + d.minutes, 0);
-    const total = meetingMin[date] || 0;
-    const talk = Math.max(0, total - demoMin);
-    return { total, demos, talk };
-  });
+  // ---------------------------------------------------------------
+  // Панель сбоку
+  // ---------------------------------------------------------------
 
-  const states = {};
-  const trackOf = (id) => {
-    if (!states[id]) {
-      states[id] = [];
-      for (let i = 0; i < n; i++) states[id].push(MISSED);
-    }
-    return states[id];
-  };
-
-  Object.entries(DB.attendance || {}).forEach(([date, people]) => {
-    const slot = slotOf[date];
-    if (slot === undefined) return;
-    people.forEach((id) => {
-      if (!personById[id]) return;
-      const row = trackOf(id);
-      if (row[slot] === MISSED) row[slot] = VISIT;
-    });
-  });
-
-  DB.demos.forEach((d) => {
-    const slot = slotOf[d.meeting];
-    if (slot === undefined) return;
-    d.presenters.forEach((id) => {
-      if (!personById[id]) return;
-      trackOf(id)[slot] = DEMO;
-    });
-  });
-
-  const people = Object.keys(states)
-    .map((id) => ({
-      id,
-      name: personById[id].name,
-      row: states[id],
-    }));
-
-  // Каждая следующая встреча на 10% весомее предыдущей.
-  const score = (row) => {
-    let s = 0;
-    let w = 1;
-    row.forEach((v) => {
-      if (v !== MISSED) s += w;
-      w *= 1.1;
-    });
-    return s;
-  };
-
-  people.sort((a, b) => {
-    const d = score(b.row) - score(a.row);
-    if (d) return d;
-    return a.name.localeCompare(b.name, "ru");
-  });
-
-  const totals = dates.map((_, i) => {
-    let peopleN = 0;
-    let demos = 0;
-    people.forEach((r) => {
-      const v = r.row[i];
-      if (v === MISSED) return;
-      peopleN++;
-      if (v === DEMO) demos++;
-    });
-    return { people: peopleN, demos };
-  });
-
-  const summaryLayers = (i) => {
-    let html = "";
-    people.forEach((r) => {
-      const v = r.row[i];
-      if (v === VISIT) html += `<i class="sum visit"></i>`;
-      else if (v === DEMO) html += `<i class="sum demo"></i>`;
-    });
-    return html;
-  };
-
-  const plural = (k, one, few, many) => {
-    if (k % 10 === 1 && k % 100 !== 11) return one;
-    if (k % 10 >= 2 && k % 10 <= 4 && (k % 100 < 12 || k % 100 > 14)) return few;
-    return many;
-  };
-
-  const fmtDate = (iso) =>
-    `${+iso.slice(8, 10)}\u00a0${MONTHS_GEN[+iso.slice(5, 7) - 1]}\u00a0’${iso.slice(2, 4)}`;
-
-  const peopleAt = dates.map((_, i) =>
-    people
-      .filter((r) => r.row[i] !== MISSED)
-      .map((r) => r.name)
-      .sort((a, b) => a.localeCompare(b, "ru"))
-  );
-
-  const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
-
-  const panelHtml = (title, entries, note) => {
-    const fields = entries
-      .filter(([, v]) => v != null && v !== "")
-      .map(([k, v]) => {
-        const label = k
-          ? `<div class="plviz-field-label">${esc(/^\d/.test(k) || k === "демо" ? k : cap(k))}</div>`
+  const panelHtml = (panel) => {
+    const rows = panel.rows
+      .map((row) => {
+        const label = row.label ? `<div class="plviz-panel-label">${esc(row.label)}</div>` : "";
+        const value = row.lines.length
+          ? `<div class="plviz-panel-value">` +
+            row.lines
+              .map((line, j) => {
+                const hot = row.hot && row.hot.includes(j);
+                return (j > 0 ? "<br>" : "") + `<span${hot ? ' class="hot"' : ""}>${esc(line)}</span>`;
+              })
+              .join("") +
+            `</div>`
           : "";
-        return `<div class="plviz-field">${label}<div class="plviz-field-value">${v}</div></div>`;
+        return `<div class="plviz-panel-row${row.sub ? " sub" : ""}">${label}${value}</div>`;
       })
       .join("");
     return (
-      (title ? `<p class="plviz-panel-title">${esc(title)}</p>` : "") +
-      fields +
-      (note ? `<p class="plviz-panel-note">${note}</p>` : "")
+      `<div class="plviz-panel-inner${panel.dimmed ? " dimmed" : ""}">` +
+      `<p class="plviz-panel-title">${esc(panel.title)}</p>` +
+      rows +
+      `</div>`
     );
   };
 
-  const defaultPanel = () =>
-    panelHtml("Все встречи", [
-      ["период", `${fmtDate(dates[0])} — ${fmtDate(dates[n - 1])}`],
-      ["встреч", String(n)],
-      ["участников", String(people.length)],
-      ["демо", String(demosAt.reduce((s, list) => s + list.length, 0))],
-    ]);
-
-  const namesLines = (names) =>
-    names
-      .map((name, i) => esc(name) + (i < names.length - 1 ? "," : ""))
-      .join("<br>");
-
-  const meetingPanel = (i) => {
-    const t = totals[i];
-    const b = barAt[i];
-    const shown = demosAt[i];
-    const hasDemos = shown.length > 0;
-    const demoValue = hasDemos
-      ? shown.map(demoLine).join("<br>")
-      : "Не фиксировались";
-    const were = t.people
-      ? `${t.people} ${plural(t.people, "человек", "человека", "человек")}:<br>${namesLines(peopleAt[i])}`
-      : "данных о явке нет";
-    const fields = [
-      ["", b.total ? `${b.total} мин` : ""],
-      ["", were],
-      [hasDemos ? `${shown.length} демо` : "демо", demoValue],
-    ];
-    if (hasDemos) fields.push(["обсуждение", b.talk ? `${b.talk} мин` : ""]);
-    return panelHtml(fmtDate(dates[i]), fields);
+  const renderPanel = () => {
+    if (!panelBox || !model) return;
+    panelBox.innerHTML = panelHtml(D.panelFor(model, target));
   };
 
-  const demoFields = (d) => {
-    const project = projectById[d.project];
-    const title = project ? project.title : d.project;
-    const fmt = FORMATS[formatOf(d)];
-    return [
-      ["проект", esc(title)],
-      ["формат", fmt || ""],
-      ["длительность", d.minutes ? `${d.minutes} мин` : ""],
-    ];
+  // ---------------------------------------------------------------
+  // Подсветка
+  // ---------------------------------------------------------------
+
+  // Подпись над зелёной частью: сумма демо или длительность наведённого демо.
+  const demoLabelValue = (meeting, i) => {
+    if (target.kind === "demo" && target.i === i) {
+      const own = meeting.bars.find((d) => d.id === target.demoId);
+      if (own) return own.minutes ?? 0;
+    }
+    return meeting.demoMinutes;
   };
 
-  const talkPanel = (i) =>
-    panelHtml(fmtDate(dates[i]), [
-      ["обсуждение", barAt[i].talk ? `${barAt[i].talk} мин` : ""],
-    ]);
-
-  const demoPanel = (d, i) => {
-    const project = projectById[d.project];
-    const title = project ? project.title : d.project;
-    const names = d.presenters
-      .map((id) => personById[id] && personById[id].name)
-      .filter(Boolean);
-    const head = [fmtDate(dates[i])];
-    if (d.minutes) head.push(`${d.minutes} мин`);
-    return panelHtml("Демо", [
-      ["", head.join(" · ")],
-      ["проект", esc(title)],
-      ["", namesLines(names)],
-      ["формат", FORMATS[formatOf(d)] || ""],
-    ]);
+  const refreshDemoLabel = (i) => {
+    const label = demoLabels[i];
+    if (label) label.textContent = String(demoLabelValue(model.meetings[i], i));
   };
 
-  const personPanel = (r, i) => {
-    const own = demosAt[i].filter((d) => d.presenters.indexOf(r.id) >= 0);
-    const extra = own.flatMap(demoFields);
-    return panelHtml(r.name, [["", fmtDate(dates[i])], ...extra]);
+  const applyHighlight = () => {
+    const col = "i" in target ? target.i : -1;
+    if (col !== hotCol) {
+      const toggle = (i, on) => {
+        if (i < 0) return;
+        (colCells[i] || []).forEach((el) => el.classList.toggle("hot", on));
+        (colSegs[i] || []).forEach((el) => el.classList.toggle("hot", on));
+      };
+      toggle(hotCol, false);
+      toggle(col, true);
+      hotCol = col;
+    }
+    if (hotRow) {
+      rowEls[hotRow]?.classList.remove("hot");
+      board.querySelectorAll(".plviz-cell.self").forEach((el) => el.classList.remove("self"));
+    }
+    hotRow = target.kind === "person" || target.kind === "personAll" ? target.personId : "";
+    if (hotRow) {
+      rowEls[hotRow]?.classList.add("hot");
+      cellAt[hotRow]?.[col]?.classList.add("self");
+    }
   };
 
-  const el = document.getElementById("plviz-dashboard");
-  const box = document.getElementById("plviz-panel");
-  if (!el) return;
+  const setTarget = (next) => {
+    const prev = target;
+    target = next;
+    applyHighlight();
+    // Подпись меняется только у столбика, с которого ушли или на который навели.
+    const cols = new Set();
+    if ("i" in prev) cols.add(prev.i);
+    if ("i" in next) cols.add(next.i);
+    cols.forEach(refreshDemoLabel);
+    renderPanel();
+  };
 
-  if (!n) {
-    el.innerHTML = `<p>Встреч с марта 2026 в базе пока нет.</p>`;
-    return;
-  }
+  // ---------------------------------------------------------------
+  // Разметка
+  // ---------------------------------------------------------------
 
-  const maxBarMins = Math.max(
-    0,
-    ...barAt.map((b) => b.demos.reduce((s, d) => s + d.minutes, 0) + b.talk)
-  );
-  const minH = (minutes) => `calc(${minutes} * var(--plviz-bar-row) * 4 / 60)`;
+  const filtersHtml = () => {
+    const segmented = (label, items, current, action) =>
+      `<div class="plviz-segmented" role="radiogroup" aria-label="${esc(label)}">` +
+      items
+        .map(
+          ([value, text]) =>
+            `<button type="button" role="radio" aria-checked="${current === value}"` +
+            `${current === value ? ' class="active"' : ""} data-${action}="${value}">${esc(text)}</button>`
+        )
+        .join("") +
+      `</div>`;
 
-  const datesHtml = dates
-    .map((d, i) => {
-      const day = String(+d.slice(8, 10));
-      const prev = dates[i - 1];
-      const isNewMonth = !prev || prev.slice(0, 7) !== d.slice(0, 7);
-      const month = isNewMonth
-        ? `<span class="plviz-date-month">${MONTHS_SHORT[+d.slice(5, 7) - 1]}</span>`
-        : "";
-      const cls = isNewMonth ? "plviz-date has-month" : "plviz-date";
-      return `<div class="${cls}">${day}${month}</div>`;
-    })
-    .join("");
+    const audience = D.hasActiveFlags(DB)
+      ? segmented("Участники", AUDIENCE, activeOnly, "audience")
+      : "";
+    const formats =
+      `<div class="plviz-filter-group">` +
+      `<span class="plviz-filter-caption">Демо</span>` +
+      segmented("Формат демо", FORMAT_FILTER, format, "format") +
+      `</div>`;
+    return `<div class="plviz-filters">${audience}${formats}</div>`;
+  };
 
-  const barsHtml = barAt
-    .map((b, i) => {
-      const segs = b.demos.map(
-        (d) =>
-          `<span class="plviz-seg demo" data-i="${i}" data-demo="${esc(d.id)}" style="height:${minH(d.minutes)}"></span>`
-      );
-      if (b.talk > 0) {
-        segs.push(
-          `<span class="plviz-seg talk" data-i="${i}" style="height:${minH(b.talk)}"></span>`
-        );
-      }
-      return (
-        `<span class="plviz-bar" data-i="${i}" data-row="sum">` +
-        segs.join("") +
-        `</span>`
-      );
-    })
-    .join("");
+  const barsHtml = () =>
+    `<div class="plviz-bars">` +
+    model.meetings
+      .map((m, i) => {
+        const minutesLabel =
+          m.minutes > 0
+            ? `<span class="plviz-label talk">${m.minutes}` +
+              (i === 0 ? `<span class="plviz-unit">&nbsp;мин</span>` : "") +
+              `</span>`
+            : "";
+        const caption =
+          m.date === model.demoStart
+            ? `<span class="plviz-caption">В августе начали фиксировать демо</span>`
+            : "";
+        const talk =
+          m.talk > 0
+            ? `<span class="plviz-seg talk" data-i="${i}" data-talk style="--minutes:${m.talk}"></span>`
+            : "";
+        const demos = m.bars.length
+          ? `<div class="plviz-demos">` +
+            `<span class="plviz-label demo"><span data-demo-label="${i}">${demoLabelValue(m, i)}</span>` +
+            (m.date === model.firstDemo ? `<span class="plviz-unit">&nbsp;мин</span>` : "") +
+            `</span>` +
+            m.bars
+              .map((d) => {
+                const dim = format && D.demoFormatCode(model, d) !== format ? " dim" : "";
+                return (
+                  `<span class="plviz-seg demo${dim}" data-i="${i}" data-demo="${esc(d.id)}"` +
+                  ` style="--minutes:${d.minutes}"></span>`
+                );
+              })
+              .join("") +
+            `</div>`
+          : "";
+        return `<div class="plviz-bar" data-i="${i}" data-talk>${minutesLabel}${caption}${talk}${demos}</div>`;
+      })
+      .join("") +
+    `</div>`;
 
-  const headHtml = dates
-    .map(
-      (d, i) =>
-        `<span class="plviz-cell sum-cell" data-i="${i}" data-row="sum">${summaryLayers(i)}</span>`
-    )
-    .join("");
+  const datesHtml = () =>
+    `<div class="plviz-dates">` +
+    model.meetings
+      .map(
+        (m) =>
+          `<div class="plviz-date${m.month ? " has-month" : ""}">${m.day}` +
+          (m.month ? `<span class="plviz-month">${m.month}</span>` : "") +
+          `</div>`
+      )
+      .join("") +
+    `</div>`;
 
-  const cellsHtml = (list) =>
-    list
-      .map((r) =>
-        r.row
-          .map((v, i) => {
-            if (v === MISSED) return `<span class="plviz-cell"></span>`;
-            if (v === VISIT)
-              return `<span class="plviz-cell visit" data-i="${i}" data-row="${esc(r.id)}"></span>`;
-            return `<span class="plviz-cell demo" data-i="${i}" data-row="${esc(r.id)}"></span>`;
+  const matrixHtml = () => {
+    const rows = model.people
+      .map((person, r) => {
+        const cells = person.row
+          .map((state, i) => {
+            const cls =
+              state === VISIT ? " visit" : state === DEMO ? " demo" : state === DEMO_OTHER ? " dim" : "";
+            return `<span class="plviz-cell${cls}" data-i="${i}" data-row="${esc(person.id)}"></span>`;
           })
+          .join("");
+        const last = r === model.people.length - 1 ? " last" : "";
+        return (
+          `<div class="plviz-row${last}" data-row="${esc(person.id)}">` +
+          `<span class="plviz-name">${esc(person.name)}</span>${cells}</div>`
+        );
+      })
+      .join("");
+
+    // Зоны ховера совпадают с изначально видимыми полосками строк и не зависят от того,
+    // какая строка сейчас поднята. Последняя строка видна целиком — у неё две полоски.
+    const stripes = [...model.people, model.people[model.people.length - 1]]
+      .filter(Boolean)
+      .map((person) =>
+        person.row
+          .map((state, i) =>
+            state === MISSED
+              ? `<span data-i="${i}" data-all data-row="${esc(person.id)}"></span>`
+              : `<span data-i="${i}" data-person="${esc(person.id)}" data-row="${esc(person.id)}"></span>`
+          )
           .join("")
       )
       .join("");
 
-  const namesHtml = (list) =>
-    `<div class="plviz-names">` +
-    list.map((r) => `<div class="plviz-name">${esc(r.name)}</div>`).join("") +
-    `</div>`;
-
-  el.innerHTML =
-    `<div class="plviz-chart" style="--n:${n};--bar-mins:${maxBarMins}">` +
-    `<div class="plviz-timeline">${datesHtml}</div>` +
-    `<div class="plviz-bars">${barsHtml}</div>` +
-    `<div class="plviz-summary">` +
-    `<div class="plviz-name plviz-name-all">Все участники</div>` +
-    `<div class="plviz-summary-grid">${headHtml}</div>` +
-    `</div>` +
-    `<div class="plviz-matrix">${namesHtml(people)}<div class="plviz-grid">${cellsHtml(people)}</div></div></div>` +
-    `<div class="plviz-legend">` +
-    `<span><i class="visit"></i>был / обсуждение</span>` +
-    `<span><i class="demo"></i>показывал / демо</span>` +
-    `</div>`;
-
-  const rowById = Object.fromEntries(people.map((r) => [r.id, r]));
-
-  const showDefault = () => {
-    if (box) box.innerHTML = defaultPanel();
+    return (
+      `<div class="plviz-matrix ids__rounded" style="--rows:${model.people.length}">` +
+      rows +
+      `<div class="plviz-hits">${stripes}</div>` +
+      `</div>`
+    );
   };
 
-  const shell = el.closest(".plviz-shell") || el;
-  shell.addEventListener("pointerover", (e) => {
-    if (!box) return;
-    const seg = e.target.closest(".plviz-seg");
-    if (seg && seg.dataset.i != null) {
-      const i = +seg.dataset.i;
-      if (seg.dataset.demo) {
-        const d = barAt[i].demos.find((x) => x.id === seg.dataset.demo);
-        box.innerHTML = d ? demoPanel(d, i) : meetingPanel(i);
-      } else {
-        box.innerHTML = talkPanel(i);
-      }
+  const render = () => {
+    model = D.buildDashboard(DB, { activeOnly, format });
+    target = { kind: "all" };
+    hotCol = -1;
+    hotRow = "";
+
+    if (!model.n) {
+      board.innerHTML = filtersHtml() + `<p>Встреч с марта 2026 в базе пока нет.</p>`;
+      board.style.removeProperty("--n");
+      if (panelBox) panelBox.innerHTML = "";
       return;
     }
-    const bar = e.target.closest(".plviz-bar");
-    if (bar && bar.dataset.i != null) {
-      box.innerHTML = meetingPanel(+bar.dataset.i);
-      return;
-    }
-    const cell = e.target.closest(".plviz-cell");
-    if (!cell || cell.dataset.i == null) return;
-    const i = +cell.dataset.i;
-    if (cell.dataset.row === "sum") box.innerHTML = meetingPanel(i);
-    else box.innerHTML = personPanel(rowById[cell.dataset.row], i);
+
+    board.style.setProperty("--n", String(model.n));
+    board.style.setProperty("--max-minutes", String(Math.max(1, model.maxMinutes)));
+    board.innerHTML = filtersHtml() + barsHtml() + datesHtml() + matrixHtml();
+
+    colCells = model.meetings.map(() => []);
+    colSegs = model.meetings.map(() => []);
+    rowEls = {};
+    cellAt = {};
+    demoLabels = model.meetings.map((_, i) => board.querySelector(`[data-demo-label="${i}"]`));
+
+    board.querySelectorAll(".plviz-seg").forEach((el) => colSegs[+el.dataset.i].push(el));
+    board.querySelectorAll(".plviz-row").forEach((row) => {
+      const id = row.dataset.row;
+      rowEls[id] = row;
+      cellAt[id] = [];
+      row.querySelectorAll(".plviz-cell").forEach((cell) => {
+        const i = +cell.dataset.i;
+        cellAt[id][i] = cell;
+        colCells[i].push(cell);
+      });
+    });
+
+    renderPanel();
+  };
+
+  // ---------------------------------------------------------------
+  // Ховер и фильтры
+  // ---------------------------------------------------------------
+
+  board.addEventListener("pointerover", (e) => {
+    const el = e.target.closest("[data-i]");
+    if (!el || !model) return;
+    const i = Number(el.dataset.i);
+    const { demo, person, talk, row, all } = el.dataset;
+    if (demo) setTarget({ kind: "demo", i, demoId: demo });
+    else if (all !== undefined && row) setTarget({ kind: "personAll", i, personId: row });
+    else if (talk !== undefined) setTarget({ kind: "talk", i });
+    else if (person) setTarget({ kind: "person", i, personId: person });
+    else setTarget({ kind: "meeting", i });
   });
-  shell.addEventListener("pointerleave", showDefault);
-  showDefault();
+
+  const shell = board.closest(".plviz-shell") || board;
+  shell.addEventListener("pointerleave", () => {
+    if (model) setTarget({ kind: "all" });
+  });
+
+  board.addEventListener("click", (e) => {
+    const audience = e.target.closest("[data-audience]");
+    if (audience) {
+      activeOnly = audience.dataset.audience === "true";
+      render();
+      return;
+    }
+    const fmt = e.target.closest("[data-format]");
+    if (fmt) {
+      format = Number(fmt.dataset.format);
+      render();
+    }
+  });
+
+  render();
 })();

@@ -71,6 +71,8 @@
     out.meetings.forEach((m) => {
       prune(m, ["minutes"]);
       if (!m.generated) delete m.generated;
+      // Стрима больше нет: любая встреча — еженедельная.
+      m.type = "weekly";
     });
     out.demos.forEach((d) => prune(d, ["minutes", "format"]));
     return out;
@@ -359,7 +361,11 @@
   };
 
   // Файл для загрузки на сайт: чистый JSON, без JS-обёртки.
-  const serializeJson = (data = db) => `${JSON.stringify(dbPayload(data), null, 2)}\n`;
+  // Фидбэк остаётся только в базе репозитория: сайт его всё равно вырезает.
+  const serializeJson = (data = db) => {
+    const { feedback, ...forSite } = dbPayload(data);
+    return `${JSON.stringify(forSite, null, 2)}\n`;
+  };
 
   const serializeFile = (data = db) =>
     `// Единая база данных Планетария.\n` +
@@ -1788,8 +1794,9 @@
     }
     if (name) name.value = "";
     if (tg) tg.value = "";
+    // Кто пришёл на эфир — подписчик, пока не снимешь галочку вручную.
     const active = document.getElementById("live-new-person-active");
-    if (active) active.checked = false;
+    if (active) active.checked = true;
   };
 
   document.getElementById("live-person-add")?.addEventListener("click", () => {
@@ -2062,7 +2069,6 @@
         out.meetings.push(clone(srcMeeting));
         out.meetings.sort((a, b) => a.date.localeCompare(b.date));
       } else {
-        meeting.type = srcMeeting.type || meeting.type;
         setField(meeting, "minutes", srcMeeting.minutes);
         if (srcMeeting.generated) meeting.generated = true;
         else delete meeting.generated;

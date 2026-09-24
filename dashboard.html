@@ -23,221 +23,342 @@
     <link rel="stylesheet" href="css/components/ids.css">
     <link rel="stylesheet" href="css/components/theme-toggle.css">
     <style>
+      /* Дашборд повторяет разметку и стили дашборда на сайте: те же переменные,
+         те же пропорции. Правки нужно переносить в оба места. */
       header {
         padding: 0;
       }
       .ids__wrapper.L {
         padding-top: 3rem;
       }
+
       .plviz-shell {
-        --plviz-bar-row: 2.2rem;
-        --plviz-row: calc(2.2rem / 3);
-        --plviz-sum: calc(var(--plviz-row) * 2);
-        --plviz-dates: 1.9rem;
-        --plviz-sidebar: 10rem;
+        /* Строка занимает ровно два шага плюс линия: бордер-боттом поднятой строки
+           ложится точно на бордер-топ строки через одну */
+        --pitch: 0.8em;
+        --row: calc(2 * var(--pitch) + 1px);
+        --overlap: calc(var(--pitch) + 1px);
+        --hot-line: 1.03;
+        --hot-cell: 1.06;
+        --bars-height: 7.5em;
+        --figure-font: 0.7em;
+        --sidebar: 10em;
+        --gap: 1.2em;
+        /* На сколько сайдбар свисает выше уровня фильтров */
+        --hang: 0.8em;
+        --caption-line: 1.3;
+        --segment-border: 2px;
+        --segment-pad: 0.25em;
+        /* Тёмно-серый пустой ячейки — тот же, что фон сайдбара */
+        --plviz-dark: rgb(40, 40, 40);
+        /* Линии между строками — светлые, полупрозрачные */
+        --plviz-line: rgba(255, 255, 255, 0.2);
+        --plviz-accent: var(--ids__color-blue-400);
+        --plviz-demo: var(--ids__color-green-400);
+        /* Демо не выбранного формата: зелёный на 30% поверх синего */
+        --plviz-demo-dim: color-mix(in srgb, var(--plviz-demo) 30%, var(--plviz-accent));
+
         display: grid;
-        grid-template-columns: minmax(0, 1fr) var(--plviz-sidebar);
-        gap: var(--ids__gap-l);
+        grid-template-columns: minmax(0, 1fr) var(--sidebar);
+        gap: var(--gap);
         align-items: start;
-        min-width: 0;
-        width: 100%;
-        font-size: 0.7rem;
         line-height: 1.25;
       }
-      .plviz-board {
-        min-width: 0;
-      }
+
       #plviz-dashboard {
         min-width: 0;
       }
-      aside.plviz-panel {
-        position: sticky;
-        top: 3rem;
-        width: var(--plviz-sidebar);
-        box-sizing: border-box;
-        background: color-mix(in srgb, var(--ids__surface) 50%, var(--ids__background));
-      }
-      .plviz-panel-title {
-        margin: 0 0 0.7em;
-        font-weight: 600;
-      }
-      .plviz-field {
-        margin: 0 0 0.7em;
-      }
-      .plviz-field-label {
-        color: var(--ids__text-caption);
-      }
-      .plviz-field-value {
-        margin: 0;
-      }
-      .plviz-panel-note {
-        margin: 0.7em 0 0;
-        color: var(--ids__text-caption);
-      }
-      .plviz-chart {
-        position: relative;
-        width: 100%;
-        min-width: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 0.7rem;
-        --bars: calc(var(--bar-mins, 0) * var(--plviz-bar-row) * 4 / 60);
-      }
-      .plviz-timeline,
+
       .plviz-bars,
-      .plviz-summary-grid,
-      .plviz-grid {
+      .plviz-dates,
+      .plviz-row {
         display: grid;
-        width: 100%;
-        min-width: 0;
-        grid-template-columns: repeat(var(--n, 1), minmax(0, 1fr));
+        grid-template-columns: repeat(var(--n), minmax(0, 1fr));
       }
-      .plviz-timeline {
-        grid-template-rows: var(--plviz-dates);
-        border-top: 1px solid var(--ids__text);
-        padding-top: 0.2em;
-      }
-      .plviz-bars {
-        grid-template-rows: var(--bars);
-      }
-      .plviz-summary,
-      .plviz-matrix {
-        position: relative;
-        min-width: 0;
-      }
-      .plviz-summary-grid {
-        grid-template-rows: var(--plviz-sum);
-      }
-      .plviz-grid {
-        grid-auto-rows: var(--plviz-row);
-      }
-      .plviz-summary .plviz-name {
-        position: absolute;
-        inset: 0 auto 0 0;
-        z-index: 3;
-        pointer-events: none;
+
+      /* Фильтры — толстая рамка, тонкие перемычки */
+      .plviz-filters {
         display: flex;
-        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.6em 1em;
+        /* Под фильтрами ~1em плюс место под подписи над столбиками */
+        margin: 0 0 2.6em;
+        font-weight: 700;
+        font-size: var(--figure-font);
+        line-height: var(--caption-line);
       }
-      .plviz-names {
-        position: absolute;
-        inset: 0 auto 0 0;
-        z-index: 3;
-        display: grid;
-        grid-auto-rows: var(--plviz-row);
-        pointer-events: none;
+      .plviz-filter-group {
+        display: flex;
+        align-items: baseline;
+        gap: 0.4em;
+        margin-left: 0.3em;
       }
-      .plviz-name {
-        width: max-content;
-        max-width: 12em;
-        padding-right: 0.8em;
-        line-height: 1;
-        color: var(--ids__text-caption);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        align-self: center;
+      .plviz-filter-caption {
+        font-weight: 700;
       }
-      .plviz-name-all {
+      .plviz-segmented {
+        display: flex;
+      }
+      .plviz-segmented button {
+        display: inline-block;
+        padding: var(--segment-pad) 0.5em 0.35em;
+        border: var(--segment-border) solid var(--ids__text);
+        border-right: 0;
+        border-left: 1px solid var(--ids__text);
+        margin: 0 -1px -1px 0;
+        background: none;
         color: var(--ids__text);
+        font: inherit;
+        cursor: pointer;
       }
-      .plviz-date {
-        position: relative;
-        min-width: 0;
-        overflow: visible;
-        line-height: 1.15;
-        padding-left: 0.1em;
-        white-space: nowrap;
+      .plviz-segmented button:hover {
+        color: var(--plviz-demo);
+        background-color: color-mix(in srgb, var(--plviz-demo) 10%, transparent);
       }
-      .plviz-date.has-month {
-        z-index: 1;
+      .plviz-segmented button:first-child {
+        padding-left: 0.7em;
+        border-left: var(--segment-border) solid var(--ids__text);
       }
-      .plviz-date-month {
-        display: block;
+      .plviz-segmented button:last-child {
+        padding-right: 0.7em;
+        border-right: var(--segment-border) solid var(--ids__text);
+      }
+      .plviz-segmented button.active {
+        background-color: color-mix(in srgb, var(--ids__text) 5%, transparent);
+        cursor: default;
+      }
+
+      /* Столбики — стоят на линии шкалы, высота считается от самой долгой встречи */
+      .plviz-bars {
+        height: var(--bars-height);
+        align-items: end;
       }
       .plviz-bar {
+        position: relative;
         display: flex;
-        flex-direction: column-reverse;
-        justify-content: flex-start;
-        align-self: end;
-        width: 100%;
-        box-sizing: border-box;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .plviz-demos {
+        position: relative;
+        display: flex;
+        flex-direction: column;
       }
       .plviz-seg {
         display: block;
-        width: 100%;
+        height: calc(var(--minutes) / var(--max-minutes) * var(--bars-height));
         flex: none;
-        box-sizing: border-box;
       }
       .plviz-seg.talk {
-        background: var(--ids__color-blue-400);
+        background: var(--plviz-accent);
       }
       .plviz-seg.demo {
-        background: var(--ids__color-green-400);
+        background: var(--plviz-demo);
       }
-      .plviz-cell {
-        box-sizing: border-box;
+      .plviz-seg.demo.dim {
+        background: var(--plviz-demo-dim);
       }
-      .plviz-cell.sum-cell {
+
+      .plviz-label {
+        position: absolute;
+        left: 0;
+        bottom: 100%;
+        z-index: 1;
+        padding-bottom: 0.25em;
+        font-size: var(--figure-font);
+        line-height: 1;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+      .plviz-label.talk {
+        color: var(--plviz-accent);
+      }
+      .plviz-label.demo {
+        color: var(--ids__background);
+      }
+
+      /* Пояснение в левом нижнем углу столбика, идёт поверх соседних */
+      .plviz-caption {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        z-index: 1;
+        padding: 0 0 0.3em;
+        font-size: var(--figure-font);
+        line-height: 1;
+        white-space: nowrap;
+        color: var(--ids__background);
+        pointer-events: none;
+      }
+
+      /* Шкала под столбиками: прилипает к верху, столбики уезжают под неё */
+      .plviz-dates {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        border-top: 1px solid var(--ids__text);
+        /* Нижние 20% высоты — градиент в прозрачность; под него добавлен паддинг,
+           чтобы текст целиком остался на фоне */
+        padding: 0.3em 0 0.6em;
+        margin-bottom: 1em;
+        font-size: var(--figure-font);
+        background: linear-gradient(to bottom, var(--ids__background) 80%, transparent);
+      }
+      .plviz-date {
+        min-width: 0;
+        padding-left: 0.15em;
+        white-space: nowrap;
+        line-height: 1.15;
+      }
+      .plviz-month {
+        display: block;
+        margin-top: -0.1em;
+      }
+
+      /* Матрица: строки наползают друг на друга, как стопка карточек */
+      .plviz-matrix {
         position: relative;
+        /* Свой стековый контекст: поднятые строки и слой ховера не вылезают над шкалой */
+        z-index: 0;
+        display: flex;
+        flex-direction: column;
+        /* Тот же радиус, что у сайдбара: у него em мельче на --figure-font */
+        --ids__radius: calc(0.8 * var(--figure-font));
       }
-      .plviz-cell .sum {
+      .plviz-hits {
         position: absolute;
         inset: 0;
+        z-index: 10;
+        display: grid;
+        grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+        grid-auto-rows: var(--pitch);
+      }
+      .plviz-row {
+        position: relative;
+        z-index: 0;
+        height: var(--row);
+        margin-top: calc(-1 * var(--overlap));
+      }
+      .plviz-row:first-child {
+        margin-top: 0;
+      }
+      .plviz-row:first-child .plviz-cell {
+        border-top: 0;
+      }
+      .plviz-row.last .plviz-cell {
+        border-bottom: 0;
+      }
+      /* Строка под курсором выходит наверх целиком */
+      .plviz-row.hot {
+        z-index: 5;
+      }
+
+      .plviz-name {
+        position: absolute;
+        top: 0.2em;
+        left: 0.25em;
+        z-index: 1;
+        font-size: var(--figure-font);
+        line-height: var(--caption-line);
+        white-space: nowrap;
+        color: var(--ids__background);
         pointer-events: none;
-        opacity: 0.08;
       }
-      .plviz-cell .sum.visit {
-        background: var(--ids__color-blue-400);
-      }
-      .plviz-cell .sum.demo {
-        background: var(--ids__color-green-400);
+
+      .plviz-cell {
+        min-width: 0;
+        box-sizing: border-box;
+        border-top: 1px solid var(--plviz-line);
+        border-bottom: 1px solid var(--plviz-line);
+        /* Пропуск — тёмно-серый */
+        background: var(--plviz-dark);
       }
       .plviz-cell.visit {
-        background: color-mix(in srgb, var(--ids__color-blue-400) 14%, var(--ids__background));
+        background: var(--plviz-accent);
       }
       .plviz-cell.demo {
-        background: color-mix(in srgb, var(--ids__color-green-400) 16%, var(--ids__background));
+        background: var(--plviz-demo);
+      }
+      .plviz-cell.dim {
+        background: var(--plviz-demo-dim);
+      }
+
+      /* Подсветка: колонка +3%, наведённая ячейка +6% */
+      .plviz-cell.hot,
+      .plviz-seg.hot {
+        filter: brightness(var(--hot-line));
       }
       .plviz-seg:hover,
-      .plviz-cell.visit:hover,
-      .plviz-cell.demo:hover,
-      .plviz-cell.sum-cell:hover {
-        filter: brightness(1.1);
+      .plviz-cell.self {
+        filter: brightness(var(--hot-cell));
       }
-      .plviz-legend {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5em 1.4em;
-        max-width: 100%;
-        margin-top: 1em;
-        box-sizing: border-box;
-        color: var(--ids__text-caption);
+
+      /* Сайдбар — тёмная карточка на всю высоту, сверху свисает на --hang */
+      aside.plviz-panel {
+        position: relative;
+        align-self: stretch;
+        margin: calc(-1 * var(--hang)) 0 0;
+        padding: 0;
+        border-radius: 0.8em;
+        corner-shape: squircle;
+        background: var(--plviz-dark);
+        color: var(--ids__color-white);
+        /* Кегль задан здесь, чтобы свес и компенсация считались в одном em */
+        font-size: var(--figure-font);
+        line-height: var(--caption-line);
       }
-      .plviz-legend span {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45em;
+      .plviz-panel-inner {
+        position: sticky;
+        top: 0;
+        /* Заголовок на одной линии с подписями фильтров: свес + рамка + паддинг кнопки */
+        padding: calc(var(--hang) + var(--segment-border) + var(--segment-pad)) 1em 1em;
       }
-      .plviz-legend i {
-        width: 1.4em;
-        height: 1.4em;
-        flex: none;
+      .plviz-panel-title {
+        margin: 0 0 0.7em;
+        font-weight: 700;
       }
-      .plviz-legend .visit {
-        background: color-mix(in srgb, var(--ids__color-blue-400) 14%, var(--ids__background));
+      .plviz-panel-row {
+        margin: 0 0 0.7em;
       }
-      .plviz-legend .demo {
-        background: color-mix(in srgb, var(--ids__color-green-400) 16%, var(--ids__background));
+      .plviz-panel-row:last-child {
+        margin-bottom: 0;
       }
+      /* Следующее демо в списке: небольшой отступ */
+      .plviz-panel-row.sub {
+        margin-top: -0.45em;
+      }
+      .plviz-panel-label {
+        color: color-mix(in srgb, var(--ids__color-white) 40%, transparent);
+      }
+      /* Панель человека: всё серое, подсвечены строки под курсором */
+      .plviz-panel-inner.dimmed .plviz-panel-value {
+        color: color-mix(in srgb, var(--ids__color-white) 40%, transparent);
+      }
+      .plviz-panel-inner.dimmed .plviz-panel-value .hot {
+        color: var(--ids__color-white);
+      }
+
       @media (width < 768px) {
         .plviz-shell {
           grid-template-columns: minmax(0, 1fr);
+          /* Кегль на 20% мельче */
+          font-size: 0.8em;
         }
+        .plviz-filter-group,
+        .plviz-caption,
+        .plviz-label .plviz-unit,
         aside.plviz-panel {
+          display: none;
+        }
+        .plviz-dates {
           position: static;
-          width: auto;
-          padding-top: 1em;
+        }
+        .plviz-date:not(.has-month) {
+          visibility: hidden;
+        }
+        /* Два месяца в соседних колонках слипаются: первый прячем */
+        .plviz-date.has-month:has(+ .has-month) {
+          visibility: hidden;
         }
       }
     </style>
@@ -254,9 +375,7 @@
       <div class="ids__wrapper L">
         <div class="section">
           <div class="plviz-shell">
-            <div class="plviz-board">
-              <div id="plviz-dashboard"></div>
-            </div>
+            <div id="plviz-dashboard"></div>
             <aside class="plviz-panel" id="plviz-panel"></aside>
           </div>
           <div class="ids__space XL"></div>
@@ -265,7 +384,8 @@
     </main>
 
     <script src="./js/theme-toggle.js"></script>
-    <script src="./js/db.js?v=2026-09-21-1930"></script>
-    <script src="./js/dashboard.js?v=2026-09-21a"></script>
+    <script src="./js/db.js?v=2026-09-24-1955"></script>
+    <script src="./js/dashboard-data.js?v=2026-09-24a"></script>
+    <script src="./js/dashboard.js?v=2026-09-24a"></script>
   </body>
 </html>
