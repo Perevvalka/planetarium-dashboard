@@ -156,16 +156,14 @@
     added.attendance +
     added.feedback;
 
-  // Черновик старше подписок: переносим флаги из файла целиком, иначе при выгрузке
-  // на сайт они пропали бы. Если в черновике есть хоть один флаг — подписки уже
-  // ведут в нём, и снятую галку возвращать нельзя.
+  // Подписки из файла дописываются тем, у кого в черновике флага ещё нет.
+  // Иначе старый черновик с частью галок выгрузит на сайт людей без подписки.
+  // Снятую галку это вернёт только если в файле флаг ещё стоит.
   const adoptActiveFlags = (draft, file) => {
-    const anyActive = (list) => (list || []).some((p) => p.active);
-    if (!anyActive(file.persons) || anyActive(draft.persons)) return 0;
     const fromFile = new Map((file.persons || []).map((p) => [p.id, p]));
     let filled = 0;
     (draft.persons || []).forEach((p) => {
-      if (!fromFile.get(p.id)?.active) return;
+      if (p.active || !fromFile.get(p.id)?.active) return;
       p.active = true;
       filled++;
     });

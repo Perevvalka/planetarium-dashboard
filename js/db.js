@@ -266,7 +266,7 @@
     },
     {
       "id": "andrey",
-      "name": "Андрей Шикарненко",
+      "name": "Андрей Шинкаренко",
       "active": true
     },
     {
@@ -286,11 +286,6 @@
     {
       "id": "nikita-breyk",
       "name": "Никита Брейк",
-      "active": true
-    },
-    {
-      "id": "egor",
-      "name": "Егор",
       "active": true
     }
   ],
