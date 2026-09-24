@@ -266,7 +266,7 @@
     },
     {
       "id": "andrey",
-      "name": "Андрей Шинкаренко",
+      "name": "Андрей Шикарненко",
       "active": true
     },
     {
@@ -604,6 +604,13 @@
       ]
     },
     {
+      "id": "dashbord-planetariya-2",
+      "title": "Дашборд Планетария",
+      "authors": [
+        "polina-perevalova"
+      ]
+    },
+    {
       "id": "kurs-dizayn-s-klodom",
       "title": "Курс «Дизайн с Клодом»",
       "authors": [
@@ -630,13 +637,6 @@
       "url": "https://t.me/cool_triad_bot",
       "authors": [
         "kristina-marchenko"
-      ]
-    },
-    {
-      "id": "dashbord-planetariya-2",
-      "title": "Дашборд Планетария",
-      "authors": [
-        "polina-perevalova"
       ]
     }
   ],
