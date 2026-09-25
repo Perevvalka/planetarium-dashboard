@@ -833,7 +833,7 @@
       "generated": true
     },
     {
-      "date": "2026-08-10",
+      "date": "2026-08-06",
       "type": "weekly",
       "minutes": 57
     },
@@ -871,6 +871,11 @@
       "date": "2026-09-24",
       "type": "weekly",
       "minutes": 45
+    },
+    {
+      "date": "2026-08-10",
+      "type": "weekly",
+      "minutes": 57
     }
   ],
   "attendance": {
@@ -1227,6 +1232,23 @@
       "zoya",
       "zhenya-arutyunov",
       "polina-perevalova"
+    ],
+    "2026-08-06": [
+      "andrey",
+      "artem-ermolaev",
+      "asya-dragun",
+      "danya-samoylenko",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "zhenya-arutyunov",
+      "kirill-myshkin",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "magomed-vagabov",
+      "olga-permyakova",
+      "polina-perevalova",
+      "ruslan-mamedov",
+      "rustam-mushraipov"
     ],
     "2026-08-10": [
       "andrey",
@@ -1867,6 +1889,27 @@
       ],
       "minutes": 3,
       "format": 2
+    },
+    {
+      "id": "demo-61",
+      "meeting": "2026-08-06",
+      "project": "dashbord-planetariya",
+      "presenters": [
+        "zhenya-arutyunov",
+        "polina-perevalova"
+      ],
+      "minutes": 8,
+      "format": 2
+    },
+    {
+      "id": "demo-62",
+      "meeting": "2026-08-06",
+      "project": "hypetype",
+      "presenters": [
+        "ruslan-mamedov"
+      ],
+      "minutes": 4,
+      "format": 4
     }
   ],
   "feedback": [
