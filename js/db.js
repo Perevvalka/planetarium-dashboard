@@ -835,7 +835,7 @@
     {
       "date": "2026-08-06",
       "type": "weekly",
-      "minutes": 57
+      "minutes": 44
     },
     {
       "date": "2026-08-13",
