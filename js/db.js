@@ -661,7 +661,7 @@
       "type": "weekly"
     },
     {
-      "date": "2025-10-10",
+      "date": "2025-10-09",
       "type": "weekly",
       "minutes": 53,
       "generated": true
@@ -677,19 +677,19 @@
       "type": "weekly"
     },
     {
-      "date": "2025-11-07",
+      "date": "2025-11-06",
       "type": "weekly",
       "minutes": 59,
       "generated": true
     },
     {
-      "date": "2025-11-14",
+      "date": "2025-11-13",
       "type": "weekly",
       "minutes": 62,
       "generated": true
     },
     {
-      "date": "2025-11-21",
+      "date": "2025-11-20",
       "type": "weekly",
       "minutes": 58,
       "generated": true
@@ -699,25 +699,25 @@
       "type": "weekly"
     },
     {
-      "date": "2025-12-05",
+      "date": "2025-12-04",
       "type": "weekly",
       "minutes": 56,
       "generated": true
     },
     {
-      "date": "2025-12-12",
+      "date": "2025-12-11",
       "type": "weekly",
       "minutes": 56,
       "generated": true
     },
     {
-      "date": "2026-01-16",
+      "date": "2026-01-15",
       "type": "weekly",
       "minutes": 59,
       "generated": true
     },
     {
-      "date": "2026-01-23",
+      "date": "2026-01-22",
       "type": "weekly",
       "minutes": 52,
       "generated": true
@@ -729,25 +729,25 @@
       "generated": true
     },
     {
-      "date": "2026-02-06",
+      "date": "2026-02-05",
       "type": "weekly",
       "minutes": 58,
       "generated": true
     },
     {
-      "date": "2026-02-21",
+      "date": "2026-02-19",
       "type": "weekly",
       "minutes": 55,
       "generated": true
     },
     {
-      "date": "2026-02-27",
+      "date": "2026-02-26",
       "type": "weekly",
       "minutes": 53,
       "generated": true
     },
     {
-      "date": "2026-03-07",
+      "date": "2026-03-05",
       "type": "weekly",
       "minutes": 59,
       "generated": true
@@ -759,13 +759,13 @@
       "generated": true
     },
     {
-      "date": "2026-03-20",
+      "date": "2026-03-19",
       "type": "weekly",
       "minutes": 56,
       "generated": true
     },
     {
-      "date": "2026-03-28",
+      "date": "2026-03-26",
       "type": "weekly",
       "minutes": 59,
       "generated": true
@@ -783,41 +783,41 @@
       "generated": true
     },
     {
-      "date": "2026-04-17",
+      "date": "2026-04-16",
       "type": "weekly",
       "minutes": 58,
       "generated": true
     },
     {
-      "date": "2026-04-24",
+      "date": "2026-04-23",
       "type": "weekly",
       "minutes": 62,
       "generated": true
     },
     {
-      "date": "2026-05-01",
+      "date": "2026-04-30",
       "type": "weekly",
       "minutes": 54,
       "generated": true
     },
     {
-      "date": "2026-05-15",
+      "date": "2026-05-14",
       "type": "weekly",
       "minutes": 55,
       "generated": true
     },
     {
-      "date": "2026-05-25",
+      "date": "2026-05-28",
       "type": "weekly"
     },
     {
-      "date": "2026-06-05",
+      "date": "2026-06-04",
       "type": "weekly",
       "minutes": 56,
       "generated": true
     },
     {
-      "date": "2026-06-12",
+      "date": "2026-06-11",
       "type": "weekly",
       "minutes": 58,
       "generated": true
@@ -827,7 +827,7 @@
       "type": "weekly"
     },
     {
-      "date": "2026-07-03",
+      "date": "2026-07-02",
       "type": "weekly",
       "minutes": 55,
       "generated": true
@@ -871,15 +871,10 @@
       "date": "2026-09-24",
       "type": "weekly",
       "minutes": 45
-    },
-    {
-      "date": "2026-08-10",
-      "type": "weekly",
-      "minutes": 57
     }
   ],
   "attendance": {
-    "2025-10-10": [
+    "2025-10-09": [
       "polina-perevalova",
       "zhenya-arutyunov",
       "kristina-marchenko",
@@ -900,7 +895,7 @@
       "lesha-nikitin",
       "marat-habibulin"
     ],
-    "2025-11-07": [
+    "2025-11-06": [
       "zhenya-arutyunov",
       "ruslan-mamedov",
       "artem-ermolaev",
@@ -916,7 +911,7 @@
       "marat-habibulin",
       "polina-perevalova"
     ],
-    "2025-11-14": [
+    "2025-11-13": [
       "zhenya-arutyunov",
       "kirill-oleynichenko",
       "kristina-dunina",
@@ -935,7 +930,7 @@
       "asya-dragun",
       "rustam-mushraipov"
     ],
-    "2025-11-21": [
+    "2025-11-20": [
       "zhenya-arutyunov",
       "lora-guranina",
       "kirill-myshkin",
@@ -950,7 +945,7 @@
       "viktor-timofeev",
       "rustam-mushraipov"
     ],
-    "2025-12-05": [
+    "2025-12-04": [
       "polina-perevalova",
       "asya-dragun",
       "zhenya-arutyunov",
@@ -963,7 +958,7 @@
       "tatyana-kashina",
       "rustam-mushraipov"
     ],
-    "2025-12-12": [
+    "2025-12-11": [
       "polina-perevalova",
       "anna-safka",
       "artem-ermolaev",
@@ -976,7 +971,7 @@
       "rustam-mushraipov",
       "tatyana-kashina"
     ],
-    "2026-01-16": [
+    "2026-01-15": [
       "polina-perevalova",
       "alena-grishkovets",
       "vika-german",
@@ -992,7 +987,7 @@
       "rustam-mushraipov",
       "tatyana-kashina"
     ],
-    "2026-01-23": [
+    "2026-01-22": [
       "polina-perevalova",
       "alena-grishkovets",
       "vika-german",
@@ -1009,7 +1004,7 @@
       "tatyana-kashina",
       "zhenya-arutyunov"
     ],
-    "2026-02-06": [
+    "2026-02-05": [
       "georgiy-mishurovskiy",
       "alena-grishkovets",
       "asya-dragun",
@@ -1024,7 +1019,7 @@
       "polina-perevalova",
       "zhenya-arutyunov"
     ],
-    "2026-02-21": [
+    "2026-02-19": [
       "alena-grishkovets",
       "georgiy-mishurovskiy",
       "dmitriy-sivuhin",
@@ -1036,7 +1031,7 @@
       "zhenya-arutyunov",
       "polina-perevalova"
     ],
-    "2026-02-27": [
+    "2026-02-26": [
       "alena-grishkovets",
       "daler-alierov",
       "kristina-marchenko",
@@ -1046,7 +1041,7 @@
       "zhenya-arutyunov",
       "polina-perevalova"
     ],
-    "2026-03-07": [
+    "2026-03-05": [
       "alena-grishkovets",
       "georgiy-mishurovskiy",
       "kristina-dunina",
@@ -1077,7 +1072,7 @@
       "tatyana-kashina",
       "zhenya-arutyunov"
     ],
-    "2026-03-20": [
+    "2026-03-19": [
       "alena-grishkovets",
       "gosha",
       "dmitriy-sivuhin",
@@ -1090,7 +1085,7 @@
       "zhenya-arutyunov",
       "polina-perevalova"
     ],
-    "2026-03-28": [
+    "2026-03-26": [
       "adam-arutyunov",
       "artem-ermolaev",
       "ilya-narinskiy",
@@ -1136,7 +1131,7 @@
       "valeriya-romanova",
       "zhenya-arutyunov"
     ],
-    "2026-04-17": [
+    "2026-04-16": [
       "asya-dragun",
       "vlad",
       "magomed-vagabov",
@@ -1151,7 +1146,7 @@
       "polina-perevalova",
       "zhenya-arutyunov"
     ],
-    "2026-04-24": [
+    "2026-04-23": [
       "dmitriy-sivuhin",
       "evgeniy-smirnov",
       "artem-ermolaev",
@@ -1170,7 +1165,7 @@
       "polina-perevalova",
       "zhenya-arutyunov"
     ],
-    "2026-05-01": [
+    "2026-04-30": [
       "adam-arutyunov",
       "dana",
       "dmitriy-sivuhin",
@@ -1181,7 +1176,7 @@
       "magomed-vagabov",
       "polina-perevalova"
     ],
-    "2026-05-15": [
+    "2026-05-14": [
       "artem-ermolaev",
       "ruslan-mamedov",
       "dmitriy-sivuhin",
@@ -1193,7 +1188,7 @@
       "zhenya-arutyunov",
       "polina-perevalova"
     ],
-    "2026-06-05": [
+    "2026-06-04": [
       "vova",
       "dmitriy-sivuhin",
       "evgeniy-smirnov",
@@ -1206,7 +1201,7 @@
       "zhenya-arutyunov",
       "polina-perevalova"
     ],
-    "2026-06-12": [
+    "2026-06-11": [
       "artem-ermolaev",
       "dmitriy-sivuhin",
       "evgeniy-smirnov",
@@ -1221,7 +1216,7 @@
       "polina-perevalova",
       "zhenya-arutyunov"
     ],
-    "2026-07-03": [
+    "2026-07-02": [
       "dmitriy-sivuhin",
       "evgeniy-smirnov",
       "kristina-marchenko",
@@ -1234,23 +1229,6 @@
       "polina-perevalova"
     ],
     "2026-08-06": [
-      "andrey",
-      "artem-ermolaev",
-      "asya-dragun",
-      "danya-samoylenko",
-      "dmitriy-sivuhin",
-      "evgeniy-smirnov",
-      "zhenya-arutyunov",
-      "kirill-myshkin",
-      "kristina-marchenko",
-      "lesha-nikitin",
-      "magomed-vagabov",
-      "olga-permyakova",
-      "polina-perevalova",
-      "ruslan-mamedov",
-      "rustam-mushraipov"
-    ],
-    "2026-08-10": [
       "andrey",
       "artem-ermolaev",
       "asya-dragun",
@@ -1505,7 +1483,7 @@
     },
     {
       "id": "demo-19",
-      "meeting": "2026-05-25",
+      "meeting": "2026-05-28",
       "project": "pervyy-rolik-na-yutyub",
       "presenters": [
         "masha-troitskaya"
@@ -1513,7 +1491,7 @@
     },
     {
       "id": "demo-20",
-      "meeting": "2026-05-25",
+      "meeting": "2026-05-28",
       "project": "prilozhenie-dlya-rasshifrovki-vstrech-context",
       "presenters": [
         "daler-alierov"
@@ -1521,7 +1499,7 @@
     },
     {
       "id": "demo-21",
-      "meeting": "2026-05-25",
+      "meeting": "2026-05-28",
       "project": "past-simple",
       "presenters": [
         "artem-ermolaev"
@@ -1529,7 +1507,7 @@
     },
     {
       "id": "demo-22",
-      "meeting": "2026-05-25",
+      "meeting": "2026-05-28",
       "project": "aside",
       "presenters": [
         "lesha-nikitin"
@@ -1537,7 +1515,7 @@
     },
     {
       "id": "demo-23",
-      "meeting": "2026-05-25",
+      "meeting": "2026-05-28",
       "project": "bot-letmidzhoyn",
       "presenters": [
         "kirill-myshkin"

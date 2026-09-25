@@ -233,6 +233,10 @@
     "января", "февраля", "марта", "апреля", "мая", "июня",
     "июля", "августа", "сентября", "октября", "ноября", "декабря",
   ];
+  const WEEKDAYS_GEN = [
+    "воскресенье", "понедельник", "вторник", "среда",
+    "четверг", "пятница", "суббота",
+  ];
 
   const todayIso = () => {
     const d = new Date();
@@ -242,6 +246,18 @@
     return `${y}-${m}-${day}`;
   };
 
+  const weekdayOf = (iso) => {
+    const parts = String(iso).split("-");
+    if (parts.length !== 3) return -1;
+    const y = +parts[0];
+    const m = +parts[1];
+    const d = +parts[2];
+    if (!y || !m || !d) return -1;
+    return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+  };
+
+  const isThursday = (iso) => weekdayOf(iso) === 4;
+
   const fmtDateRu = (iso) => {
     if (!iso) return "";
     const parts = String(iso).split("-");
@@ -250,7 +266,11 @@
     const m = +parts[1];
     const d = +parts[2];
     if (!y || !m || !d || !MONTHS_GEN[m - 1]) return iso;
-    return `${d} ${MONTHS_GEN[m - 1]} ${y}`;
+    const wd = weekdayOf(iso);
+    const dayName = wd >= 0 ? WEEKDAYS_GEN[wd] : "";
+    return dayName
+      ? `${d} ${MONTHS_GEN[m - 1]} ${y}, ${dayName}`
+      : `${d} ${MONTHS_GEN[m - 1]} ${y}`;
   };
 
   const revealListItem = (list, selector) => {
@@ -895,7 +915,12 @@
     loadMeeting(date);
     revealListItem(listMeetings, `[data-date="${CSS.escape(date)}"]`);
     flashSubmit(formMeeting, "Сохранено");
-    setStatus(`Встреча сохранена: ${fmtDateRu(date)}`, true);
+    setStatus(
+      isThursday(date)
+        ? `Встреча сохранена: ${fmtDateRu(date)}`
+        : `Встреча сохранена: ${fmtDateRu(date)} — обычно эфир в четверг`,
+      isThursday(date)
+    );
   });
 
   document.querySelector('[data-clear="meeting"]').addEventListener("click", clearMeeting);
@@ -1218,6 +1243,7 @@
   const meetingChecks = (m, presentIds, demos) => {
     const out = [];
     const present = new Set(presentIds);
+    if (m.date && !isThursday(m.date)) out.push("дата не четверг");
     if (!m.minutes) out.push("у встречи не указана длительность");
     if (!presentIds.length) out.push("не отмечено присутствие");
     if (!demos.length) out.push("нет ни одного демо");
