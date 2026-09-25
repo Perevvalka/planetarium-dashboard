@@ -287,11 +287,6 @@
       "id": "nikita-breyk",
       "name": "Никита Брейк",
       "active": true
-    },
-    {
-      "id": "egor",
-      "name": "Егор",
-      "active": true
     }
   ],
   "projects": [
@@ -838,6 +833,11 @@
       "generated": true
     },
     {
+      "date": "2026-08-10",
+      "type": "weekly",
+      "minutes": 57
+    },
+    {
       "date": "2026-08-13",
       "type": "weekly",
       "minutes": 50
@@ -1227,6 +1227,23 @@
       "zoya",
       "zhenya-arutyunov",
       "polina-perevalova"
+    ],
+    "2026-08-10": [
+      "andrey",
+      "artem-ermolaev",
+      "asya-dragun",
+      "danya-samoylenko",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "zhenya-arutyunov",
+      "kirill-myshkin",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "magomed-vagabov",
+      "olga-permyakova",
+      "polina-perevalova",
+      "ruslan-mamedov",
+      "rustam-mushraipov"
     ],
     "2026-08-13": [
       "andrey",
