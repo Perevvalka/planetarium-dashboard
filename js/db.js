@@ -835,7 +835,7 @@
     {
       "date": "2026-08-06",
       "type": "weekly",
-      "minutes": 57
+      "minutes": 44
     },
     {
       "date": "2026-08-13",
@@ -1043,19 +1043,20 @@
     ],
     "2026-03-05": [
       "alena-grishkovets",
+      "vlad",
       "georgiy-mishurovskiy",
+      "gosha",
+      "dmitriy-sivuhin",
+      "zhenya-arutyunov",
       "kristina-dunina",
       "kristina-marchenko",
-      "nastya-tulaeva",
       "lesha-nikitin",
       "masha-troitskaya",
-      "rustam-mushraipov",
-      "ruslan-mamedov",
-      "vlad",
-      "gosha",
+      "nastya-tulaeva",
+      "polina-perevalova",
       "roma-kuzhel",
-      "zhenya-arutyunov",
-      "polina-perevalova"
+      "ruslan-mamedov",
+      "rustam-mushraipov"
     ],
     "2026-03-12": [
       "georgiy-mishurovskiy",
@@ -1277,13 +1278,14 @@
     ],
     "2026-08-27": [
       "artem-ermolaev",
-      "danya-samoylenko",
+      "dmitriy-sivuhin",
       "evgeniy-smirnov",
       "zhenya-arutyunov",
       "kristina-marchenko",
       "lesha-nikitin",
       "polina-perevalova",
-      "ramil-karimov"
+      "ramil-karimov",
+      "danya-samoylenko"
     ],
     "2026-09-03": [
       "andrey",
