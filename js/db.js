@@ -287,6 +287,15 @@
       "id": "nikita-breyk",
       "name": "Никита Брейк",
       "active": true
+    },
+    {
+      "id": "stas-dayneko",
+      "name": "Стас Дайнеко",
+      "active": true
+    },
+    {
+      "id": "natalya",
+      "name": "Наталья"
     }
   ],
   "projects": [
@@ -645,6 +654,47 @@
       "authors": [
         "artem-ermolaev"
       ]
+    },
+    {
+      "id": "svoy-sayt-3",
+      "title": "Свой сайт",
+      "url": "https://olga-permiakova.ru/",
+      "authors": [
+        "olga-permyakova"
+      ]
+    },
+    {
+      "id": "stranitsa-pro-taymstrayp",
+      "title": "Страница про Таймстрайп",
+      "url": "https://timestripe.com/for-teams/",
+      "authors": [
+        "daler-alierov",
+        "kristina-marchenko"
+      ]
+    },
+    {
+      "id": "papir",
+      "title": "papir",
+      "url": "https://app.thepapir.com/",
+      "authors": [
+        "daler-alierov",
+        "kristina-marchenko"
+      ]
+    },
+    {
+      "id": "tekstovaya-versiya-lektsii",
+      "title": "Текстовая версия лекции",
+      "authors": [
+        "adam-arutyunov"
+      ]
+    },
+    {
+      "id": "tulzy-dlya-dizayna",
+      "title": "Тулзы для дизайна",
+      "url": "https://stas-daineko.vercel.app/",
+      "authors": [
+        "stas-dayneko"
+      ]
     }
   ],
   "meetings": [
@@ -871,6 +921,11 @@
       "date": "2026-09-24",
       "type": "weekly",
       "minutes": 45
+    },
+    {
+      "date": "2026-10-01",
+      "type": "weekly",
+      "minutes": 60
     }
   ],
   "attendance": {
@@ -1336,6 +1391,22 @@
       "kristina-marchenko",
       "polina-perevalova",
       "rustam-mushraipov"
+    ],
+    "2026-10-01": [
+      "adam-arutyunov",
+      "artem-ermolaev",
+      "daler-alierov",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "zhenya-arutyunov",
+      "kristina-dunina",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "natalya",
+      "olga-permyakova",
+      "polina-perevalova",
+      "rustam-mushraipov",
+      "stas-dayneko"
     ]
   },
   "demos": [
@@ -1890,6 +1961,86 @@
       ],
       "minutes": 4,
       "format": 4
+    },
+    {
+      "id": "demo-63",
+      "meeting": "2026-10-01",
+      "project": "svoy-sayt-3",
+      "presenters": [
+        "olga-permyakova"
+      ],
+      "minutes": 5,
+      "format": 2
+    },
+    {
+      "id": "demo-64",
+      "meeting": "2026-10-01",
+      "project": "stranitsa-pro-taymstrayp",
+      "presenters": [
+        "daler-alierov"
+      ],
+      "minutes": 2,
+      "format": 4
+    },
+    {
+      "id": "demo-65",
+      "meeting": "2026-10-01",
+      "project": "papir",
+      "presenters": [
+        "daler-alierov"
+      ],
+      "minutes": 6,
+      "format": 4
+    },
+    {
+      "id": "demo-66",
+      "meeting": "2026-10-01",
+      "project": "kurs-po-matematike-kotoraya-prigoditsya-v-zhizni",
+      "presenters": [
+        "adam-arutyunov"
+      ],
+      "minutes": 2,
+      "format": 4
+    },
+    {
+      "id": "demo-67",
+      "meeting": "2026-10-01",
+      "project": "tekstovaya-versiya-lektsii",
+      "presenters": [
+        "adam-arutyunov"
+      ],
+      "minutes": 7,
+      "format": 2
+    },
+    {
+      "id": "demo-68",
+      "meeting": "2026-10-01",
+      "project": "tulzy-dlya-dizayna",
+      "presenters": [
+        "stas-dayneko"
+      ],
+      "minutes": 8,
+      "format": 4
+    },
+    {
+      "id": "demo-69",
+      "meeting": "2026-10-01",
+      "project": "obnovlenie-sayta-evgeniya-smirnova",
+      "presenters": [
+        "evgeniy-smirnov"
+      ],
+      "minutes": 7,
+      "format": 4
+    },
+    {
+      "id": "demo-70",
+      "meeting": "2026-10-01",
+      "project": "kurs-dizayn-s-klodom",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 1,
+      "format": 2
     }
   ],
   "feedback": [
@@ -1943,6 +2094,10 @@
     },
     {
       "demo": "demo-59",
+      "person": "zhenya-arutyunov"
+    },
+    {
+      "demo": "demo-63",
       "person": "zhenya-arutyunov"
     }
   ]
