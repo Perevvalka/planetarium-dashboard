@@ -101,12 +101,15 @@
         else added[key]++;
       });
     };
+    const hadMeetings = new Set((draft.meetings || []).map((x) => x.date));
     addBy("persons", (x) => x.id);
     addBy("projects", (x) => x.id);
     addBy("meetings", (x) => x.date);
     addBy("demos", (x) => x.id);
     if (!draft.attendance || typeof draft.attendance !== "object") draft.attendance = {};
+    // Явку существующих встреч не дополняем: снятый человек иначе вернётся из файла.
     Object.entries(file.attendance || {}).forEach(([date, people]) => {
+      if (hadMeetings.has(date)) return;
       if (!Array.isArray(draft.attendance[date])) draft.attendance[date] = [];
       const list = draft.attendance[date];
       people.forEach((person) => {
@@ -208,7 +211,11 @@
       const raw = localStorage.getItem(key);
       if (!raw) return null;
       const parsed = normalizeDb(JSON.parse(raw));
-      syncDraftFromSource(parsed, source);
+      // Редактура — полный снимок: доливать встречи и явку из файла нельзя,
+      // иначе удаление в черновике откатится при перезагрузке.
+      if (key === STORAGE_LIVE) mergeMissingFromSource(parsed, source);
+      fillEmptyFromSource(parsed, source);
+      adoptActiveFlags(parsed, source);
       localStorage.setItem(key, JSON.stringify(parsed));
       return parsed;
     } catch (_) {
@@ -2192,8 +2199,18 @@
 
   // Опубликованное становится обоими черновиками. Долив по недостающим записям
   // тут не годится: удаление в одном режиме иначе вернётся из другого.
+  const replaceSource = (data) => {
+    const next = normalizeDb(clone(data));
+    Object.keys(source).forEach((key) => {
+      delete source[key];
+    });
+    Object.assign(source, next);
+  };
+
   const adoptPublished = (published) => {
     if (!published) return;
+    // Иначе «Сбросить к файлу» поднимет js/db.js, с которым открыли страницу.
+    replaceSource(published);
     liveDb = clone(published);
     editDb = clone(published);
     db = adminMode === "edit" ? editDb : liveDb;
@@ -2261,9 +2278,8 @@
       let toWrite = db;
       if (adminMode === "live") {
         toWrite = applyLiveMeeting(remoteDb || clone(source));
-      } else if (remoteDb) {
-        syncDraftFromSource(db, remoteDb);
-        persistDraft();
+      } else {
+        // Редактура пишется как есть: долив из remote вернул бы удалённые встречи и явку.
         toWrite = db;
       }
       const dbContent = serializeFile(toWrite);
