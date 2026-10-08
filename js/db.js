@@ -296,6 +296,10 @@
     {
       "id": "natalya",
       "name": "Наталья"
+    },
+    {
+      "id": "veronika",
+      "name": "Вероника"
     }
   ],
   "projects": [
@@ -695,6 +699,13 @@
       "authors": [
         "stas-dayneko"
       ]
+    },
+    {
+      "id": "prosmotrschik-shriftov",
+      "title": "Просмотрщик шрифтов",
+      "authors": [
+        "stas-dayneko"
+      ]
     }
   ],
   "meetings": [
@@ -926,6 +937,11 @@
       "date": "2026-10-01",
       "type": "weekly",
       "minutes": 60
+    },
+    {
+      "date": "2026-10-08",
+      "type": "weekly",
+      "minutes": 52
     }
   ],
   "attendance": {
@@ -1404,6 +1420,19 @@
       "lesha-nikitin",
       "natalya",
       "olga-permyakova",
+      "polina-perevalova",
+      "rustam-mushraipov",
+      "stas-dayneko"
+    ],
+    "2026-10-08": [
+      "adam-arutyunov",
+      "artem-ermolaev",
+      "veronika",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "zhenya-arutyunov",
+      "kristina-marchenko",
+      "magomed-vagabov",
       "polina-perevalova",
       "rustam-mushraipov",
       "stas-dayneko"
@@ -2041,6 +2070,56 @@
       ],
       "minutes": 1,
       "format": 2
+    },
+    {
+      "id": "demo-71",
+      "meeting": "2026-10-08",
+      "project": "kurs-po-matematike-kotoraya-prigoditsya-v-zhizni",
+      "presenters": [
+        "adam-arutyunov"
+      ],
+      "minutes": 3,
+      "format": 4
+    },
+    {
+      "id": "demo-72",
+      "meeting": "2026-10-08",
+      "project": "kurs-dizayn-s-klodom",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 3,
+      "format": 4
+    },
+    {
+      "id": "demo-73",
+      "meeting": "2026-10-08",
+      "project": "prosmotrschik-shriftov",
+      "presenters": [
+        "stas-dayneko"
+      ],
+      "minutes": 1,
+      "format": 2
+    },
+    {
+      "id": "demo-74",
+      "meeting": "2026-10-08",
+      "project": "obnovlenie-sayta-evgeniya-smirnova",
+      "presenters": [
+        "evgeniy-smirnov"
+      ],
+      "minutes": 5,
+      "format": 4
+    },
+    {
+      "id": "demo-75",
+      "meeting": "2026-10-08",
+      "project": "konsultatsionnyy-klub",
+      "presenters": [
+        "zhenya-arutyunov"
+      ],
+      "minutes": 7,
+      "format": 1
     }
   ],
   "feedback": [
@@ -2099,6 +2178,14 @@
     {
       "demo": "demo-63",
       "person": "zhenya-arutyunov"
+    },
+    {
+      "demo": "demo-72",
+      "person": "zhenya-arutyunov"
+    },
+    {
+      "demo": "demo-72",
+      "person": "stas-dayneko"
     }
   ]
 };
