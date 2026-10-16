@@ -300,6 +300,10 @@
     {
       "id": "veronika",
       "name": "Вероника"
+    },
+    {
+      "id": "sasha",
+      "name": "Саша"
     }
   ],
   "projects": [
@@ -706,6 +710,20 @@
       "authors": [
         "stas-dayneko"
       ]
+    },
+    {
+      "id": "prilozhenie-minuta",
+      "title": "Приложение Минута",
+      "authors": [
+        "ramil-karimov"
+      ]
+    },
+    {
+      "id": "animatsiya-shrifta",
+      "title": "Анимация шрифта",
+      "authors": [
+        "magomed-vagabov"
+      ]
     }
   ],
   "meetings": [
@@ -942,6 +960,11 @@
       "date": "2026-10-08",
       "type": "weekly",
       "minutes": 52
+    },
+    {
+      "date": "2026-10-15",
+      "type": "weekly",
+      "minutes": 59
     }
   ],
   "attendance": {
@@ -1435,6 +1458,20 @@
       "magomed-vagabov",
       "polina-perevalova",
       "rustam-mushraipov",
+      "stas-dayneko"
+    ],
+    "2026-10-15": [
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "zhenya-arutyunov",
+      "kristina-dunina",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "magomed-vagabov",
+      "polina-perevalova",
+      "ramil-karimov",
+      "rustam-mushraipov",
+      "sasha",
       "stas-dayneko"
     ]
   },
@@ -2120,6 +2157,46 @@
       ],
       "minutes": 7,
       "format": 1
+    },
+    {
+      "id": "demo-76",
+      "meeting": "2026-10-15",
+      "project": "pechat-knigi-eto-krasivo-a-eto-net",
+      "presenters": [
+        "zhenya-arutyunov"
+      ],
+      "minutes": 7,
+      "format": 2
+    },
+    {
+      "id": "demo-77",
+      "meeting": "2026-10-15",
+      "project": "prilozhenie-minuta",
+      "presenters": [
+        "ramil-karimov"
+      ],
+      "minutes": 6,
+      "format": 2
+    },
+    {
+      "id": "demo-78",
+      "meeting": "2026-10-15",
+      "project": "prosmotrschik-shriftov",
+      "presenters": [
+        "stas-dayneko"
+      ],
+      "minutes": 5,
+      "format": 2
+    },
+    {
+      "id": "demo-79",
+      "meeting": "2026-10-15",
+      "project": "animatsiya-shrifta",
+      "presenters": [
+        "magomed-vagabov"
+      ],
+      "minutes": 3,
+      "format": 2
     }
   ],
   "feedback": [
@@ -2186,6 +2263,10 @@
     {
       "demo": "demo-72",
       "person": "stas-dayneko"
+    },
+    {
+      "demo": "demo-78",
+      "person": "zhenya-arutyunov"
     }
   ]
 };
