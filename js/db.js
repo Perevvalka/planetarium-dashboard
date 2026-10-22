@@ -724,6 +724,27 @@
       "authors": [
         "magomed-vagabov"
       ]
+    },
+    {
+      "id": "deeptalk",
+      "title": "Deeptalk",
+      "authors": [
+        "zhenya-arutyunov"
+      ]
+    },
+    {
+      "id": "deeptalk-2",
+      "title": "Deeptalk",
+      "authors": [
+        "zhenya-arutyunov"
+      ]
+    },
+    {
+      "id": "akademicheskiy-risunok",
+      "title": "Академический рисунок",
+      "authors": [
+        "evgeniy-smirnov"
+      ]
     }
   ],
   "meetings": [
@@ -965,6 +986,11 @@
       "date": "2026-10-15",
       "type": "weekly",
       "minutes": 59
+    },
+    {
+      "date": "2026-10-22",
+      "type": "weekly",
+      "minutes": 52
     }
   ],
   "attendance": {
@@ -1472,6 +1498,18 @@
       "ramil-karimov",
       "rustam-mushraipov",
       "sasha",
+      "stas-dayneko"
+    ],
+    "2026-10-22": [
+      "alena-grishkovets",
+      "artem-ermolaev",
+      "evgeniy-smirnov",
+      "zhenya-arutyunov",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "magomed-vagabov",
+      "polina-perevalova",
+      "rustam-mushraipov",
       "stas-dayneko"
     ]
   },
@@ -2197,6 +2235,46 @@
       ],
       "minutes": 3,
       "format": 2
+    },
+    {
+      "id": "demo-80",
+      "meeting": "2026-10-22",
+      "project": "deeptalk-2",
+      "presenters": [
+        "zhenya-arutyunov"
+      ],
+      "minutes": 18,
+      "format": 2
+    },
+    {
+      "id": "demo-81",
+      "meeting": "2026-10-22",
+      "project": "prosmotrschik-shriftov",
+      "presenters": [
+        "stas-dayneko"
+      ],
+      "minutes": 4,
+      "format": 2
+    },
+    {
+      "id": "demo-82",
+      "meeting": "2026-10-22",
+      "project": "kurs-dizayn-s-klodom",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 3,
+      "format": 4
+    },
+    {
+      "id": "demo-83",
+      "meeting": "2026-10-22",
+      "project": "akademicheskiy-risunok",
+      "presenters": [
+        "evgeniy-smirnov"
+      ],
+      "minutes": 1,
+      "format": 2
     }
   ],
   "feedback": [
@@ -2266,6 +2344,10 @@
     },
     {
       "demo": "demo-78",
+      "person": "zhenya-arutyunov"
+    },
+    {
+      "demo": "demo-81",
       "person": "zhenya-arutyunov"
     }
   ]
