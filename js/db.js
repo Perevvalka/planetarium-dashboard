@@ -304,6 +304,14 @@
     {
       "id": "sasha",
       "name": "Саша"
+    },
+    {
+      "id": "denis",
+      "name": "Денис"
+    },
+    {
+      "id": "dina",
+      "name": "Дина"
     }
   ],
   "projects": [
@@ -745,6 +753,48 @@
       "authors": [
         "evgeniy-smirnov"
       ]
+    },
+    {
+      "id": "odnorazovyy-soft-generatsii-shem-dlya-vyazaniya",
+      "title": "Одноразовый софт генерации схем для вязания",
+      "authors": [
+        "zhenya-arutyunov"
+      ]
+    },
+    {
+      "id": "plagin-dlya-gugl-fonts-dlya-demonstratsii-nachertaniy",
+      "title": "Плагин для гугл фонтс для демонстрации начертаний",
+      "authors": [
+        "dmitriy-sivuhin"
+      ]
+    },
+    {
+      "id": "vebinar-dlya-kursa-sayt-starogo-byuro-kollab-s-podkastom-zakat-imperii",
+      "title": "Вебинар для курса, сайт старого бюро, коллаб с подкастом «Закат империи»",
+      "authors": [
+        "artem-ermolaev"
+      ]
+    },
+    {
+      "id": "navaybkozhenyy-kontent-meyker",
+      "title": "Навайбкоженый контент мейкер",
+      "authors": [
+        "kristina-marchenko"
+      ]
+    },
+    {
+      "id": "vopros-pro-dizayn-reshenie",
+      "title": "Вопрос про дизайн решение",
+      "authors": [
+        "danya-samoylenko"
+      ]
+    },
+    {
+      "id": "content-media-lab",
+      "title": "Content Media Lab",
+      "authors": [
+        "kristina-marchenko"
+      ]
     }
   ],
   "meetings": [
@@ -991,6 +1041,11 @@
       "date": "2026-10-22",
       "type": "weekly",
       "minutes": 52
+    },
+    {
+      "date": "2026-11-05",
+      "type": "weekly",
+      "minutes": 63
     }
   ],
   "attendance": {
@@ -1511,6 +1566,21 @@
       "polina-perevalova",
       "rustam-mushraipov",
       "stas-dayneko"
+    ],
+    "2026-11-05": [
+      "alena-grishkovets",
+      "artem-ermolaev",
+      "danya-samoylenko",
+      "denis",
+      "dina",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "zhenya-arutyunov",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "magomed-vagabov",
+      "polina-perevalova",
+      "rustam-mushraipov"
     ]
   },
   "demos": [
@@ -2274,6 +2344,56 @@
         "evgeniy-smirnov"
       ],
       "minutes": 1,
+      "format": 2
+    },
+    {
+      "id": "demo-84",
+      "meeting": "2026-11-05",
+      "project": "odnorazovyy-soft-generatsii-shem-dlya-vyazaniya",
+      "presenters": [
+        "zhenya-arutyunov"
+      ],
+      "minutes": 9,
+      "format": 2
+    },
+    {
+      "id": "demo-85",
+      "meeting": "2026-11-05",
+      "project": "plagin-dlya-gugl-fonts-dlya-demonstratsii-nachertaniy",
+      "presenters": [
+        "dmitriy-sivuhin"
+      ],
+      "minutes": 4,
+      "format": 2
+    },
+    {
+      "id": "demo-86",
+      "meeting": "2026-11-05",
+      "project": "vebinar-dlya-kursa-sayt-starogo-byuro-kollab-s-podkastom-zakat-imperii",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 6,
+      "format": 2
+    },
+    {
+      "id": "demo-88",
+      "meeting": "2026-11-05",
+      "project": "vopros-pro-dizayn-reshenie",
+      "presenters": [
+        "danya-samoylenko"
+      ],
+      "minutes": 5,
+      "format": 2
+    },
+    {
+      "id": "demo-89",
+      "meeting": "2026-11-05",
+      "project": "content-media-lab",
+      "presenters": [
+        "kristina-marchenko"
+      ],
+      "minutes": 5,
       "format": 2
     }
   ],
