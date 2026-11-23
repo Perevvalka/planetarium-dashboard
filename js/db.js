@@ -329,6 +329,14 @@
     {
       "id": "igor",
       "name": "Игорь"
+    },
+    {
+      "id": "katya",
+      "name": "Катя"
+    },
+    {
+      "id": "denis-lapin",
+      "name": "Денис Лапин"
     }
   ],
   "projects": [
@@ -864,6 +872,28 @@
       "authors": [
         "polina-volkova"
       ]
+    },
+    {
+      "id": "lichnye-sots-seti",
+      "title": "Личные соц. сети",
+      "authors": [
+        "lesha-nikitin"
+      ]
+    },
+    {
+      "id": "cool-center-solutions",
+      "title": "Cool Center Solutions",
+      "authors": [
+        "kristina-marchenko",
+        "polina-perevalova"
+      ]
+    },
+    {
+      "id": "taynyy-proekt-dlya-podkasta",
+      "title": "Тайный проект для подкаста",
+      "authors": [
+        "artem-ermolaev"
+      ]
     }
   ],
   "meetings": [
@@ -1113,6 +1143,11 @@
     },
     {
       "date": "2026-11-05",
+      "type": "weekly",
+      "minutes": 63
+    },
+    {
+      "date": "2026-11-12",
       "type": "weekly",
       "minutes": 63
     },
@@ -1654,6 +1689,25 @@
       "lesha-nikitin",
       "magomed-vagabov",
       "polina-perevalova",
+      "rustam-mushraipov"
+    ],
+    "2026-11-12": [
+      "adam-arutyunov",
+      "artem-ermolaev",
+      "daler-alierov",
+      "danya-samoylenko",
+      "denis-lapin",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "zhenya-arutyunov",
+      "katya",
+      "kristina",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "magomed-vagabov",
+      "pavel-s",
+      "polina-perevalova",
+      "ruslan-mamedov",
       "rustam-mushraipov"
     ],
     "2026-11-19": [
@@ -2563,6 +2617,57 @@
       ],
       "minutes": 3,
       "format": 1
+    },
+    {
+      "id": "demo-98",
+      "meeting": "2026-11-12",
+      "project": "lichnye-sots-seti",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 2,
+      "format": 2
+    },
+    {
+      "id": "demo-99",
+      "meeting": "2026-11-12",
+      "project": "cool-center-solutions",
+      "presenters": [
+        "polina-perevalova"
+      ],
+      "minutes": 9,
+      "format": 2
+    },
+    {
+      "id": "demo-100",
+      "meeting": "2026-11-12",
+      "project": "papir",
+      "presenters": [
+        "daler-alierov",
+        "kristina-marchenko"
+      ],
+      "minutes": 6,
+      "format": 4
+    },
+    {
+      "id": "demo-101",
+      "meeting": "2026-11-12",
+      "project": "tekstovaya-versiya-lektsii",
+      "presenters": [
+        "adam-arutyunov"
+      ],
+      "minutes": 7,
+      "format": 4
+    },
+    {
+      "id": "demo-102",
+      "meeting": "2026-11-12",
+      "project": "taynyy-proekt-dlya-podkasta",
+      "presenters": [
+        "artem-ermolaev"
+      ],
+      "minutes": 6,
+      "format": 2
     }
   ],
   "feedback": [
