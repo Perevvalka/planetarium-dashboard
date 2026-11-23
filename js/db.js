@@ -312,6 +312,23 @@
     {
       "id": "dina",
       "name": "Дина"
+    },
+    {
+      "id": "polina-volkova",
+      "name": "Полина Волкова"
+    },
+    {
+      "id": "kristina",
+      "name": "Кристина"
+    },
+    {
+      "id": "pavel-s",
+      "name": "Павел С",
+      "active": true
+    },
+    {
+      "id": "igor",
+      "name": "Игорь"
     }
   ],
   "projects": [
@@ -795,6 +812,58 @@
       "authors": [
         "kristina-marchenko"
       ]
+    },
+    {
+      "id": "prilozhenie-dlya-peredachi-foto-s-kamery-na-telefon",
+      "title": "Приложение для передачи фото с камеры на телефон",
+      "authors": [
+        "lesha-nikitin"
+      ]
+    },
+    {
+      "id": "proshivka-dlya-routera",
+      "title": "Прошивка для роутера",
+      "authors": [
+        "lesha-nikitin"
+      ]
+    },
+    {
+      "id": "rassylka-intuitsii",
+      "title": "Рассылка Интуиции",
+      "authors": [
+        "zhenya-arutyunov",
+        "polina-perevalova"
+      ]
+    },
+    {
+      "id": "rassylka-intuitsii-2",
+      "title": "Рассылка Интуиции",
+      "authors": [
+        "zhenya-arutyunov",
+        "polina-perevalova"
+      ]
+    },
+    {
+      "id": "portfolio",
+      "title": "Портфолио",
+      "url": "https://rustam.works/",
+      "authors": [
+        "rustam-mushraipov"
+      ]
+    },
+    {
+      "id": "arhiv-tipografiki-uzbekistana",
+      "title": "Архив типографики Узбекистана",
+      "authors": [
+        "rustam-mushraipov"
+      ]
+    },
+    {
+      "id": "dizayn-vyhodnye-v-samare",
+      "title": "Дизайн-выходные в Самаре",
+      "authors": [
+        "polina-volkova"
+      ]
     }
   ],
   "meetings": [
@@ -1046,6 +1115,11 @@
       "date": "2026-11-05",
       "type": "weekly",
       "minutes": 63
+    },
+    {
+      "date": "2026-11-19",
+      "type": "weekly",
+      "minutes": 49
     }
   ],
   "attendance": {
@@ -1579,6 +1653,21 @@
       "kristina-marchenko",
       "lesha-nikitin",
       "magomed-vagabov",
+      "polina-perevalova",
+      "rustam-mushraipov"
+    ],
+    "2026-11-19": [
+      "artem-ermolaev",
+      "dmitriy-sivuhin",
+      "evgeniy-smirnov",
+      "zhenya-arutyunov",
+      "igor",
+      "kristina",
+      "kristina-dunina",
+      "kristina-marchenko",
+      "lesha-nikitin",
+      "pavel-s",
+      "polina-volkova",
       "polina-perevalova",
       "rustam-mushraipov"
     ]
@@ -2395,6 +2484,85 @@
       ],
       "minutes": 5,
       "format": 2
+    },
+    {
+      "id": "demo-90",
+      "meeting": "2026-11-19",
+      "project": "pechat-knigi-eto-krasivo-a-eto-net",
+      "presenters": [
+        "zhenya-arutyunov"
+      ],
+      "minutes": 20,
+      "format": 2
+    },
+    {
+      "id": "demo-91",
+      "meeting": "2026-11-19",
+      "project": "prilozhenie-dlya-peredachi-foto-s-kamery-na-telefon",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 2,
+      "format": 2
+    },
+    {
+      "id": "demo-92",
+      "meeting": "2026-11-19",
+      "project": "proshivka-dlya-routera",
+      "presenters": [
+        "lesha-nikitin"
+      ],
+      "minutes": 2,
+      "format": 2
+    },
+    {
+      "id": "demo-93",
+      "meeting": "2026-11-19",
+      "project": "polina-hochet-uchitsya-vo-frantsii",
+      "presenters": [
+        "polina-perevalova"
+      ],
+      "minutes": 4,
+      "format": 4
+    },
+    {
+      "id": "demo-94",
+      "meeting": "2026-11-19",
+      "project": "rassylka-intuitsii-2",
+      "presenters": [
+        "zhenya-arutyunov"
+      ],
+      "minutes": 4,
+      "format": 1
+    },
+    {
+      "id": "demo-95",
+      "meeting": "2026-11-19",
+      "project": "portfolio",
+      "presenters": [
+        "rustam-mushraipov"
+      ],
+      "minutes": 3,
+      "format": 4
+    },
+    {
+      "id": "demo-96",
+      "meeting": "2026-11-19",
+      "project": "arhiv-tipografiki-uzbekistana",
+      "presenters": [
+        "rustam-mushraipov"
+      ],
+      "minutes": 4
+    },
+    {
+      "id": "demo-97",
+      "meeting": "2026-11-19",
+      "project": "dizayn-vyhodnye-v-samare",
+      "presenters": [
+        "polina-volkova"
+      ],
+      "minutes": 3,
+      "format": 1
     }
   ],
   "feedback": [
